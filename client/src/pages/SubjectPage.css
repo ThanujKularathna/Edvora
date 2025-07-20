@@ -1,0 +1,174 @@
+.subject-container {
+  padding: 20px 40px;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.subject-header {
+  display: flex;
+  position: relative;
+  background-color: rgba(105, 125, 127, 1);
+  padding: 25px;
+  width: 100%;
+  max-width: 1300px;
+  height: 125px;
+  margin-bottom: 30px;
+  margin-top: 12px;
+  border-radius: 12px;
+}
+
+.subject-n {
+  color: aliceblue;
+  font-size: 60px;
+}
+
+.subject-teacher {
+  color: #f9f9f9;
+  font-size: 20px;
+  margin-left: 30px;
+  align-self: flex-end;
+  padding-bottom: 5px;
+}
+
+.section-block {
+  display: flex;
+  flex-direction: column;
+  margin: 50px 0;
+  padding: 15px;
+  background-color: #e6f0f0;
+  border-radius: 6px;
+  max-width: 1300px;
+}
+
+.assignment-card {
+  width: 1200px;
+  background-color: #dce6e6;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+
+
+  position:relative;
+ 
+}
+
+.assignment-card .buttons {
+  display: flex;
+  gap: 10px;
+  position:absolute;
+  right: 40px;
+}
+
+.assignment-card .buttons button {
+  padding: 8px 20px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.assignment-card .buttons button:hover {
+  background-color: #cceeee;
+  transform: scale(1.05);
+}
+
+/* === Quiz Modal === */
+.quiz-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(17, 60, 60, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.quiz-form {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.quiz-question p {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.quiz-question label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  font-size: 16px;
+  padding: 4px 0;
+}
+
+.quiz-form input[type="radio"] {
+  margin-right: 8px;
+  transform: scale(1.1);
+}
+
+.submit-btn {
+  background-color: #009688;
+  color: #fff;
+  font-size: 16px;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.submit-btn:hover {
+  background-color: #007d71;
+}
+
+.section-block .q-btn{
+  position: absolute;
+  bottom: -25px;
+  right: 2px;
+  padding: 8px 20px;
+
+  
+}
+
+/* For quiz options to appear vertically */
+.option-group {
+  display: flex;
+  flex-direction: column;  /* 👈 This makes answers stack vertically */
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ans-btn{
+  width: 120px;
+  padding: 8px 20px;
+  color: #ffffff;
+  position:absolute;
+  right: 12px;
+  bottom: 9px;
+  background-color: #ffffff;
+  color: black;
+  transition: all 0.3s ease;
+}
+
+.ans-btn:hover{
+  background-color: #cceeee;
+}
+
+.sub-page-title{
+  padding-bottom: 20px;
+  color: #0c3e39;
+}

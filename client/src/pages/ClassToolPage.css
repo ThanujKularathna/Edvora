@@ -1,0 +1,363 @@
+.tool-page-main-container{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+
+.tool-page{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100vh;
+}
+
+.tool-page-body{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.tool-page-body h2{
+  margin: 25px;
+}
+
+.tools{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 30px 120px;
+
+
+}
+
+.class-name-tp{
+    padding: 50px;
+    background-color: #dbdcdc;
+    margin: 25px;
+    border-radius: 6px;
+}
+
+.tool-buttons{
+    display: flex;
+    justify-content: center;
+    padding: 20px 80px;
+    margin: 20px;
+    border-radius:6px ;
+    border-style: none;
+    background-color:rgb(223, 234, 235);
+    cursor: pointer;
+}
+
+.tool-buttons button {
+    transition: background-color 0.3s ease;
+}
+
+.tool-buttons button:hover {
+    background-color: #226b6b;
+}
+
+.top-btn{
+  margin-right: 90px;
+}
+
+
+
+
+.video-body{
+    background-color: rgba(220, 230, 231, 1);
+    height: auto;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    margin: 25px;
+    border-radius: 6px;
+}
+
+.video-boy .text-box{
+    padding: 12px;
+}
+
+.video-option{
+    display: flex;
+    
+}
+
+.video-option button{
+    padding: 12px 80px; 
+    border-style: none;
+    border-radius:6px;
+    margin-top: 12px;
+    margin-right:30px;
+    cursor: pointer;
+    background-color: #265d5c;
+    transition: background-color 0.3s ease;
+}
+
+.video-option button:hover {
+    background-color: #226b6b;
+}
+
+
+.text-box{
+    border-radius: 6px;
+    border-style: none;
+    padding: 10px;
+    margin: 0px 0px 20px;
+}
+
+h3{
+    margin-left: 15px;
+}
+
+
+
+/* quize part */
+
+/* src/components/QuizCreator.css */
+
+
+.quiz-wrapper h2 {
+  color: #073642;
+}
+
+.quiz-container {
+  background-color:rgba(220, 230, 231, 1);
+  padding: 50px;
+  border-radius: 6px;
+  /* max-width: 900px; */
+  margin:25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  outline: none;
+}
+
+.question-block {
+  background-color: rgba(220, 230, 231, 1);
+  /* border: 1px solid rgba(220, 230, 231, 1); */
+  padding: 20px;
+  border-radius: 8px;
+  border-style: none;
+  margin-bottom: 20px;
+  position: relative;
+ 
+}
+
+.question-block h3 {
+  margin-top: 0;
+  color: #074f57;
+  
+}
+
+.delete-btn {
+  float: right;
+  margin-bottom: 10px;
+  top: 15px;
+  right: 15px;
+  background-color: #397d7c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+  background-color: #265d5c;
+}
+
+button {
+  background-color: #265d5c;
+  color: white;
+  padding: 12px 80px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 20px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #226b6b;
+}
+
+
+
+/*three section (video, assignments,quiz)*/
+
+.content-section{
+  margin: 50px 25px;
+}
+
+          /* Section Titles */
+.content-section h3 {
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.3rem;
+  padding-left: 10px;
+}
+
+.section-body {
+  background-color: #e4ecef;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 90%;
+  max-width: 1500px;
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*css for uploaded card section*/
+
+.content-section {
+  margin-top: 12px;
+  margin-top: 30px;
+}
+
+.content-section h3 {
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f5f7fa;
+  border-radius: 6px;
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  font-size: 1rem;
+}
+
+.content-section .card{
+  /* width: 90%; */
+  height:50px;
+  background-color: #f5f7fa;
+}
+
+/* Card delete button */
+.card .delete-btn {
+  background-color: #265d5c;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  width: 120px;
+  height: 30px;
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.3s ease;
+  margin-bottom: 9px;
+  position: static;
+  float: none;
+}
+
+.card .delete-btn:hover {
+  background-color: #226b6b;
+}
+
+/* Quiz card styling */
+.quiz-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.quiz-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.quiz-subject {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Confirmation dialog styling */
+.confirmation-dialog {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.confirmation-dialog h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.confirmation-dialog p {
+  margin: 20px 0;
+  color: #555;
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.confirmation-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.confirmation-buttons .confirm-btn {
+  background-color: #ff5252;
+  color: white;
+}
+
+.confirmation-buttons .confirm-btn:hover {
+  background-color: #e04343;
+}
+
+.confirmation-buttons .cancel-btn {
+  background-color: #777;
+  color: white;
+}
+
+.confirmation-buttons .cancel-btn:hover {
+  background-color: #555;
+}
+
+
+
+
+
+

@@ -1,0 +1,85 @@
+[
+  {
+    "name": "thanuja",
+    "role": "student",
+    "password": "test1111",
+    "email": "thanuja@example.com",
+    "classes": "11-A",
+    "photo": "default.jpg"
+  },
+  {
+    "name": "Dia Clark",
+    "role": "student",
+    "password": "test1111",
+    "email": "dia@example.com",
+    "classes": "10-B",
+    "subjects": ["History", "Geography"],
+    "photo": "default.jpg"
+  },
+  {
+    "name": "Brock Smith",
+    "role": "teacher",
+    "password": "test1111",
+    "email": "brock@example.com",
+    "subjects": ["civic", "health"],
+    "classes": ["10-E", "8-D", "8-C", "7-B", "6-A"],
+    "photo": "default.jpg"
+  },
+  {
+    "name": "Ethan Wright",
+    "role": "teacher",
+    "password": "test1111",
+    "email": "ethan@example.com",
+    "subjects": ["maths", "science"],
+    "classes": ["10-A", "10-B", "9-D", "8-C", "7-B", "6-A"]
+  },
+
+  {
+    "name": "john snow",
+    "role": "teacher",
+    "password": "test1111",
+    "email": "john@example.com",
+    "subjects": ["maths", "science"],
+    "classes": ["9-D", "8-C", "7-B", "6-A"]
+  },
+
+  {
+    "name": "Charl Brown",
+    "role": "admin",
+    "password": "test1111",
+    "email": "charl@example.com",
+    "photo": "default.jpg"
+  },
+  {
+    "name": "Brownd de",
+    "role": "admin",
+    "password": "test1111",
+    "email": "brown@example.com",
+    "photo": "default.jpg"
+  },
+  {
+    "name": "teacher-user",
+    "role": "teacher",
+    "password": "test1111",
+    "email": "test-teacher@example.com",
+    "subjects": ["maths,science"],
+    "photo": "default.jpg",
+    "classes": ["9-D", "8-C", "7-B", "6-A"]
+  },
+  {
+    "name": "admin ",
+    "role": "admin",
+    "password": "test1111",
+    "email": "test-admin@gmail.com",
+    "photo": "default.jpg"
+  },
+  {
+    "name": "stuent user",
+    "role": "student",
+    "password": "test1111",
+    "email": "test-student@gmail.com",
+    "class": "10-B",
+    "subjects": ["History", "Geography"],
+    "photo": "default.jpg"
+  }
+]

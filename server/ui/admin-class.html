@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Class Management - LMS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    h2 {
+      color: #003366;
+    }
+    form {
+      margin-bottom: 40px;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select, button {
+      padding: 8px;
+      margin-top: 5px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Class Management</h2>
+
+  <!-- ✅ Create Class -->
+  <form id="create-class-form">
+    <h3>Create Class</h3>
+
+    <label for="className">Class Name</label>
+    <input type="text" id="className" name="className" placeholder="e.g., Grade 6 A" required />
+
+    <label for="userCSV">Upload CSV (Name, Email, Role)</label>
+    <input type="file" id="userCSV" name="userCSV" accept=".csv" required />
+
+    <div id="csvPreview" class="hidden">
+      <h4>Preview Students</h4>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th></tr></thead>
+        <tbody id="studentTableBodyPreview"></tbody>
+      </table>
+
+      <h4>Preview Teachers</h4>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th></tr></thead>
+        <tbody id="teacherTableBodyPreview"></tbody>
+      </table>
+    </div>
+
+    <button type="submit">Create Class</button>
+  </form>
+
+  <!-- ✅ Delete Class -->
+  <form id="delete-class-form">
+    <h3>Delete Class</h3>
+    <label for="deleteClass">Select Class</label>
+    <select id="deleteClass" required>
+      <option value="class6A">Grade 6 A</option>
+      <option value="class6B">Grade 6 B</option>
+    </select>
+    <button type="submit">Delete Class</button>
+  </form>
+
+  <!-- ✅ Promote Class -->
+  <form id="promote-class-form">
+    <h3>Promote Class (Year-End)</h3>
+    <label for="fromClass">From Class</label>
+    <select id="fromClass" required>
+      <option value="">Select class</option>
+      <option value="class6A">Grade 6 A</option>
+      <option value="class6B">Grade 6 B</option>
+    </select>
+
+    <label for="toClass">To Class</label>
+    <select id="toClass" required>
+      <option value="">Select class</option>
+      <option value="class7A">Grade 7 A</option>
+      <option value="class7B">Grade 7 B</option>
+    </select>
+
+    <button type="button" onclick="loadClassDetails()">Show Class Details</button>
+
+    <div id="classDetails" class="hidden">
+      <h4>Students</h4>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Class</th></tr></thead>
+        <tbody id="studentTableBody"></tbody>
+      </table>
+
+      <h4>Teachers</h4>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Class</th></tr></thead>
+        <tbody id="teacherTableBody"></tbody>
+      </table>
+
+      <button type="submit" style="margin-top: 15px;">Confirm Promotion</button>
+    </div>
+  </form>
+
+  <script>
+    const mockClassData = {
+      class6A: {
+        students: [
+          { name: "Alice", email: "alice@example.com", role: "Student", class: "Grade 6 A" },
+          { name: "Bob", email: "bob@example.com", role: "Student", class: "Grade 6 A" }
+        ],
+        teachers: [
+          { name: "Mr. Smith", email: "smith@example.com", role: "Teacher", class: "Grade 6 A" }
+        ]
+      },
+      class6B: {
+        students: [
+          { name: "David", email: "david@example.com", role: "Student", class: "Grade 6 B" }
+        ],
+        teachers: [
+          { name: "Ms. Jane", email: "jane@example.com", role: "Teacher", class: "Grade 6 B" }
+        ]
+      }
+    };
+
+    let parsedStudents = [];
+    let parsedTeachers = [];
+
+    document.getElementById('userCSV').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const lines = event.target.result.trim().split('\n').slice(1); // Skip header
+        parsedStudents = [];
+        parsedTeachers = [];
+
+        lines.forEach(line => {
+          const [name, email, role] = line.split(',').map(x => x.trim());
+          if (role.toLowerCase() === 'student') {
+            parsedStudents.push({ name, email });
+          } else if (role.toLowerCase() === 'teacher') {
+            parsedTeachers.push({ name, email });
+          }
+        });
+
+        // Preview
+        const studentTable = document.getElementById('studentTableBodyPreview');
+        const teacherTable = document.getElementById('teacherTableBodyPreview');
+        studentTable.innerHTML = '';
+        teacherTable.innerHTML = '';
+
+        parsedStudents.forEach(s => {
+          studentTable.innerHTML += `<tr><td>${s.name}</td><td>${s.email}</td></tr>`;
+        });
+
+        parsedTeachers.forEach(t => {
+          teacherTable.innerHTML += `<tr><td>${t.name}</td><td>${t.email}</td></tr>`;
+        });
+
+        document.getElementById('csvPreview').classList.remove('hidden');
+      };
+
+      reader.readAsText(file);
+    });
+
+    document.getElementById("create-class-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const className = e.target.className.value.trim();
+
+      const payload = {
+        className,
+        students: parsedStudents,
+        teachers: parsedTeachers
+      };
+
+      // TODO: Send to backend
+      console.log("Creating Class:", payload);
+      alert(`Class "${className}" created with ${parsedStudents.length} students and ${parsedTeachers.length} teachers.`);
+
+      e.target.reset();
+      parsedStudents = [];
+      parsedTeachers = [];
+      document.getElementById('csvPreview').classList.add('hidden');
+    });
+
+    document.getElementById("delete-class-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const selectedClass = e.target.deleteClass.value;
+      const confirmDelete = confirm(`Are you sure you want to delete ${selectedClass}?`);
+      if (confirmDelete) {
+        alert(`Class '${selectedClass}' deleted.`);
+      }
+    });
+
+    function loadClassDetails() {
+      const fromClass = document.getElementById("fromClass").value;
+      const studentTable = document.getElementById("studentTableBody");
+      const teacherTable = document.getElementById("teacherTableBody");
+      const classDetailsDiv = document.getElementById("classDetails");
+
+      if (!fromClass) {
+        alert("Please select a class to promote from.");
+        return;
+      }
+
+      const data = mockClassData[fromClass];
+
+      studentTable.innerHTML = "";
+      (data?.students || []).forEach(s => {
+        studentTable.innerHTML += `<tr>
+          <td>${s.name}</td><td>${s.email}</td><td>${s.role}</td><td>${s.class}</td>
+        </tr>`;
+      });
+
+      teacherTable.innerHTML = "";
+      (data?.teachers || []).forEach(t => {
+        teacherTable.innerHTML += `<tr>
+          <td>${t.name}</td><td>${t.email}</td><td>${t.role}</td><td>${t.class}</td>
+        </tr>`;
+      });
+
+      classDetailsDiv.classList.remove("hidden");
+    }
+
+    document.getElementById("promote-class-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const fromClass = e.target.fromClass.value;
+      const toClass = e.target.toClass.value;
+
+      if (fromClass === toClass) {
+        alert("From and To class cannot be the same.");
+        return;
+      }
+
+      alert(`Promoted all students and teachers from ${fromClass} to ${toClass}`);
+      e.target.reset();
+      document.getElementById("classDetails").classList.add("hidden");
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+.assignment-card{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 91%;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.buttons{
+  display: flex;
+  gap: 35px;
+}
+
+.buttons button{
+  
+  padding: 8px 50px;
+  background-color: #113c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+

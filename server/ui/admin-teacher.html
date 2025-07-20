@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    section {
+      margin-bottom: 40px;
+    }
+    form {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+      margin-top: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      background: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+    .bulk-row {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>👨‍🏫 Teacher Management</h2>
+
+  <!-- 👩‍🏫 Assign Teacher to Class -->
+  <section>
+    <h3>👩‍🏫 Assign Teacher to a Class</h3>
+    <form>
+      <label for="teacherEmail1">Teacher Email:</label>
+      <input type="email" id="teacherEmail1" required placeholder="e.g., teacher@example.com" />
+
+      <label for="classSelect1">Select Class:</label>
+      <select id="classSelect1" required>
+        <option value="">-- Select Class --</option>
+        <option value="6-A">6-A</option>
+        <option value="7-B">7-B</option>
+        <option value="8-C">8-C</option>
+      </select>
+
+      <button type="submit">Assign to Class</button>
+    </form>
+  </section>
+
+  <!-- ❌ Remove Teacher from Class -->
+  <section>
+    <h3>❌ Remove Teacher from a Class</h3>
+    <form>
+      <label for="teacherEmail2">Teacher Email:</label>
+      <input type="email" id="teacherEmail2" required placeholder="e.g., teacher@example.com" />
+
+      <label for="classSelect2">Select Class:</label>
+      <select id="classSelect2" required>
+        <option value="">-- Select Class --</option>
+        <option value="6-A">6-A</option>
+        <option value="7-B">7-B</option>
+        <option value="8-C">8-C</option>
+      </select>
+
+      <button type="submit" style="background:#dc3545;">Remove from Class</button>
+    </form>
+  </section>
+
+  <!-- 📚 Assign Subject to Teacher -->
+  <section>
+    <h3>📚 Assign Subject(s) to a Teacher</h3>
+    <form>
+      <label for="teacherEmail3">Teacher Email:</label>
+      <input type="email" id="teacherEmail3" required placeholder="e.g., teacher@example.com" />
+
+      <label for="subjects">Subjects (comma-separated):</label>
+      <input type="text" id="subjects" required placeholder="e.g., Science, History, Geography" />
+
+      <button type="submit">Assign Subjects</button>
+    </form>
+  </section>
+
+  <!-- 📥 Bulk Assign Teachers to Classes -->
+  <!-- <section>
+    <h3>📥 Bulk Assign Teachers to Classes (Manual Entry)</h3>
+    <form id="bulkAssignForm">
+      <div class="bulk-row">
+        <label>Teacher Email:</label>
+        <input type="email" name="emails[]" required placeholder="e.g., teacher1@example.com" />
+
+        <label>Select Class:</label>
+        <select name="classes[]" required>
+          <option value="">-- Select Class --</option>
+          <option value="6-A">6-A</option>
+          <option value="7-B">7-B</option>
+          <option value="8-C">8-C</option>
+        </select>
+      </div>
+
+      <button type="submit">Assign Teachers</button>
+    </form>
+  </section> -->
+
+  <!-- 📤 Upload Teachers by CSV -->
+  <section>
+    <h3>📤 Upload Teachers to Classes (CSV)</h3>
+    <form id="uploadTeacherCSV" enctype="multipart/form-data">
+      <label for="teacherCsv">Select CSV File:</label>
+      <input type="file" id="teacherCsv" accept=".csv" required>
+      <button type="submit">Upload</button>
+    </form>
+    <p><strong>CSV Format:</strong> email,class (e.g., teacher1@example.com,6-A)</p>
+  </section>
+
+</body>
+</html>

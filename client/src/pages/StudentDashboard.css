@@ -1,0 +1,180 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  font-family: Arial, sans-serif;
+  /* padding: 10px; */
+}
+
+.dashboard-header {
+  background-color: #113c3c;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+/* .logo {
+  height: 40px;
+}
+
+.nav-buttons button {
+  margin-left: 10px;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+} */
+
+.greeting {
+  background-color: #ecf2f1;
+  padding: 30px 50px;
+  margin-top: 10px;
+  font-size: 25px;
+  text-align: left;
+}
+
+.greeting-begin{
+  color: #2f6767;
+  padding: 5px 0px;
+  font-size: 17px;
+  text-align: left;
+}
+
+.section {
+  background-color: #dde7e7;
+  padding: 15px 20px;
+  margin-top: 15px;
+  border-radius: 10px;
+  margin: 15px;
+}
+
+.subjects-grid {
+  display: grid;
+  /* grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); */
+  grid-template-columns: repeat(auto-fit,180px);
+  gap: 15px;
+  padding: 20px 0px;
+  max-width: auto;
+  margin: 0 auto;
+  background-color: #d9e3e6;
+  border-radius: 10px;
+}
+
+
+/* .subjects-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  max-width: 600px; 
+  margin: 0 auto;
+  
+  
+} */
+
+.subject-btn {
+  border: none;
+  padding: 12px 12px;
+  margin: 0px 8px;
+  background-color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  text-align: center;
+  transition: background-color 0.4s ease, color 0.4s ease, transform 0.3s ease;
+
+}
+
+.subject-btn:hover {
+  background-color: #2f6767; 
+  color: white;
+  transform: scale(1.05);
+}
+
+
+/* .subject-btn.active {
+  background-color: #2f6767;
+  color: white;
+} */
+
+
+.assignments {
+  /* display: flex;
+  flex-direction: column; */
+  gap: 10px;
+  margin-top: 10px;
+  
+}
+
+
+.assignment-card {
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: left;
+  border-style: none;
+
+}
+
+/* .assignment-card.highlight {
+  background-color: #2f6767;
+  color: white;
+} */
+
+.assignment-card{
+  display: flex;
+  flex-direction: column;
+  width: 1300px;
+  margin: 12px;
+  cursor: pointer;
+  transition: background-color 0.5s ease, transform 0.3s ease;
+}
+
+.assignment-card:hover {
+  background-color: #2f6767;
+  transform: scale(1.01);
+}
+
+
+
+.assignment-card-sp{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 91%;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: rgba(220, 230, 231, 1);
+}
+
+
+.assignment-card-sp{
+  
+  /* padding: 8px 50px; */
+  background-color: #ffffff;
+  margin-left: 5px;
+  margin-top:20px ;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+
+.assignment-card-sp:hover {
+  background-color: #2f6767;
+  color: rgb(255, 255, 255);
+  /* transform: scale(1.05); */
+}
+
+.h3-sp{
+  padding-left: 2px;
+}

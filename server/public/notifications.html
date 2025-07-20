@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Notifications</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .notification {
+            background: #f0f8ff;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            animation: slideIn 0.3s ease-in;
+        }
+        .notification.assignment {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        .notification.quiz {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>LMS Real-time Notifications</h1>
+    
+    <div class="test-section">
+        <h3>Test Notifications</h3>
+        <button onclick="sendTestNotification()">Send Test Notification</button>
+        <button onclick="requestNotificationPermission()">Enable Browser Notifications</button>
+    </div>
+    
+    <div id="notifications">
+        <h3>Live Notifications:</h3>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const notificationsDiv = document.getElementById('notifications');
+
+        // Request notification permission on page load
+        if (Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            addNotificationToPage('Connected to LMS notification system', 'info');
+        });
+
+        socket.on('pushNotification', (data) => {
+            console.log('Received notification:', data);
+            addNotificationToPage(data.message, data.type);
+            
+            // Show browser notification if permission granted
+            if (Notification.permission === 'granted') {
+                new Notification('LMS Notification', {
+                    body: data.message,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/3002/3002543.png'
+                });
+            }
+        });
+
+        function addNotificationToPage(message, type = 'info') {
+            const notificationEl = document.createElement('div');
+            notificationEl.className = `notification ${type}`;
+            notificationEl.innerHTML = `
+                <strong>${type.toUpperCase()}:</strong> ${message}
+                <br><small>${new Date().toLocaleString()}</small>
+            `;
+            notificationsDiv.appendChild(notificationEl);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (notificationEl.parentNode) {
+                    notificationEl.remove();
+                }
+            }, 10000);
+        }
+
+        function sendTestNotification() {
+            fetch('/api/v1/notifications/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: 'This is a test notification from LMS!',
+                    type: 'info'
+                })
+            })
+            .then(response => response.json())
+            .then(data => console.log('Test notification sent:', data))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function requestNotificationPermission() {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    alert('Browser notifications enabled!');
+                } else {
+                    alert('Browser notifications denied.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

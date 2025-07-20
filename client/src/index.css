@@ -1,0 +1,131 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f2f4f8;
+  height: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: #0066cc;
+}
+
+input, button {
+  font-size: 1rem;
+}
+
+.login-page {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+input:focus {
+    outline: none;
+    border: none;
+}
+
+
+.left-section {
+  flex: 1;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  height: 100vh;
+  overflow: hidden;
+}
+
+.left-section img {
+  max-width: 100;
+  height: auto;
+
+  object-fit: cover;
+}
+
+.right-section {
+  flex: 1;
+  background-color: #D0DADB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-container h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #042f2e;
+}
+
+.login-container p {
+  margin-bottom: 30px;
+  color: #666;
+  font-size: 14px;
+}
+
+.login-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-container input {
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.login-container button {
+  background-color: #042f2e;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.3s;
+}
+
+.login-container button:hover {
+  background-color: #064343;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #444;
+}
+
+.form-footer input {
+  margin-right: 5px;
+}

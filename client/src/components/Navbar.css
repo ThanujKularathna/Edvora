@@ -1,0 +1,110 @@
+/* .navbar {
+  background-color: #0a3b3b;
+  padding: 10px 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-left .logo {
+  height: 40px;
+}
+
+.navbar-right{
+  display: flex;
+}
+
+.navbar-right .icon{
+  border: 1px solid black;
+}
+
+.navbar-right a { 
+  margin-left: 15px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 20px;
+  font-size: 16px;
+  transition: background-color 0.5s ease, transform 0.3s ease;
+}
+
+.navbar-right a:hover {
+  background-color:#89c8c8;
+  color: black;
+  border-radius: 8px;
+} */
+
+.navbar {
+  background-color: #255b5b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  padding: 15px;
+}
+
+.logo-container {
+  margin-right: 30px;
+}
+
+.logo{
+  width: 60px;
+}
+
+.logo-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+.navbar-left img{
+  width: 90px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+  
+}
+
+.navbar-right .nav-item .nav-circle{
+  /* border: 1px solid black; */
+  padding-left: 12px;
+}
+
+.navbar-right{
+  display: flex;
+  gap: 40px;
+  
+}
+
+
+/* .icon-circle {
+  background-color: #e1e1e1;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+} */
+
+.nav-icon {
+  color: black;
+  font-size: 22px;
+}
+
+.nav-label {
+  color: white;
+  font-size: 14px;
+}
+
+.nav-item .nav-link{
+  color: aliceblue;
+  
+}
+
