@@ -1,0 +1,71 @@
+# Node modules
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Package lock files
+/package-lock.json
+/package.json
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+
+
+#not completed functions
+notificationController.js
+notificationContext.jsx
+
+#Read me files
+README.md
+
+
+# Env files
+.env
+client/.env
+server/config.env
+
+# Build files
+dist/
+build/
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Windows thumbnail cache files
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+[Dd]esktop.ini
+>>>>>>> 1f351d6 (Initial commit of LMS project)
