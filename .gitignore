@@ -13,11 +13,12 @@ server/node_modules/
 # OS files
 .DS_Store
 
-
-
 #not completed functions
 notificationController.js
 notificationContext.jsx
+
+#tested functions
+test.js
 
 #Read me files
 README.md
@@ -68,4 +69,3 @@ ehthumbs.db
 
 # Folder config file
 [Dd]esktop.ini
->>>>>>> 1f351d6 (Initial commit of LMS project)
