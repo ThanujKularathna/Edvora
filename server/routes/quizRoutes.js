@@ -1,8 +1,12 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const quizController = require('../controllers/quizController');
+const quizResultRoutes = require('./quizResultRoutes');
 
 const router = express.Router();
+
+// Nested routes for quiz results & answers
+router.use('/:quizId/results', quizResultRoutes);
 
 router
   .route('/create')

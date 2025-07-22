@@ -1,0 +1,173 @@
+[
+  {
+    "name": "Nimal Perera",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "nimal@example.com",
+    "classes": "7-B",
+    "subjects": ["Mathematics", "Science"]
+  },
+  {
+    "name": "Ishara Jayasinghe",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "ishara@example.com",
+    "classes": "7-B",
+    "subjects": ["English", "History"]
+  },
+  {
+    "name": "Kavindu Silva",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "kavindu@example.com",
+    "classes": "7-B",
+    "subjects": ["Mathematics", "Geography"]
+  },
+  {
+    "name": "Sanduni Hettiarachchi",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "sanduni@example.com",
+    "classes": "7-B",
+    "subjects": ["Science", "English"]
+  },
+  {
+    "name": "Nuwani Perera",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "nuwani@example.com",
+    "classes": "7-B",
+    "subjects": ["Science", "English"]
+  },
+  {
+    "name": "Tharindu Jayasuriya",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "tharindu@example.com",
+    "classes": "7-B",
+    "subjects": ["Mathematics", "History"]
+  },
+  {
+    "name": "Ruwani Silva",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "ruwani@example.com",
+    "classes": "7-B",
+    "subjects": ["Geography", "Science"]
+  },
+  {
+    "name": "Sachin Fernando",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "sachin@example.com",
+    "classes": "7-B",
+    "subjects": ["English", "Mathematics"]
+  },
+  {
+    "name": "Amaya Gunasekara",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "amaya@example.com",
+    "classes": "7-B",
+    "subjects": ["Science", "History"]
+  },
+  {
+    "name": "Hasindu Dissanayake",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "hasindu@example.com",
+    "classes": "7-B",
+    "subjects": ["Mathematics", "Geography"]
+  },
+  {
+    "name": "Yasodhara Wickramasinghe",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "yasodhara@example.com",
+    "classes": "7-B",
+    "subjects": ["Science", "History"]
+  },
+  {
+    "name": "Malith Rathnayake",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "malith@example.com",
+    "classes": "7-B",
+    "subjects": ["English", "Mathematics"]
+  },
+  {
+    "name": "Shehani Abeywardena",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "shehani@example.com",
+    "classes": "7-B",
+    "subjects": ["Geography", "Science"]
+  },
+  {
+    "name": "Kasun Samarasinghe",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "kasun@example.com",
+    "classes": "7-B",
+    "subjects": ["Mathematics", "English"]
+  },
+  {
+    "name": "Dilani Rajapaksha",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "dilani@example.com",
+    "classes": "7-B",
+    "subjects": ["History", "Science"]
+  },
+  {
+    "name": "Janith Bandara",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "janith@example.com",
+    "classes": "7-B",
+    "subjects": ["English", "Geography"]
+  },
+  {
+    "name": "Thilini Weerasinghe",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "thilini@example.com",
+    "classes": "7-B",
+    "subjects": ["Mathematics", "History"]
+  },
+  {
+    "name": "Bhanuka Ekanayake",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "bhanuka@example.com",
+    "classes": "7-B",
+    "subjects": ["Science", "Geography"]
+  },
+  {
+    "name": "Nadeesha Karunarathna",
+    "role": "student",
+    "password": "test1111",
+    "photo": "default.jpg",
+    "email": "nadeesha@example.com",
+    "classes": "7-B",
+    "subjects": ["English", "History"]
+  }
+]

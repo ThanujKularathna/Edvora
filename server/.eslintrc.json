@@ -19,7 +19,11 @@
     "no-else-return": "error",
     "import/no-extraneous-dependencies": "off",
     "no-undef": "error",
-     "comma-dangle": ["error", "never"]
+    "comma-dangle": ["error", "never"],
+    "engines": {
+    "node": ">=8.3.0"
+}
+
     // "parser": "babel-eslint"
     // "parserOptions": {
     //   "sourceType": "module",
