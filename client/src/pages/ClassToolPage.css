@@ -259,6 +259,12 @@ button:hover {
   font-size: 1rem;
 }
 
+.card-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .content-section .card{
   /* width: 90%; */
   height:50px;
@@ -270,8 +276,8 @@ button:hover {
   background-color: #265d5c;
   border: none;
   color: white;
-  font-size: 1.2rem;
-  width: 120px;
+  font-size: 0.9rem;
+  width: 140px;
   height: 30px;
   cursor: pointer;
   line-height: 1;
@@ -279,6 +285,10 @@ button:hover {
   margin-bottom: 9px;
   position: static;
   float: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 5px 10px;
 }
 
 .card .delete-btn:hover {

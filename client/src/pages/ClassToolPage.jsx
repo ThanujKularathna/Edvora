@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/authContext";
+import { capitalCase } from "change-case";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -82,6 +83,56 @@ const ClassToolPage = () => {
     } finally {
       // Reset confirmation state
       setDeleteConfirmation({ show: false, index: null });
+    }
+  };
+
+  const handleDownloadQuizResults = async (quizId) => {
+    try {
+      // Show loading indicator or message
+      console.log(`Downloading results for quiz ${quizId}...`);
+
+      // Make a fetch request to the download endpoint
+      const response = await fetch(
+        `/api/v1/quizzes/${quizId}/results/download`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/pdf",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Download failed with status: ${response.status}`);
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary link element
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Get the quiz details to match the backend filename format
+      const quiz = createdQuizzes.find((q) => q.id === quizId);
+      link.download = `quiz-results-${
+        quiz?.quizTitle || "quiz"
+      }-${className}.pdf`;
+
+      // Append to body, click, then remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up the URL object
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading quiz results:", error);
+      alert(`Failed to download quiz results: ${error.message}`);
     }
   };
 
@@ -331,7 +382,7 @@ const ClassToolPage = () => {
         </div>
 
         <div className="content-section">
-          <h3>Assignments</h3>
+          <h3>Home Works</h3>
           <div className="section-body">
             {uploadedHomework.length === 0 ? (
               <p></p>
@@ -375,7 +426,7 @@ const ClassToolPage = () => {
                     <span className="quiz-title">{quiz.quizTitle}</span>
                     {quiz.subject && (
                       <span className="quiz-subject">
-                        Subject: {quiz.subject}
+                        Subject: {capitalCase(quiz.subject)}
                       </span>
                     )}
                   </div>
@@ -394,6 +445,12 @@ const ClassToolPage = () => {
                       }}
                     >
                       View
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDownloadQuizResults(quiz.id)}
+                    >
+                      Download Results
                     </button>
                   </div>
                 </div>
@@ -434,7 +491,6 @@ const ClassToolPage = () => {
             teacherSubjects={
               user?.subjects || ["Mathematics", "Science", "English"]
             }
-            // user?.subjects || ["Mathematics", "Science", "English"]
           />
         )}
 

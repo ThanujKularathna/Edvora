@@ -41,6 +41,6 @@ const quizResultSchema = new mongoose.Schema(
 // Indexes for faster queries
 quizResultSchema.index({ quizId: 1, studentId: 1 }, { unique: true });
 
-const QuizResult = mongoose.model('QuizResult', quizResultSchema);
+const QuizResult = mongoose.model('QuizResult', quizResultSchema, 'quizResult');
 
 module.exports = QuizResult;
