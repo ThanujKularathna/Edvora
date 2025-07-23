@@ -8,7 +8,6 @@ router
   .route('/')
   .get(
     authController.protect,
-    authController.restrictTo('student', 'admin'),
     assignmentController.getAllAssignments
   )
   .post(
@@ -25,6 +24,11 @@ router
 //     authController.restrictTo('student', 'teacherj'),
 //     assignmentController.getAssignmentsByClassAndSubject
 //   );
+
+// Route to download assignment PDF files
+router
+  .route('/download/:filename')
+  .get(authController.protect, assignmentController.downloadAssignment);
 
 router
   .route('/:id')

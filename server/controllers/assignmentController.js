@@ -34,23 +34,46 @@ const upload = multer({
 exports.uploadAssignment = upload.single('pdf');
 
 exports.getAllAssignments = catchAsync(async (req, res, next) => {
-  const assignments = await Assignment.find();
+  const filter = {};
+
+  if (req.query.class) filter.class = req.query.class;
+
+  if (req.user && req.user.role === 'teacher') {
+    filter.teacher = req.user.id;
+  }
+
+  const assignments = await Assignment.find(filter);
+
+  // Add download URL to each assignment and ensure id property exists
+  const assignmentsWithUrls = assignments.map((assignment) => {
+    const assignmentObj = assignment.toObject();
+    // Ensure there's an id property that matches what frontend expects
+    assignmentObj.id = assignmentObj._id;
+    if (assignmentObj.fileName) {
+      assignmentObj.downloadUrl = `/api/v1/assignments/download/${assignmentObj.fileName}`;
+    }
+    return assignmentObj;
+  });
+
   return res.status(200).json({
     status: 'success',
-    data: assignments
+    results: assignmentsWithUrls.length,
+    data: assignmentsWithUrls
   });
 });
 
 exports.createAssignment = catchAsync(async (req, res, next) => {
+  console.log(req.body);
   req.body.teacher = req.user.id;
 
   if (req.file) {
-    console.log(req.file);
+    // console.log(req.file);
     req.body.fileName = req.file.filename;
     req.body.originalFileName = req.file.originalname;
   }
 
   if (req.body.deadline) {
+    // Parse the YYYY-MM-DD format
     const newDeadline = new Date(req.body.deadline);
     if (Number.isNaN(newDeadline)) {
       return next(new AppError('Invalid deadline format', 400));
@@ -139,7 +162,6 @@ exports.deleteAssignment = catchAsync(async (req, res, next) => {
       return next(new AppError('Error deleting file', 500));
     }
   }
-  // console.log(assignment);
 
   return res.status(200).json({
     status: 'success',
@@ -147,22 +169,26 @@ exports.deleteAssignment = catchAsync(async (req, res, next) => {
   });
 });
 
-//assignments/content?class=10A&subject=Math
-// exports.getAssignmentsByClassAndSubject = catchAsync(async (req, res, next) => {
-//   const { class: className, subject } = req.query;
+/**
+ * Download assignment PDF file
+ * @route GET /api/v1/assignments/download/:filename
+ */
+exports.downloadAssignment = catchAsync(async (req, res, next) => {
+  const { filename } = req.params;
+  const filePath = `${__dirname}/../public/pdf/${filename}`;
 
-//   const filter = {};
-//   if (className) filter.class = className;
-//   if (subject) filter.subject = subject;
+  // Check if file exists
+  try {
+    await util.promisify(fs.access)(filePath, fs.constants.F_OK);
+  } catch (error) {
+    return next(new AppError('File not found', 404));
+  }
 
-//   const assignments = await Assignment.find(filter);
-//   if (!assignments) {
-//     return next(new AppError('No assignment founds', 404));
-//   }
+  // Set headers for PDF viewing in browser (not downloading)
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `inline; filename=${filename}`);
 
-//   return res.status(200).json({
-//     status: 'success',
-//     results: assignments.length,
-//     data: assignments
-//   });
-// });
+  // Stream the file to the response
+  const fileStream = fs.createReadStream(filePath);
+  fileStream.pipe(res);
+});

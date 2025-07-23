@@ -60,12 +60,12 @@ const ForgotPasswordPage = () => {
               disabled={loading}
             />
             {error && (
-              <div style={{ color: "red" }} className="error-message">
+              <div className="error-message">
                 {error}
               </div>
             )}
             {success && (
-              <div style={{}} className="success-message">
+              <div className="success-message">
                 {success}
               </div>
             )}

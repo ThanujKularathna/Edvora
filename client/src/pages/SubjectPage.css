@@ -64,18 +64,27 @@
 }
 
 .assignment-card .buttons button {
-  padding: 8px 20px;
-  background-color: #ffffff;
+  background-color: #265d5c;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  color: white;
   font-size: 0.9rem;
-  transition: all 0.3s ease;
+  width: 140px;
+  height: 30px;
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.3s ease;
+  margin-bottom: 9px;
+  position: static;
+  float: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 5px 10px;
+  border-radius: 5px;
 }
 
 .assignment-card .buttons button:hover {
-  background-color: #cceeee;
-  transform: scale(1.05);
+  background-color: #226b6b;
 }
 
 /* === Quiz Modal === */
@@ -153,19 +162,27 @@
 }
 
 .ans-btn{
-  width: 120px;
-  padding: 8px 20px;
-  color: #ffffff;
+  width: 140px;
   position:absolute;
   right: 12px;
   bottom: 9px;
-  background-color: #ffffff;
-  color: black;
-  transition: all 0.3s ease;
+  background-color: #265d5c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  height: 30px;
+  line-height: 1;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 5px 10px;
 }
 
 .ans-btn:hover{
-  background-color: #cceeee;
+  background-color: #226b6b;
 }
 
 .sub-page-title{

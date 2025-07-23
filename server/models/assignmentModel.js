@@ -15,6 +15,7 @@ const assignmentSchema = new mongoose.Schema({
     type: String,
     required: [true, 'assignment must have a file name']
   },
+  description: String,
 
   originalFileName: String,
 
