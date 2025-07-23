@@ -8,29 +8,26 @@ import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+
   const handleLogout = async () => {
     await logout();
     navigate("/");
   };
-  // const { user, isAuthenticated } = useAuth();
-  // let dashBoardType = "";
-  // switch (user.role) {
-  //   case "student":
-  //     dashBoardType = "student-dashboard";
-  //     break;
-  //   case "teacher":
-  //     dashBoardType = "teacher-dashboard";
-  //     break;
 
-  //   case "admin":
-  //     dashBoardType = "admin-dashboard";
-  //     break;
+  const handleHomeClick = () => {
+    if (!user) return navigate("/");
 
-  //   default:
-  //     dashBoardType = "";
-  //     break;
-  // }
+    if (user.role === "student") {
+      navigate("/student-dashboard");
+    } else if (user.role === "teacher") {
+      navigate("/teacher-dashboard");
+    } else if (user.role === "admin") {
+      navigate("/admin-dashboard");
+    } else {
+      navigate("/");
+    }
+  };
   return (
     <nav className="navbar">
       <div className="navbar-left">
@@ -42,17 +39,20 @@ const Navbar = () => {
           <div className="nav-circle">
             <FontAwesomeIcon icon={faHome} className="icon" />
           </div>
-          <a className="nav-link" href="/student-dashboard">
+          <div
+            className="nav-link"
+            onClick={handleHomeClick}
+            style={{ cursor: "pointer" }}
+          >
             Home
-          </a>
-          {/* <Link to="/student-dashboard">Home</Link> */}
+          </div>
         </div>
 
         <div className="nav-item">
           <div className="nav-circle">
             <FontAwesomeIcon icon={faUser} className="icon" />
           </div>
-          <a className="nav-link" href="/profie">
+          <a className="nav-link" href="/profile">
             Profile
           </a>
           {/* <Link to="/profile">Profile</Link> */}

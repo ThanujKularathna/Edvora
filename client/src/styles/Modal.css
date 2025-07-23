@@ -175,6 +175,61 @@
   position: relative;
 }
 
+/* Confirmation dialog styling */
+.confirmation-dialog {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+.confirmation-dialog h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.confirmation-dialog p {
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.confirmation-buttons .confirm-btn {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.confirmation-buttons .confirm-btn:hover {
+  background-color: #b71c1c;
+}
+
+.confirmation-buttons .cancel-btn {
+  background-color: #757575;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.confirmation-buttons .cancel-btn:hover {
+  background-color: #616161;
+}
+
 .subject-select label {
   display: block;
   margin-bottom: 8px;

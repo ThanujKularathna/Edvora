@@ -6,9 +6,9 @@ import { capitalCase } from "change-case";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import UploadVideoModal from "../components/modals/UploadVideoModal";
-import UploadHomeworkModal from "../components/modals/UploadHomeworkModal";
 import CreateQuizModal from "../components/modals/CreateQuizModal";
-import QuizViewModal from "../components/modals/QuizViewModal"; // ✅ NEW
+import QuizViewModal from "../components/modals/QuizViewModal";
+import HomeworkSection from "../components/HomeworkSection";
 import "./ClassToolPage.css";
 
 const ClassToolPage = () => {
@@ -17,7 +17,6 @@ const ClassToolPage = () => {
 
   // Debug user object
   console.log("User object:", user);
-  console.log("User ID:", user?._id);
   console.log("Class name from params:", className);
 
   const [showVideoModal, setShowVideoModal] = useState(false);
@@ -25,7 +24,7 @@ const ClassToolPage = () => {
   const [showQuizModal, setShowQuizModal] = useState(false);
 
   const [uploadedVideos, setUploadedVideos] = useState([]);
-  const [uploadedHomework, setUploadedHomework] = useState([]);
+  // uploadedHomework state removed - now handled by HomeworkSection
   const [createdQuizzes, setCreatedQuizzes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,11 +41,7 @@ const ClassToolPage = () => {
     );
   };
 
-  const handleDeleteHomework = (indexToDelete) => {
-    setUploadedHomework((prev) =>
-      prev.filter((_, index) => index !== indexToDelete)
-    );
-  };
+  // handleDeleteHomework removed - now handled by HomeworkSection
 
   // Show delete confirmation dialog
   const showDeleteConfirmation = (indexToDelete) => {
@@ -72,16 +67,11 @@ const ClassToolPage = () => {
       setCreatedQuizzes((prev) =>
         prev.filter((_, index) => index !== indexToDelete)
       );
-
-      // Use a more React-friendly approach instead of alert
-      // You could use a toast notification library here
-      console.log("Quiz deleted successfully");
     } catch (error) {
       console.error("Error deleting quiz:", error);
       // Use a more React-friendly approach instead of alert
       console.error(`Failed to delete quiz: ${error.message}`);
     } finally {
-      // Reset confirmation state
       setDeleteConfirmation({ show: false, index: null });
     }
   };
@@ -165,9 +155,6 @@ const ClassToolPage = () => {
 
       try {
         setIsLoading(true);
-        console.log(
-          `Fetching quizzes for teacher ${userId} and class ${className}`
-        );
 
         const response = await fetch(
           `/api/v1/quizzes/teacher/${userId}/class/${className}`,
@@ -176,14 +163,10 @@ const ClassToolPage = () => {
           }
         );
 
-        console.log("Fetch response status:", response.status);
-
         if (!response.ok) {
           throw new Error(`Failed to fetch quizzes: ${response.status}`);
         }
-
         const data = await response.json();
-        console.log("Fetched quizzes data:", data);
 
         if (data && data.data && Array.isArray(data.data.quizzes)) {
           setCreatedQuizzes(
@@ -301,8 +284,6 @@ const ClassToolPage = () => {
         body: JSON.stringify(quizData),
       });
 
-      console.log(response);
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to create quiz");
@@ -381,36 +362,12 @@ const ClassToolPage = () => {
           </div>
         </div>
 
-        <div className="content-section">
-          <h3>Home Works</h3>
-          <div className="section-body">
-            {uploadedHomework.length === 0 ? (
-              <p></p>
-            ) : (
-              uploadedHomework.map((hw, idx) => (
-                <div key={idx} className="card">
-                  <span>{hw.title}</span>
-                  <div className="card-buttons">
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteHomework(idx)}
-                    >
-                      Delete
-                    </button>
-                    <a
-                      className="view-btn"
-                      href={hw.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <button className="delete-btn">View</button>
-                    </a>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+        {/* HomeworkSection with modal state passed from parent */}
+        <HomeworkSection
+          className={className}
+          showModal={showHomeworkModal}
+          setShowModal={setShowHomeworkModal}
+        />
 
         <div className="content-section">
           <h3>Quizzes</h3>
@@ -467,12 +424,7 @@ const ClassToolPage = () => {
           />
         )}
 
-        {showHomeworkModal && (
-          <UploadHomeworkModal
-            onClose={() => setShowHomeworkModal(false)}
-            onUpload={(hw) => setUploadedHomework([...uploadedHomework, hw])}
-          />
-        )}
+        {/* Homework modal removed - now handled by HomeworkSection */}
 
         {showQuizModal && (
           <CreateQuizModal
