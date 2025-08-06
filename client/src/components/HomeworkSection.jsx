@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/authContext";
 import EnhancedHomeworkModal from "./modals/EnhancedHomeworkModal";
-import { API_BASE_URL } from "../config";
+// import { API_BASE_URL } from "../config";
 import "./HomeworkSection.css";
 import "../styles/Modal.css";
 
@@ -130,7 +130,14 @@ const HomeworkSection = ({ className, showModal, setShowModal }) => {
                 <button
                   className="delete-btn"
                   onClick={() => {
-                    window.open(`${API_BASE_URL}/api/v1/assignments/download/${encodeURIComponent(hw.fileName)}`, '_blank');
+                    window.open(
+                      `${
+                        process.env.REACT_APP_API_BASE_URL
+                      }/api/v1/assignments/download/${encodeURIComponent(
+                        hw.fileName
+                      )}`,
+                      "_blank"
+                    );
                   }}
                 >
                   View
@@ -167,9 +174,7 @@ const HomeworkSection = ({ className, showModal, setShowModal }) => {
                 Yes, Delete
               </button>
               <button
-                onClick={() =>
-                  setDeleteConfirmation({ show: false, id: null })
-                }
+                onClick={() => setDeleteConfirmation({ show: false, id: null })}
                 className="cancel-btn"
               >
                 Cancel

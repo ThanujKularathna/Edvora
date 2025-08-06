@@ -1,7 +1,6 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Quiz = require('../models/quizModel');
-const { sendQuizNotification } = require('./notificationController');
 
 exports.createQuiz = catchAsync(async (req, res, next) => {
   console.log(req.body);
@@ -64,7 +63,7 @@ exports.getQuizzesByTeacherAndClass = catchAsync(async (req, res, next) => {
   }).sort({ createdAt: -1 }); // Sort by creation date, newest first
 
   console.log(`Found ${quizzes.length} quizzes`);
-  
+
   // If no quizzes found, return empty array instead of error
   res.status(200).json({
     status: 'success',

@@ -17,7 +17,7 @@ const ClassToolPage = () => {
 
   // Debug user object
   console.log("User object:", user);
-  console.log("Class name from params:", className);
+  // console.log("Class name from params:", className);
 
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showHomeworkModal, setShowHomeworkModal] = useState(false);
@@ -35,10 +35,27 @@ const ClassToolPage = () => {
     index: null,
   });
 
-  const handleDeleteVideo = (indexToDelete) => {
-    setUploadedVideos((prevVideos) =>
-      prevVideos.filter((_, index) => index !== indexToDelete)
-    );
+  const handleDeleteVideo = async (indexToDelete) => {
+    const videoToDelete = uploadedVideos[indexToDelete];
+    if (!videoToDelete || !videoToDelete.id) return;
+
+    try {
+      const response = await fetch(`/api/v1/videos/${videoToDelete.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete video");
+      }
+
+      setUploadedVideos((prevVideos) =>
+        prevVideos.filter((_, index) => index !== indexToDelete)
+      );
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      alert(`Failed to delete video: ${error.message}`);
+    }
   };
 
   // handleDeleteHomework removed - now handled by HomeworkSection
@@ -141,8 +158,23 @@ const ClassToolPage = () => {
     }
   }, [user, quizSubject]);
 
-  // Fetch quizzes for this teacher and class
+  // Fetch videos and quizzes for this class
   useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch(`/api/v1/videos/class/${className}`, {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUploadedVideos(data.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      }
+    };
+
     const fetchQuizzes = async () => {
       // Use either _id or id property from user object
       const userId = user?._id || user?.id;
@@ -189,6 +221,7 @@ const ClassToolPage = () => {
       }
     };
 
+    fetchVideos();
     fetchQuizzes();
   }, [user, className]);
 
@@ -312,6 +345,8 @@ const ClassToolPage = () => {
       alert(`Failed to create quiz: ${error.message}`);
     }
   };
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+  console.log(`${API_BASE_URL}/api/v1/videos/stream/`);
 
   return (
     <div className="tool-page">
@@ -348,14 +383,17 @@ const ClassToolPage = () => {
                   >
                     Delete
                   </button>
-                  <a
-                    className="view-btn"
-                    href={video.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    className="delete-btn"
+                    onClick={() =>
+                      window.open(
+                        `${API_BASE_URL}/api/v1/videos/stream/${video._id}`,
+                        "_blank"
+                      )
+                    }
                   >
-                    <button className="delete-btn">View</button>
-                  </a>
+                    View
+                  </button>
                 </div>
               </div>
             ))}
@@ -421,6 +459,7 @@ const ClassToolPage = () => {
           <UploadVideoModal
             onClose={() => setShowVideoModal(false)}
             onUpload={(video) => setUploadedVideos([...uploadedVideos, video])}
+            className={className}
           />
         )}
 

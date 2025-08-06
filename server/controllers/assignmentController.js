@@ -4,7 +4,6 @@ const fs = require('fs');
 const catchAsync = require('../utils/catchAsync');
 const Assignment = require('../models/assignmentModel');
 const AppError = require('../utils/appError');
-const { sendAssignmentNotification } = require('./notificationController');
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
