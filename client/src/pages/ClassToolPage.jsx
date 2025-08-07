@@ -34,6 +34,10 @@ const ClassToolPage = () => {
     show: false,
     index: null,
   });
+  const [videoDeleteConfirmation, setVideoDeleteConfirmation] = useState({
+    show: false,
+    index: null,
+  });
 
   const handleDeleteVideo = async (indexToDelete) => {
     const videoToDelete = uploadedVideos[indexToDelete];
@@ -68,6 +72,11 @@ const ClassToolPage = () => {
   // Show delete confirmation dialog
   const showDeleteConfirmation = (indexToDelete) => {
     setDeleteConfirmation({ show: true, index: indexToDelete });
+  };
+
+  // Show video delete confirmation dialog
+  const showVideoDeleteConfirmation = (indexToDelete) => {
+    setVideoDeleteConfirmation({ show: true, index: indexToDelete });
   };
 
   // Handle actual quiz deletion
@@ -384,7 +393,7 @@ const ClassToolPage = () => {
                 <div className="card-buttons">
                   <button
                     className="delete-btn"
-                    onClick={() => handleDeleteVideo(idx)}
+                    onClick={() => showVideoDeleteConfirmation(idx)}
                   >
                     Delete
                   </button>
@@ -498,7 +507,7 @@ const ClassToolPage = () => {
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Quiz Delete Confirmation Dialog */}
       {deleteConfirmation.show && (
         <div className="modal-overlay">
           <div className="confirmation-dialog">
@@ -514,6 +523,35 @@ const ClassToolPage = () => {
               <button
                 onClick={() =>
                   setDeleteConfirmation({ show: false, index: null })
+                }
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Delete Confirmation Dialog */}
+      {videoDeleteConfirmation.show && (
+        <div className="modal-overlay">
+          <div className="confirmation-dialog">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this video?</p>
+            <div className="confirmation-buttons">
+              <button
+                onClick={() => {
+                  handleDeleteVideo(videoDeleteConfirmation.index);
+                  setVideoDeleteConfirmation({ show: false, index: null });
+                }}
+                className="confirm-btn"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() =>
+                  setVideoDeleteConfirmation({ show: false, index: null })
                 }
                 className="cancel-btn"
               >
