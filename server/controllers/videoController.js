@@ -39,17 +39,17 @@ exports.createVideo = catchAsync(async (req, res, next) => {
     return next(new AppError('Please upload a video file', 400));
   }
 
-  const { title, teacherId, class: className } = req.body;
+  const { title, class: className } = req.body;
 
-  if (!title || !teacherId || !className) {
-    return next(new AppError('Title, teacher ID, and class are required', 400));
+  if (!title || !className) {
+    return next(new AppError('Title and class are required', 400));
   }
 
   const newVideo = await Video.create({
     title,
     fileName: req.file.filename,
     url: `/api/v1/videos/stream`,
-    teacherId,
+    teacherId: req.user.id, // Use authenticated user's ID
     class: className
   });
 
@@ -119,8 +119,23 @@ exports.deleteVideo = catchAsync(async (req, res, next) => {
     return next(new AppError('No video found with that ID', 404));
   }
 
-  res.status(204).json({
+  // Delete the video file from the filesystem
+  if (video.fileName) {
+    const videoPath = path.join(__dirname, '..', 'public', 'videos', video.fileName);
+    
+    try {
+      if (fs.existsSync(videoPath)) {
+        fs.unlinkSync(videoPath);
+        console.log(`Video file ${video.fileName} deleted successfully`);
+      }
+    } catch (error) {
+      console.error('Error deleting video file:', error);
+      // Don't fail the request if file deletion fails
+    }
+  }
+
+  res.status(200).json({
     status: 'success',
-    data: null
+    message: 'Video deleted successfully'
   });
 });

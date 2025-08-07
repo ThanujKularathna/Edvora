@@ -37,10 +37,15 @@ const ClassToolPage = () => {
 
   const handleDeleteVideo = async (indexToDelete) => {
     const videoToDelete = uploadedVideos[indexToDelete];
-    if (!videoToDelete || !videoToDelete.id) return;
+    const videoId = videoToDelete?._id || videoToDelete?.id;
+    
+    if (!videoToDelete || !videoId) {
+      console.error('Video ID not found:', videoToDelete);
+      return;
+    }
 
     try {
-      const response = await fetch(`/api/v1/videos/${videoToDelete.id}`, {
+      const response = await fetch(`/api/v1/videos/${videoId}`, {
         method: "DELETE",
         credentials: "include",
       });

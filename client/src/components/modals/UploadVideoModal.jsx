@@ -16,7 +16,6 @@ const UploadVideoModal = ({ onClose, onUpload, className }) => {
       const formData = new FormData();
       formData.append("video", file);
       formData.append("title", title);
-      formData.append("teacherId", user?._id || user?.id);
       formData.append("class", className);
 
       const response = await fetch("/api/v1/videos/upload", {

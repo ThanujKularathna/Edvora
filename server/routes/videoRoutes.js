@@ -19,6 +19,11 @@ router.get('/class/:className', videoController.getVideosByClass);
 
 router.get('/stream/:id', videoController.streamVideo);
 
-router.delete('/:id', videoController.deleteVideo);
+router.delete(
+  '/:id',
+  authController.protect,
+  authController.restrictTo('teacher'),
+  videoController.deleteVideo
+);
 
 module.exports = router;
