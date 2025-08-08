@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/authContext";
 import EnhancedHomeworkModal from "./modals/EnhancedHomeworkModal";
 // import { API_BASE_URL } from "../config";
+import { capitalCase } from "change-case";
 import "./HomeworkSection.css";
 import "../styles/Modal.css";
 
@@ -110,7 +111,7 @@ const HomeworkSection = ({ className, showModal, setShowModal }) => {
                 <div className="homework-details">
                   {hw.subject && (
                     <span className="homework-subject">
-                      Subject: {hw.subject}
+                      Subject: {capitalCase(hw.subject)}
                     </span>
                   )}
                   {hw.deadline && (

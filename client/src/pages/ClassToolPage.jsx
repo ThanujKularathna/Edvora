@@ -388,14 +388,16 @@ const ClassToolPage = () => {
           <div className="section-body">
             {uploadedVideos.length === 0 && <p></p>}
             {uploadedVideos.map((video, idx) => (
-              <div key={idx} className="card">
-                <div className="video-info">
-                  <span className="video-title">{video.title}</span>
-                  {video.subject && (
-                    <span className="video-subject">
-                      Subject: {video.subject}
-                    </span>
-                  )}
+              <div key={idx} className="card homework-card">
+                <div className="homework-info">
+                  <span className="homework-title">{video.title}</span>
+                  <div className="homework-details">
+                    {video.subject && (
+                      <span className="homework-subject">
+                        Subject: {capitalCase(video.subject)}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="card-buttons">
                   <button
