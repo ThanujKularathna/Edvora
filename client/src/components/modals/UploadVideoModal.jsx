@@ -5,17 +5,19 @@ import "../../styles/Modal.css";
 const UploadVideoModal = ({ onClose, onUpload, className }) => {
   const { user } = useAuth();
   const [title, setTitle] = useState("");
+  const [subject, setSubject] = useState(user?.subjects?.[0] || "");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleUpload = async () => {
-    if (!title || !file) return alert("Fill all fields");
+    if (!title || !subject || !file) return alert("Fill all fields");
     setLoading(true);
 
     try {
       const formData = new FormData();
       formData.append("video", file);
       formData.append("title", title);
+      formData.append("subject", subject);
       formData.append("class", className);
 
       const response = await fetch("/api/v1/videos/upload", {
@@ -57,6 +59,18 @@ const UploadVideoModal = ({ onClose, onUpload, className }) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+        <select
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          required
+        >
+          <option value="">Select Subject</option>
+          {(user?.subjects || ["Mathematics", "Science", "English"]).map((subj) => (
+            <option key={subj} value={subj}>
+              {subj}
+            </option>
+          ))}
+        </select>
         <input
           type="file"
           accept="video/*"

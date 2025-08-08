@@ -39,14 +39,15 @@ exports.createVideo = catchAsync(async (req, res, next) => {
     return next(new AppError('Please upload a video file', 400));
   }
 
-  const { title, class: className } = req.body;
+  const { title, subject, class: className } = req.body;
 
-  if (!title || !className) {
-    return next(new AppError('Title and class are required', 400));
+  if (!title || !subject || !className) {
+    return next(new AppError('Title, subject, and class are required', 400));
   }
 
   const newVideo = await Video.create({
     title,
+    subject,
     fileName: req.file.filename,
     url: `/api/v1/videos/stream`,
     teacherId: req.user.id, // Use authenticated user's ID

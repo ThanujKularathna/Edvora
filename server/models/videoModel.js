@@ -23,6 +23,10 @@ const videoSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Class is required']
   },
+  subject: {
+    type: String,
+    required: [true, 'Subject is required']
+  },
   uploadedAt: {
     type: Date,
     default: Date.now

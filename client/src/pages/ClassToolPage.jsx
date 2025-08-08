@@ -389,7 +389,14 @@ const ClassToolPage = () => {
             {uploadedVideos.length === 0 && <p></p>}
             {uploadedVideos.map((video, idx) => (
               <div key={idx} className="card">
-                <span>{video.title}</span>
+                <div className="video-info">
+                  <span className="video-title">{video.title}</span>
+                  {video.subject && (
+                    <span className="video-subject">
+                      Subject: {video.subject}
+                    </span>
+                  )}
+                </div>
                 <div className="card-buttons">
                   <button
                     className="delete-btn"
