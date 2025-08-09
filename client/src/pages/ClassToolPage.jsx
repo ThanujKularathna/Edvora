@@ -17,7 +17,7 @@ const ClassToolPage = () => {
 
   // Debug user object
   console.log("User object:", user);
-  console.log("Class name from params:", className);
+  // console.log("Class name from params:", className);
 
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showHomeworkModal, setShowHomeworkModal] = useState(false);
@@ -34,11 +34,37 @@ const ClassToolPage = () => {
     show: false,
     index: null,
   });
+  const [videoDeleteConfirmation, setVideoDeleteConfirmation] = useState({
+    show: false,
+    index: null,
+  });
 
-  const handleDeleteVideo = (indexToDelete) => {
-    setUploadedVideos((prevVideos) =>
-      prevVideos.filter((_, index) => index !== indexToDelete)
-    );
+  const handleDeleteVideo = async (indexToDelete) => {
+    const videoToDelete = uploadedVideos[indexToDelete];
+    const videoId = videoToDelete?._id || videoToDelete?.id;
+    
+    if (!videoToDelete || !videoId) {
+      console.error('Video ID not found:', videoToDelete);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/v1/videos/${videoId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete video");
+      }
+
+      setUploadedVideos((prevVideos) =>
+        prevVideos.filter((_, index) => index !== indexToDelete)
+      );
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      alert(`Failed to delete video: ${error.message}`);
+    }
   };
 
   // handleDeleteHomework removed - now handled by HomeworkSection
@@ -46,6 +72,11 @@ const ClassToolPage = () => {
   // Show delete confirmation dialog
   const showDeleteConfirmation = (indexToDelete) => {
     setDeleteConfirmation({ show: true, index: indexToDelete });
+  };
+
+  // Show video delete confirmation dialog
+  const showVideoDeleteConfirmation = (indexToDelete) => {
+    setVideoDeleteConfirmation({ show: true, index: indexToDelete });
   };
 
   // Handle actual quiz deletion
@@ -141,8 +172,23 @@ const ClassToolPage = () => {
     }
   }, [user, quizSubject]);
 
-  // Fetch quizzes for this teacher and class
+  // Fetch videos and quizzes for this class
   useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch(`/api/v1/videos/class/${className}`, {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUploadedVideos(data.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      }
+    };
+
     const fetchQuizzes = async () => {
       // Use either _id or id property from user object
       const userId = user?._id || user?.id;
@@ -189,6 +235,7 @@ const ClassToolPage = () => {
       }
     };
 
+    fetchVideos();
     fetchQuizzes();
   }, [user, className]);
 
@@ -312,6 +359,8 @@ const ClassToolPage = () => {
       alert(`Failed to create quiz: ${error.message}`);
     }
   };
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+  console.log(`${API_BASE_URL}/api/v1/videos/stream/`);
 
   return (
     <div className="tool-page">
@@ -339,23 +388,35 @@ const ClassToolPage = () => {
           <div className="section-body">
             {uploadedVideos.length === 0 && <p></p>}
             {uploadedVideos.map((video, idx) => (
-              <div key={idx} className="card">
-                <span>{video.title}</span>
+              <div key={idx} className="card homework-card">
+                <div className="homework-info">
+                  <span className="homework-title">{video.title}</span>
+                  <div className="homework-details">
+                    {video.subject && (
+                      <span className="homework-subject">
+                        Subject: {capitalCase(video.subject)}
+                      </span>
+                    )}
+                  </div>
+                </div>
                 <div className="card-buttons">
                   <button
                     className="delete-btn"
-                    onClick={() => handleDeleteVideo(idx)}
+                    onClick={() => showVideoDeleteConfirmation(idx)}
                   >
                     Delete
                   </button>
-                  <a
-                    className="view-btn"
-                    href={video.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    className="delete-btn"
+                    onClick={() =>
+                      window.open(
+                        `${API_BASE_URL}/api/v1/videos/stream/${video._id}`,
+                        "_blank"
+                      )
+                    }
                   >
-                    <button className="delete-btn">View</button>
-                  </a>
+                    View
+                  </button>
                 </div>
               </div>
             ))}
@@ -421,6 +482,7 @@ const ClassToolPage = () => {
           <UploadVideoModal
             onClose={() => setShowVideoModal(false)}
             onUpload={(video) => setUploadedVideos([...uploadedVideos, video])}
+            className={className}
           />
         )}
 
@@ -454,7 +516,7 @@ const ClassToolPage = () => {
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Quiz Delete Confirmation Dialog */}
       {deleteConfirmation.show && (
         <div className="modal-overlay">
           <div className="confirmation-dialog">
@@ -470,6 +532,35 @@ const ClassToolPage = () => {
               <button
                 onClick={() =>
                   setDeleteConfirmation({ show: false, index: null })
+                }
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Delete Confirmation Dialog */}
+      {videoDeleteConfirmation.show && (
+        <div className="modal-overlay">
+          <div className="confirmation-dialog">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this video?</p>
+            <div className="confirmation-buttons">
+              <button
+                onClick={() => {
+                  handleDeleteVideo(videoDeleteConfirmation.index);
+                  setVideoDeleteConfirmation({ show: false, index: null });
+                }}
+                className="confirm-btn"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() =>
+                  setVideoDeleteConfirmation({ show: false, index: null })
                 }
                 className="cancel-btn"
               >
