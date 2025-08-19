@@ -13,6 +13,7 @@ server/node_modules/
 #static files
 pdf
 videos
+dev-data
 
 # OS files
 .DS_Store

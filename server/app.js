@@ -8,8 +8,8 @@ const userRoutes = require('./routes/userRoutes');
 const assignmentRoutes = require('./routes/assignmentRoute');
 const quizRoutes = require('./routes/quizRoutes');
 const videoRoutes = require('./routes/videoRoutes');
-
-
+const classRoutes = require('./routes/classRoutes');
+const studentRoutes = require('./routes/studentRoutes');
 
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -36,7 +36,8 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/assignments', assignmentRoutes);
 app.use('/api/v1/quizzes', quizRoutes);
 app.use('/api/v1/videos', videoRoutes);
-
+app.use('/api/v1/class', classRoutes);
+app.use('/api/v1/student', studentRoutes);
 
 app.all('*', (req, res, next) => {
   res.status(404).json({

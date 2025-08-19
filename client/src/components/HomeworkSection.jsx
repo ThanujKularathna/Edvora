@@ -18,37 +18,44 @@ const HomeworkSection = ({ className, showModal, setShowModal }) => {
 
   // Fetch homeworks when component mounts
   useEffect(() => {
+    async function fetchHomeworks() {
+      try {
+        setIsLoading(true);
+        setError("");
+
+        const response = await fetch(`/api/v1/assignments?class=${className}`, {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch homeworks: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data && data.data) {
+          setHomeworks(data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching homeworks:", error);
+        setError("Failed to load homeworks");
+      } finally {
+        setIsLoading(false);
+      }
+    }
     fetchHomeworks();
   }, [className]);
 
-  const fetchHomeworks = async () => {
-    try {
-      setIsLoading(true);
-      setError("");
-
-      const response = await fetch(`/api/v1/assignments?class=${className}`, {
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch homeworks: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data && data.data) {
-        setHomeworks(data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching homeworks:", error);
-      setError("Failed to load homeworks");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleAddHomework = (homework) => {
-    setHomeworks([homework, ...homeworks]);
+    // Format the homework to match the API structure
+    const formattedHomework = {
+      ...homework,
+      id: homework.id || homework._id,
+      subject: homework.subject && user?.subjects ? 
+        user.subjects.find(s => s._id === homework.subject) || homework.subject :
+        homework.subject
+    };
+    setHomeworks([formattedHomework, ...homeworks]);
   };
 
   // Show delete confirmation dialog
@@ -111,7 +118,7 @@ const HomeworkSection = ({ className, showModal, setShowModal }) => {
                 <div className="homework-details">
                   {hw.subject && (
                     <span className="homework-subject">
-                      Subject: {capitalCase(hw.subject)}
+                      Subject: {capitalCase(hw.subject.name || hw.subject)}
                     </span>
                   )}
                   {hw.deadline && (

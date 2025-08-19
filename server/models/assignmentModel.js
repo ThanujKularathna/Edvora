@@ -32,7 +32,8 @@ const assignmentSchema = new mongoose.Schema({
     required: [true, 'Assignment must belong to a class']
   },
   subject: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
+    ref: 'Subject',
     required: [true, 'Assignment must have a subject']
   }
 });

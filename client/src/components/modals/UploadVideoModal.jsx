@@ -5,7 +5,7 @@ import "../../styles/Modal.css";
 const UploadVideoModal = ({ onClose, onUpload, className }) => {
   const { user } = useAuth();
   const [title, setTitle] = useState("");
-  const [subject, setSubject] = useState(user?.subjects?.[0] || "");
+  const [subject, setSubject] = useState(user?.subjects?.[0]?._id || "");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -66,8 +66,8 @@ const UploadVideoModal = ({ onClose, onUpload, className }) => {
         >
           <option value="">Select Subject</option>
           {(user?.subjects || ["Mathematics", "Science", "English"]).map((subj) => (
-            <option key={subj} value={subj}>
-              {subj}
+            <option key={subj._id || subj} value={subj._id || subj}>
+              {subj.name || subj}
             </option>
           ))}
         </select>

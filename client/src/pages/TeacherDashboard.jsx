@@ -10,7 +10,7 @@ import { useAuth } from "../contexts/authContext";
 const TeacherDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  console.log(user);
+  console.log('User data:', user);
 
   // const [assignedClasses, setAssignedClasses] = useState([]);
   // const [teacherName, setTeacherName] = useState("Teacher");
@@ -66,15 +66,19 @@ const TeacherDashboard = () => {
         {/* Assigned Classes */}
         <h3>Assigned Classes</h3>
         <div className="subjects-grid">
-          {user.classes.map((className, index) => (
-            <button
-              key={index}
-              className="subject-btn"
-              onClick={() => handleClassClick(className)}
-            >
-              Grade {className}
-            </button>
-          ))}
+          {user?.classes && Array.isArray(user.classes) ? (
+            user.classes.map((classObj, index) => (
+              <button
+                key={index}
+                className="subject-btn"
+                onClick={() => handleClassClick(classObj.className)}
+              >
+                Grade {classObj.className}
+              </button>
+            ))
+          ) : (
+            <p>No classes assigned</p>
+          )}
         </div>
       </div>
 

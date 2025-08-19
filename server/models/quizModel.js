@@ -23,7 +23,8 @@ const quizSchema = new mongoose.Schema({
     required: true
   },
   subject: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
+    ref: 'Subject',
     required: true
   },
   questions: {

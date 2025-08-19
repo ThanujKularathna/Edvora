@@ -41,7 +41,10 @@ exports.getAllAssignments = catchAsync(async (req, res, next) => {
     filter.teacher = req.user.id;
   }
 
-  const assignments = await Assignment.find(filter);
+  const assignments = await Assignment.find(filter).populate({
+    path: 'subject',
+    select: 'name'
+  });
 
   // Add download URL to each assignment and ensure id property exists
   const assignmentsWithUrls = assignments.map((assignment) => {

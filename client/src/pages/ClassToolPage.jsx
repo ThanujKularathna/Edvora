@@ -162,13 +162,13 @@ const ClassToolPage = () => {
   const [questions, setQuestions] = useState([]);
   // Initialize quizSubject with the first subject from user.subjects or a default value
   const [quizSubject, setQuizSubject] = useState(
-    user?.subjects?.length > 0 ? user.subjects[0] : "Mathematics"
+    user?.subjects?.length > 0 ? (user.subjects[0]?._id || user.subjects[0]) : "Mathematics"
   );
 
   // Update quizSubject when user data changes
   useEffect(() => {
     if (user?.subjects?.length > 0 && !quizSubject) {
-      setQuizSubject(user.subjects[0]);
+      setQuizSubject(user.subjects[0]?._id || user.subjects[0]);
     }
   }, [user, quizSubject]);
 

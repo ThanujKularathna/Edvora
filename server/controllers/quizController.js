@@ -8,7 +8,7 @@ exports.createQuiz = catchAsync(async (req, res, next) => {
   if (!newQuiz) return next(new AppError('Quiz not created', 400));
 
   // Send notification to all users
-  sendQuizNotification(req, newQuiz);
+  // sendQuizNotification(req, newQuiz);
   console.log('Quiz created successfully');
 
   res.status(201).json({
