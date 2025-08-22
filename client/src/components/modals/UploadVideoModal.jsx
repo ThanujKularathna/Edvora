@@ -5,7 +5,7 @@ import "../../styles/Modal.css";
 const UploadVideoModal = ({ onClose, onUpload, className }) => {
   const { user } = useAuth();
   const [title, setTitle] = useState("");
-  const [subject, setSubject] = useState(user?.subjects?.[0]?._id || "");
+  const [subject, setSubject] = useState(user?.subjects?.[0]?._id || user?.subjects?.[0] || "");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 

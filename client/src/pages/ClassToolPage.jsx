@@ -42,9 +42,9 @@ const ClassToolPage = () => {
   const handleDeleteVideo = async (indexToDelete) => {
     const videoToDelete = uploadedVideos[indexToDelete];
     const videoId = videoToDelete?._id || videoToDelete?.id;
-    
+
     if (!videoToDelete || !videoId) {
-      console.error('Video ID not found:', videoToDelete);
+      console.error("Video ID not found:", videoToDelete);
       return;
     }
 
@@ -162,7 +162,9 @@ const ClassToolPage = () => {
   const [questions, setQuestions] = useState([]);
   // Initialize quizSubject with the first subject from user.subjects or a default value
   const [quizSubject, setQuizSubject] = useState(
-    user?.subjects?.length > 0 ? (user.subjects[0]?._id || user.subjects[0]) : "Mathematics"
+    user?.subjects?.length > 0
+      ? user.subjects[0]?._id || user.subjects[0]
+      : "Mathematics"
   );
 
   // Update quizSubject when user data changes
@@ -220,7 +222,7 @@ const ClassToolPage = () => {
               id: quiz._id,
               quizTitle: quiz.title,
               questions: quiz.questions,
-              subject: quiz.subject,
+              subject: quiz.subject.name,
             }))
           );
         } else {
@@ -359,7 +361,8 @@ const ClassToolPage = () => {
       alert(`Failed to create quiz: ${error.message}`);
     }
   };
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
   console.log(`${API_BASE_URL}/api/v1/videos/stream/`);
 
   return (
@@ -394,7 +397,7 @@ const ClassToolPage = () => {
                   <div className="homework-details">
                     {video.subject && (
                       <span className="homework-subject">
-                        Subject: {capitalCase(video.subject)}
+                        Subject: {capitalCase(video.subject.name || video.subject)}
                       </span>
                     )}
                   </div>
@@ -408,12 +411,18 @@ const ClassToolPage = () => {
                   </button>
                   <button
                     className="delete-btn"
-                    onClick={() =>
-                      window.open(
-                        `${API_BASE_URL}/api/v1/videos/stream/${video._id}`,
-                        "_blank"
-                      )
-                    }
+                    onClick={() => {
+                      const videoId = video._id || video.id;
+                      if (videoId) {
+                        window.open(
+                          `${API_BASE_URL}/api/v1/videos/stream/${videoId}`,
+                          "_blank"
+                        );
+                      } else {
+                        console.error("Video ID not found:", video);
+                        alert("Cannot play video: ID not found");
+                      }
+                    }}
                   >
                     View
                   </button>
@@ -481,7 +490,22 @@ const ClassToolPage = () => {
         {showVideoModal && (
           <UploadVideoModal
             onClose={() => setShowVideoModal(false)}
-            onUpload={(video) => setUploadedVideos([...uploadedVideos, video])}
+            onUpload={async (video) => {
+              // Refetch videos to get populated subject data
+              try {
+                const response = await fetch(`/api/v1/videos/class/${className}`, {
+                  credentials: "include",
+                });
+                if (response.ok) {
+                  const data = await response.json();
+                  setUploadedVideos(data.data || []);
+                }
+              } catch (error) {
+                console.error("Error refetching videos:", error);
+                // Fallback to adding the video without populated subject
+                setUploadedVideos([...uploadedVideos, video]);
+              }
+            }}
             className={className}
           />
         )}

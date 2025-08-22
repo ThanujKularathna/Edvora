@@ -60,7 +60,9 @@ exports.getQuizzesByTeacherAndClass = catchAsync(async (req, res, next) => {
   const quizzes = await Quiz.find({
     teacherId,
     class: className
-  }).sort({ createdAt: -1 }); // Sort by creation date, newest first
+  })
+    .populate({ path: 'subject', select: 'name' })
+    .sort({ createdAt: -1 }); // Sort by creation date, newest first
 
   console.log(`Found ${quizzes.length} quizzes`);
 
