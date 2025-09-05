@@ -1,53 +1,72 @@
-// const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-// const classSchema = new mongoose.Schema({
-//   grade: {
-//     type: String,
-//     require: [true, 'Class must have a grade']
-//   },
+const classSchema = new mongoose.Schema({
+  className: {
+    type: String,
+    require: [true, 'class must have a name'],
+    unique: true
+  },
 
-//   className: {
-//     type: String,
-//     require: [true, 'class must have a name'],
-//     unique: true
-//   },
+  students: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      require: [true, 'Class must have students']
+    }
+  ],
+  teachers: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      require: [true, 'Class must have teachers']
+    }
+  ],
+  subjects: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Subject',
+      require: [true, 'Class must have subjects']
+    }
+  ],
 
-//   students: [
-//     {
-//       type: String,
-//       require: [true, 'Class must have students']
-//     }
-//   ],
-//   teachers: [
-//     {
-//       type: String,
-//       require: [true, 'Class must have teachers']
-//     }
-//   ],
-//   subjects: [
-//     {
-//       type: String
-//     }
-//   ],
+  lectureMaterial: [
+    {
+      type: String
+    }
+  ],
 
-//   lectureMaterial: [
-//     {
-//       type: String
-//     }
-//   ],
+  lectureVideos: [
+    {
+      type: String
+    }
+  ],
 
-//   lectureVideos: [
-//     {
-//       type: String
-//     }
-//   ],
+  assignments: [
+    {
+      type: String
+    }
+  ]
+});
 
-//   assignments: [
-//     {
-//       type: String
-//     }
-//   ]
-// });
+classSchema.pre(/^find/, function (next) {
+  this.populate([
+    {
+      path: 'students',
+      select: 'name email '
+    },
+    {
+      path: 'teachers',
+      select: 'name email'
+    },
+    {
+      path: 'subjects',
+      select: 'name'
+    }
+  ]);
+  next();
+});
 
-// const Class = mongoose.model('Class', classSchema);
-// module.exports = Class;
+const Class = mongoose.model('Class', classSchema);
+module.exports = Class;
+
+// mongoose.Schema.ObjectId

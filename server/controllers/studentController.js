@@ -1,0 +1,102 @@
+const User = require('../models/userModel');
+const Class = require('../models/classModel');
+const Assignment = require('../models/assignmentModel');
+const Quiz = require('../models/quizModel');
+const Video = require('../models/videoModel');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
+
+exports.getStudentDashboard = catchAsync(async (req, res, next) => {
+  const studentId = req.user.id;
+
+  // Get student details with populated class info
+  const student = await User.findById(studentId);
+  console.log(student);
+
+  if (!student || student.role !== 'student') {
+    return next(new AppError('Student not found', 404));
+  }
+
+  // Extract student's class (now it's an object with className)
+  const studentClass = student.classes.className;
+
+  if (!studentClass) {
+    return next(new AppError('Student class not found', 404));
+  }
+
+  // Get upcoming assignments (homeworks) for the student's class
+  const upcomingAssignments = await Assignment.find({
+    class: studentClass,
+    deadline: { $gte: new Date() } // Only future assignments
+  })
+    .populate([
+      { path: 'teacher', select: 'name' },
+      { path: 'subject', select: 'name' }
+    ])
+
+    .sort({ deadline: 1 })
+    .limit(5);
+
+  // Get class ObjectId for quiz queries
+  const classDoc = await Class.findOne({ className: studentClass });
+  if (!classDoc) {
+    return next(new AppError('Class not found', 404));
+  }
+
+  console.log(classDoc);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      student: {
+        id: student._id,
+        name: student.name,
+        email: student.email,
+        class: studentClass
+      },
+      subjects: student.classes?.subjects || [],
+      upcomingAssignments
+    }
+  });
+});
+
+exports.getStudentSubjects = catchAsync(async (req, res, next) => {
+  const studentId = req.user.id;
+
+  const student = await User.findById(studentId);
+  if (!student || student.role !== 'student') {
+    return next(new AppError('Student not found', 404));
+  }
+
+  const classDetails = await Class.findOne({ className: student.classes });
+  if (!classDetails) {
+    return next(new AppError('Class not found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      subjects: classDetails.subjects,
+      className: student.classes
+    }
+  });
+});
+
+exports.getStudentAssignments = catchAsync(async (req, res, next) => {
+  const studentId = req.user.id;
+
+  const student = await User.findById(studentId);
+  if (!student || student.role !== 'student') {
+    return next(new AppError('Student not found', 404));
+  }
+
+  const assignments = await Assignment.find({
+    class: student.classes
+  }).populate('teacherId', 'name');
+
+  res.status(200).json({
+    status: 'success',
+    results: assignments.length,
+    data: assignments
+  });
+});

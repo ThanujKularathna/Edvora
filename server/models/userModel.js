@@ -75,7 +75,10 @@ const userSchema = new mongoose.Schema({
     }
   },
   subjects: {
-    type: [String],
+    type: [{
+      type: mongoose.Schema.ObjectId,
+      ref: 'Subject'
+    }],
     validate: {
       validator: function (value) {
         if (this.role === 'admin') {
@@ -130,6 +133,54 @@ userSchema.methods.createResetToken = function () {
 
   return resetToken;
 };
+
+// Post-find middleware to automatically populate classes and subjects
+userSchema.post(/^find/, async function (docs) {
+  const Class = require('./classModel');
+  const Subject = require('./subjectModel');
+
+  const populateDoc = async (doc) => {
+    // Populate classes
+    if (doc.role === 'student' && typeof doc.classes === 'string') {
+      const classDoc = await Class.findOne({ _id: doc.classes }).select(
+        'className subjects'
+      );
+      if (classDoc) {
+        doc.classes = {
+          className: classDoc.className,
+          subjects: classDoc.subjects
+        };
+      }
+    }
+
+    if (doc.role === 'teacher' && Array.isArray(doc.classes)) {
+      const classDocs = await Class.find({
+        _id: { $in: doc.classes }
+      }).select('className subjects');
+      doc.classes = classDocs.map((classDoc) => ({
+        className: classDoc.className,
+        subjects: classDoc.subjects
+      }));
+    }
+
+    // Populate subjects for teachers
+    if (doc.role === 'teacher' && doc.subjects && doc.subjects.length > 0) {
+      const subjectDocs = await Subject.find({
+        _id: { $in: doc.subjects }
+      }).select('name');
+      doc.subjects = subjectDocs;
+    }
+  };
+
+  if (Array.isArray(docs)) {
+    for (let doc of docs) {
+      await populateDoc(doc);
+    }
+  } else if (docs) {
+    await populateDoc(docs);
+  }
+});
+
 userSchema.set('toJSON', {
   transform: function (doc, ret) {
     if (ret.role === 'admin') {
@@ -141,3 +192,22 @@ userSchema.set('toJSON', {
 });
 const User = mongoose.model('User', userSchema);
 module.exports = User;
+
+// userSchema.methods.populateClasses = async function () {
+//   const Class = require('./classModel');
+//   const userObj = this.toObject();
+
+//   if (this.role === 'student' && typeof this.classes === 'string') {
+//     const classDoc = await Class.findOne({ _id: this.classes }).select(
+//       'className subjects'
+//     );
+//     console.log('class id', this.classes);
+//     console.log('class doc', classDoc);
+
+//     if (classDoc) {
+//       userObj.classes = {
+//         className: classDoc.className,
+//         subjects: classDoc.subjects
+//       };
+//     }
+//   }

@@ -63,7 +63,9 @@ exports.createVideo = catchAsync(async (req, res, next) => {
 exports.getVideosByClass = catchAsync(async (req, res, next) => {
   const { className } = req.params;
 
-  const videos = await Video.find({ class: className }).populate('teacherId', 'name');
+  const videos = await Video.find({ class: className })
+    .populate('teacherId', 'name')
+    .populate('subject', 'name');
 
   res.status(200).json({
     status: 'success',

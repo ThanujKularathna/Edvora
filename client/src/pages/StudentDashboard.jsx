@@ -1,28 +1,25 @@
-import React,{ useState, useEffect } from "react";// ✅ Import hooks
-import axios from "axios";// ✅ Import axios for HTTP requests
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./StudentDashboard.css"; 
+import { useAuth } from "../contexts/authContext";
+import "./StudentDashboard.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-
-
-
 const StudentDashboard = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [subjects, setSubjects] = useState([]);
-  const [studentName, setStudentName] = useState("Nimal"); // Default name (can be fetched from backend too)
-
+  const [studentName, setStudentName] = useState("");
+  const [upcomingAssignments, setUpcomingAssignments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleLogout = () => {
     console.log("Logged out");
     navigate("/");
-
   };
 
-
-    const getGreeting = () => {
+  const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return "Good Morning";
     else if (hour >= 12 && hour < 17) return "Good Afternoon";
@@ -30,69 +27,80 @@ const StudentDashboard = () => {
     else return "Good Night";
   };
 
-    const handleSubjectClick = (subject) => {
+  const handleSubjectClick = (subject) => {
     navigate(`/subject/${subject}`);
   };
 
   useEffect(() => {
-    const fetchSubjects = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const email = localStorage.getItem("studentEmail"); // Get email from localStorage or auth context
-        const response = await axios.get(`http://localhost:5000/api/student/subjects?email=${email}`);
-        setSubjects(response.data.subjects);
-        setStudentName(response.data.name || "Student"); // Optional: set student name
+        setLoading(true);
+        const response = await fetch("/api/v1/student/dashboard", {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch dashboard data");
+        }
+
+        const data = await response.json();
+
+        if (data.status === "success") {
+          setSubjects(data.data.subjects || []);
+          setStudentName(data.data.student.name || "Student");
+          setUpcomingAssignments(data.data.upcomingAssignments || []);
+          console.log(data.data.upcomingAssignments);
+        }
       } catch (error) {
-        console.error("Failed to fetch subjects", error);
+        console.error("Failed to fetch dashboard data:", error);
+        console.log(error);
+        // Fallback data
+        setSubjects(["Mathematics", "Science", "English"]);
+        setStudentName(user?.name || "Student");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchSubjects();
-  }, []);
-
-  useEffect(() => {
-  const mockSubjects = {
-    "student1@example.com": ["Maths", "Science", "History"],
-    // "student2@example.com": ["English", "Art", "Sinhala"]
-  };
-  const email = localStorage.getItem("studentEmail") || "student1@example.com"; // fallback
-    setSubjects(mockSubjects[email] || []);
-    setStudentName(email.split("@")[0]); // optional: auto extract name
-  
-  }, []);
-
-
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
 
   return (
     <div className="dashboard-container">
-      
       <Navbar />
 
       {/* <button onClick={handleLogout}>Log out</button> */}
 
       {/* Greeting */}
       <div className="greeting">
-        <h4>{getGreeting()}  Nimal !</h4>
+        <h4>
+          {getGreeting()} {studentName}!
+        </h4>
         <p className="greeting-begin">Let’s keep learning today</p>
       </div>
 
-      
-
-      
       {/* Subjects */}
       <div className="section">
-        
         <h3>Subjects</h3>
 
         <div className="subjects-grid">
-          {subjects.map((subject, index) => (
-            <button
-              key={index}
-              className={`subject-btn ${index === 0 ? "active" : ""}`}
-              onClick={() => handleSubjectClick(subject)}
-            >
-              {subject}
-            </button>
-          ))}
+          {loading ? (
+            <p>Loading subjects...</p>
+          ) : subjects.length === 0 ? (
+            <p>No subjects available</p>
+          ) : (
+            subjects.map((subject, index) => (
+              <button
+                key={subject._id || index}
+                className="subject-btn "
+                onClick={() => handleSubjectClick(subject.name || subject)}
+              >
+                {subject.name || subject}
+              </button>
+            ))
+          )}
         </div>
       </div>
 
@@ -100,21 +108,32 @@ const StudentDashboard = () => {
       <div className="section">
         <h3 className="h3-sp">Upcomming Homeworks</h3>
         <div className="assignments">
-          {["Maths", "Sinhala",].map((subject, index) => (
-            <button
-              key={index}
-              className={`assignment-card-sp ${index === 0 ? "highlight" : ""}`}
-            >
-              <p><strong>{subject}</strong></p>
-              <p>Due: July 10 /2025</p>
-            </button>
-          ))}
+          {loading ? (
+            <p>Loading assignments...</p>
+          ) : upcomingAssignments.length === 0 ? (
+            <p>No upcoming assignments</p>
+          ) : (
+            upcomingAssignments.map((assignment, index) => (
+              <button
+                key={assignment._id || index}
+                className={`assignment-card-sp ${
+                  index === 0 ? "highlight" : ""
+                }`}
+              >
+                <p>
+                  <strong>{assignment.title}</strong>
+                </p>
+                <p>Subject: {assignment.subject?.name || assignment.subject}</p>
+                <p>Teacher: {assignment.teacher?.name || "Unknown"}</p>
+                <p>Due: {new Date(assignment.deadline).toLocaleDateString()}</p>
+              </button>
+            ))
+          )}
         </div>
       </div>
 
       {/* Footer */}
       <Footer />
-   
     </div>
   );
 };

@@ -41,8 +41,8 @@ const CreateQuizModal = ({
               required
             >
               {teacherSubjects.map((subject) => (
-                <option key={subject} value={subject}>
-                  {subject}
+                <option key={subject._id || subject} value={subject._id || subject}>
+                  {subject.name || subject}
                 </option>
               ))}
             </select>

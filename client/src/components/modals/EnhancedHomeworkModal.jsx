@@ -11,12 +11,12 @@ const EnhancedHomeworkModal = ({
 }) => {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState(null);
-  const [subject, setSubject] = useState(teacherSubjects[0] || "");
+  const [subject, setSubject] = useState(teacherSubjects[0]?._id || "");
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
-
+  console.log(teacherSubjects);
   const handleUpload = async (e) => {
     e.preventDefault();
 
@@ -120,8 +120,8 @@ const EnhancedHomeworkModal = ({
               required
             >
               {teacherSubjects.map((subj) => (
-                <option key={subj} value={subj}>
-                  {subj}
+                <option key={subj._id} value={subj._id}>
+                  {subj.name}
                 </option>
               ))}
             </select>

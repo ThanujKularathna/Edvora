@@ -8,22 +8,24 @@ const quizSchema = new mongoose.Schema({
     required: true
   },
   teacherId: {
-    // type: mongoose.Schema.Types.ObjectId,
-    // ref: 'User', // assuming your teacher model is in 'User'
-    // required: true
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // assuming your teacher model is in 'User'
     required: true
+    // type: String,
+    // required: true
   },
   // grade: {
   //   type: Number,
   //   required: true
   // },
   class: {
-    type: String, // e.g. 'A', 'B', 'C'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Class',
     required: true
   },
   subject: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
+    ref: 'Subject',
     required: true
   },
   questions: {
@@ -40,6 +42,20 @@ const quizSchema = new mongoose.Schema({
   totalMarks: {
     type: Number
   }
+});
+
+quizSchema.pre(/^find/, function (next) {
+  this.populate([
+    {
+      path: 'subject',
+      select: 'name'
+    },
+    {
+      path: 'class',
+      select: 'className'
+    }
+  ]);
+  next();
 });
 
 // Pre-save middleware to calculate totalMarks and convert deadline

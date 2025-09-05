@@ -24,7 +24,8 @@ const videoSchema = new mongoose.Schema({
     required: [true, 'Class is required']
   },
   subject: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Subject',
     required: [true, 'Subject is required']
   },
   uploadedAt: {

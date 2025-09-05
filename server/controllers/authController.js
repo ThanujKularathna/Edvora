@@ -7,6 +7,7 @@ const Email = require('../utils/email');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const User = require('../models/userModel');
+const { path } = require('../models/questionModel');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECURITY_KEY, {
@@ -27,6 +28,9 @@ const createSendToken = async (user, statusCode, res) => {
 
   res.cookie('jwt', token, cookieOptions);
 
+  user.password = undefined;
+
+  // Classes will be automatically populated by post-find middleware
   user.password = undefined;
 
   res.status(statusCode).json({
