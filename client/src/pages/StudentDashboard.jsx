@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authContext";
-import "./StudentDashboard.css"; 
+import "./StudentDashboard.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
-
-
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -17,15 +14,12 @@ const StudentDashboard = () => {
   const [upcomingAssignments, setUpcomingAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-
   const handleLogout = () => {
     console.log("Logged out");
     navigate("/");
-
   };
 
-
-    const getGreeting = () => {
+  const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return "Good Morning";
     else if (hour >= 12 && hour < 17) return "Good Afternoon";
@@ -33,7 +27,7 @@ const StudentDashboard = () => {
     else return "Good Night";
   };
 
-    const handleSubjectClick = (subject) => {
+  const handleSubjectClick = (subject) => {
     navigate(`/subject/${subject}`);
   };
 
@@ -41,26 +35,28 @@ const StudentDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/v1/students/dashboard', {
-          credentials: 'include'
+        const response = await fetch("/api/v1/student/dashboard", {
+          credentials: "include",
         });
-        
+
         if (!response.ok) {
-          throw new Error('Failed to fetch dashboard data');
+          throw new Error("Failed to fetch dashboard data");
         }
-        
+
         const data = await response.json();
-        
-        if (data.status === 'success') {
+
+        if (data.status === "success") {
           setSubjects(data.data.subjects || []);
-          setStudentName(data.data.student.name || 'Student');
+          setStudentName(data.data.student.name || "Student");
           setUpcomingAssignments(data.data.upcomingAssignments || []);
+          console.log(data.data.upcomingAssignments);
         }
       } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
+        console.error("Failed to fetch dashboard data:", error);
+        console.log(error);
         // Fallback data
-        setSubjects(['Mathematics', 'Science', 'English']);
-        setStudentName(user?.name || 'Student');
+        setSubjects(["Mathematics", "Science", "English"]);
+        setStudentName(user?.name || "Student");
       } finally {
         setLoading(false);
       }
@@ -71,27 +67,22 @@ const StudentDashboard = () => {
     }
   }, [user]);
 
-
-
   return (
     <div className="dashboard-container">
-      
       <Navbar />
 
       {/* <button onClick={handleLogout}>Log out</button> */}
 
       {/* Greeting */}
       <div className="greeting">
-        <h4>{getGreeting()} {studentName}!</h4>
+        <h4>
+          {getGreeting()} {studentName}!
+        </h4>
         <p className="greeting-begin">Let’s keep learning today</p>
       </div>
 
-      
-
-      
       {/* Subjects */}
       <div className="section">
-        
         <h3>Subjects</h3>
 
         <div className="subjects-grid">
@@ -102,11 +93,11 @@ const StudentDashboard = () => {
           ) : (
             subjects.map((subject, index) => (
               <button
-                key={index}
-                className={`subject-btn ${index === 0 ? "active" : ""}`}
-                onClick={() => handleSubjectClick(subject)}
+                key={subject._id || index}
+                className="subject-btn "
+                onClick={() => handleSubjectClick(subject.name || subject)}
               >
-                {subject}
+                {subject.name || subject}
               </button>
             ))
           )}
@@ -125,10 +116,15 @@ const StudentDashboard = () => {
             upcomingAssignments.map((assignment, index) => (
               <button
                 key={assignment._id || index}
-                className={`assignment-card-sp ${index === 0 ? "highlight" : ""}`}
+                className={`assignment-card-sp ${
+                  index === 0 ? "highlight" : ""
+                }`}
               >
-                <p><strong>{assignment.title}</strong></p>
-                <p>Subject: {assignment.subject}</p>
+                <p>
+                  <strong>{assignment.title}</strong>
+                </p>
+                <p>Subject: {assignment.subject?.name || assignment.subject}</p>
+                <p>Teacher: {assignment.teacher?.name || "Unknown"}</p>
                 <p>Due: {new Date(assignment.deadline).toLocaleDateString()}</p>
               </button>
             ))
@@ -138,7 +134,6 @@ const StudentDashboard = () => {
 
       {/* Footer */}
       <Footer />
-   
     </div>
   );
 };

@@ -7,7 +7,8 @@ const assignmentSchema = new mongoose.Schema({
   },
 
   teacher: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
     required: [true, 'assignment must be belong to a teacher']
   },
 
@@ -36,6 +37,11 @@ const assignmentSchema = new mongoose.Schema({
     ref: 'Subject',
     required: [true, 'Assignment must have a subject']
   }
+});
+
+assignmentSchema.pre(/^find/, function (next) {
+  this.populate({ path: 'teacher', select: 'name' });
+  next();
 });
 
 assignmentSchema.methods.isDeadlineExtended = function (newDeadline) {

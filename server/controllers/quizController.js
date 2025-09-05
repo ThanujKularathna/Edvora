@@ -1,10 +1,15 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Quiz = require('../models/quizModel');
+const Class = require('../models/classModel');
 
 exports.createQuiz = catchAsync(async (req, res, next) => {
-  console.log(req.body);
-  const newQuiz = await Quiz.create(req.body);
+  const teacherClass = await Class.findOne({ className: req.body.class });
+  const quizDetails = {
+    ...req.body,
+    class: teacherClass._id
+  };
+  const newQuiz = await Quiz.create(quizDetails);
   if (!newQuiz) return next(new AppError('Quiz not created', 400));
 
   // Send notification to all users
@@ -59,14 +64,11 @@ exports.getQuizzesByTeacherAndClass = catchAsync(async (req, res, next) => {
 
   const quizzes = await Quiz.find({
     teacherId,
-    class: className
+    class: classDoc._id
   })
-    .populate({ path: 'subject', select: 'name' })
-    .sort({ createdAt: -1 }); // Sort by creation date, newest first
+    .populate('subject', 'name')
+    .sort({ createdAt: -1 });
 
-  console.log(`Found ${quizzes.length} quizzes`);
-
-  // If no quizzes found, return empty array instead of error
   res.status(200).json({
     status: 'success',
     results: quizzes.length,

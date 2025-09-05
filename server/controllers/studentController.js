@@ -11,16 +11,17 @@ exports.getStudentDashboard = catchAsync(async (req, res, next) => {
 
   // Get student details with populated class info
   const student = await User.findById(studentId);
+  console.log(student);
+
   if (!student || student.role !== 'student') {
     return next(new AppError('Student not found', 404));
   }
 
-  const studentWithClass = await student.populateClasses();
-  const studentClass = student.classes;
-  // console.log(studentClass);
-  const classDetails = studentWithClass.classDetails;
-  if (!classDetails) {
-    return next(new AppError('Class not found', 404));
+  // Extract student's class (now it's an object with className)
+  const studentClass = student.classes.className;
+
+  if (!studentClass) {
+    return next(new AppError('Student class not found', 404));
   }
 
   // Get upcoming assignments (homeworks) for the student's class
@@ -28,24 +29,21 @@ exports.getStudentDashboard = catchAsync(async (req, res, next) => {
     class: studentClass,
     deadline: { $gte: new Date() } // Only future assignments
   })
-    .populate('teacherId', 'name')
+    .populate([
+      { path: 'teacher', select: 'name' },
+      { path: 'subject', select: 'name' }
+    ])
+
     .sort({ deadline: 1 })
     .limit(5);
 
-  // Get all assignments for the student's class
-  const allAssignments = await Assignment.find({
-    class: studentClass
-  }).populate('teacherId', 'name');
+  // Get class ObjectId for quiz queries
+  const classDoc = await Class.findOne({ className: studentClass });
+  if (!classDoc) {
+    return next(new AppError('Class not found', 404));
+  }
 
-  // Get quizzes for the student's class
-  const quizzes = await Quiz.find({
-    class: studentClass
-  }).populate('teacherId', 'name');
-
-  // Get videos for the student's class
-  const videos = await Video.find({
-    class: studentClass
-  }).populate('teacherId', 'name');
+  console.log(classDoc);
 
   res.status(200).json({
     status: 'success',
@@ -56,11 +54,8 @@ exports.getStudentDashboard = catchAsync(async (req, res, next) => {
         email: student.email,
         class: studentClass
       },
-      subjects: classDetails.subjects,
-      upcomingAssignments,
-      assignments: allAssignments,
-      quizzes,
-      videos
+      subjects: student.classes?.subjects || [],
+      upcomingAssignments
     }
   });
 });
