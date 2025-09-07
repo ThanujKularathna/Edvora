@@ -26,6 +26,11 @@ router
   .route('/teacher/:teacherId')
   .get(authController.protect, quizController.getQuizzesByTeacher);
 
+// Route to get quizzes by class
+router
+  .route('/class/:className')
+  .get(authController.protect, quizController.getQuizzesByClass);
+
 // Route to get, update or delete a specific quiz
 router
   .route('/:id')

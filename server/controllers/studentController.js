@@ -5,6 +5,7 @@ const Quiz = require('../models/quizModel');
 const Video = require('../models/videoModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const Subject = require('../models/subjectModel');
 
 exports.getStudentDashboard = catchAsync(async (req, res, next) => {
   const studentId = req.user.id;
@@ -98,5 +99,53 @@ exports.getStudentAssignments = catchAsync(async (req, res, next) => {
     status: 'success',
     results: assignments.length,
     data: assignments
+  });
+});
+
+exports.getSubjectData = catchAsync(async (req, res, next) => {
+  const studentId = req.user.id;
+  const { subjectName, className } = req.params;
+
+  const student = await User.findById(studentId);
+  if (!student || student.role !== 'student') {
+    return next(new AppError('Student not found', 404));
+  }
+
+  // Get class and subject ObjectIds
+  const classDoc = await Class.findOne({ className });
+  const subjectDoc = await Subject.findOne({ name: subjectName });
+  
+  if (!classDoc) {
+    return next(new AppError('Class not found', 404));
+  }
+  if (!subjectDoc) {
+    return next(new AppError('Subject not found', 404));
+  }
+
+  // Fetch all data in parallel using ObjectIds
+  const [assignments, videos, quizzes] = await Promise.all([
+    Assignment.find({ class: className, subject: subjectDoc._id })
+      .populate('teacher', 'name')
+      .populate('subject', 'name'),
+    Video.find({ class: className, subject: subjectDoc._id })
+      .populate('teacherId', 'name')
+      .populate('subject', 'name'),
+    Quiz.find({ class: classDoc._id, subject: subjectDoc._id })
+      .populate('teacherId', 'name')
+      .populate('subject', 'name')
+  ]);
+
+  // No need to filter since we're already querying by subject ObjectId
+  const subjectAssignments = assignments;
+  const subjectVideos = videos;
+  const subjectQuizzes = quizzes;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      assignments: subjectAssignments,
+      videos: subjectVideos,
+      quizzes: subjectQuizzes
+    }
   });
 });

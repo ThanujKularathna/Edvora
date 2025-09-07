@@ -1,6 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 
-const AssignmentCard = ({ teacher, assignmentTitle, dueDate, onUpload, onDownload }) => {
+const AssignmentCard = ({
+  teacher,
+  assignmentTitle,
+  dueDate,
+  onUpload,
+  onDownload,
+  type,
+}) => {
   const fileInputRef = useRef(null);
 
   const handleUploadClick = () => {
@@ -17,17 +24,21 @@ const AssignmentCard = ({ teacher, assignmentTitle, dueDate, onUpload, onDownloa
   return (
     <div className="assignment-card">
       <div>
-        <h4>{teacher} | {assignmentTitle}</h4>
-        <p>Due: {dueDate}</p>
+        <h4>
+          {teacher} | {assignmentTitle}
+        </h4>
+        <p>Due date: {dueDate}</p>
       </div>
       <div className="buttons">
-        <button onClick={onDownload}>Download</button>
+        <button onClick={onDownload}>
+          {type === "video" ? "Play" : "Download"}
+        </button>
         <button onClick={handleUploadClick}>Upload</button>
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
         />
       </div>
     </div>

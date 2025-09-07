@@ -1,47 +1,20 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import './SubjectPage.css';
-import AssignmentCard from '../components/AssignmentCard';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useAuth } from "../contexts/authContext";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import "./SubjectPage.css";
+import AssignmentCard from "../components/AssignmentCard";
 
 const SubjectPage = () => {
   const { subjectName } = useParams();
+  const { user } = useAuth();
 
-  const videoMaterials = [
-    {
-      teacher: 'Dimuth Kalpage',
-      title: 'Maths Video 2',
-      fileUrl: 'http://localhost:5000/files/video02.mp4',
-    },
-  ];
-
-  const homeworkAssignments = [
-    {
-      teacher: 'Sepalika Gunawardhana',
-      title: 'Assignment 01',
-      dueDate: 'July/10/25',
-      fileUrl: 'http://localhost:5000/files/assignment01.pdf',
-    },
-  ];
-
-  const availableQuizzes = [
-    {
-      title: 'Algebra Quiz',
-      questions: [
-        {
-          text: 'What is 5 + 3?',
-          options: ['6', '7', '8', '9'],
-          correctAnswer: '8',
-        },
-        {
-          text: 'What is 2 x 4?',
-          options: ['6', '7', '8', '10'],
-          correctAnswer: '8',
-        },
-      ],
-    },
-  ];
+  const [videoMaterials, setVideoMaterials] = useState([]);
+  const [homeworkAssignments, setHomeworkAssignments] = useState([]);
+  const [availableQuizzes, setAvailableQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [activeQuiz, setActiveQuiz] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -51,12 +24,56 @@ const SubjectPage = () => {
   const [submittedQuizTitles, setSubmittedQuizTitles] = useState([]);
   const [activeSubmitted, setActiveSubmitted] = useState(null);
 
+  // Fetch subject data when component mounts
+  useEffect(() => {
+    const fetchSubjectData = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const studentClass = user?.classes?.className || user?.classes;
+        if (!studentClass) {
+          setError("Student class not found");
+          return;
+        }
+
+        // Fetch all subject data in one request
+        const response = await fetch(
+          `/api/v1/student/subject/${subjectName}/class/${studentClass}`,
+          {
+            credentials: "include",
+          }
+        );
+        console.log(response);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setHomeworkAssignments(data.data.assignments);
+          setVideoMaterials(data.data.videos);
+          setAvailableQuizzes(data.data.quizzes);
+        } else {
+          setError("Failed to load subject data");
+        }
+      } catch (error) {
+        console.error("Error fetching subject data:", error);
+        setError("Failed to load subject data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user && subjectName) {
+      fetchSubjectData();
+    }
+  }, [user, subjectName]);
+
   const handleDownload = (url) => {
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   const handleUpload = (file) => {
-    console.log('Uploading:', file.name);
+    console.log("Uploading:", file.name);
   };
 
   const handleStartQuiz = (quiz) => {
@@ -82,7 +99,7 @@ const SubjectPage = () => {
 
     // Prevent submission if not all answers are selected
     if (Object.keys(answers).length < total) {
-      alert('Please answer all questions before submitting.');
+      alert("Please answer all questions before submitting.");
       return;
     }
 
@@ -127,50 +144,86 @@ const SubjectPage = () => {
       <div className="subject-container">
         <div className="subject-header">
           <h1 className="subject-n">{subjectName}</h1>
-          <h4 className="subject-teacher">Sepalika Gunawardhana</h4>
+          <h4 className="subject-teacher"></h4>
         </div>
 
         <div className="section-block">
           <h3 className="sub-page-title">Videos</h3>
-          {videoMaterials.map((v, i) => (
-            <AssignmentCard
-              key={i}
-              teacher={v.teacher}
-              assignmentTitle={v.title}
-              dueDate="No"
-              onUpload={null}
-              onDownload={() => handleDownload(v.fileUrl)}
-              isVideo
-            />
-          ))}
+          {loading ? (
+            <p>Loading videos...</p>
+          ) : videoMaterials.length === 0 ? (
+            <p>No videos available for this subject</p>
+          ) : (
+            videoMaterials.map((v, i) => (
+              <AssignmentCard
+                key={v._id || i}
+                teacher={v.teacherId?.name || "Unknown Teacher"}
+                assignmentTitle={v.title}
+                dueDate="No"
+                onUpload={null}
+                onDownload={() =>
+                  window.open(
+                    `${process.env.REACT_APP_API_BASE_URL}/api/v1/videos/stream/${v._id}`,
+                    "_blank"
+                  )
+                }
+                isVideo
+                type="video"
+              />
+            ))
+          )}
         </div>
 
         <div className="section-block">
           <h3 className="sub-page-title">Homeworks</h3>
-          {homeworkAssignments.map((a, i) => (
-            <AssignmentCard
-              key={i}
-              teacher={a.teacher}
-              assignmentTitle={a.title}
-              dueDate={a.dueDate}
-              onUpload={handleUpload}
-              onDownload={() => handleDownload(a.fileUrl)}
-            />
-          ))}
+          {loading ? (
+            <p>Loading homeworks...</p>
+          ) : homeworkAssignments.length === 0 ? (
+            <p>No homeworks available for this subject</p>
+          ) : (
+            homeworkAssignments.map((a, i) => (
+              <AssignmentCard
+                key={a.id || i}
+                teacher={a.teacher?.name || "Unknown Teacher"}
+                assignmentTitle={a.title}
+                dueDate={
+                  a.deadline
+                    ? new Date(a.deadline).toLocaleDateString()
+                    : "No deadline"
+                }
+                onUpload={handleUpload}
+                onDownload={() =>
+                  window.open(
+                    `${process.env.REACT_APP_API_BASE_URL}/api/v1/assignments/download/${a.fileName}`,
+                    "_blank"
+                  )
+                }
+              />
+            ))
+          )}
         </div>
 
         <div className="section-block">
           <h3 className="sub-page-title">Available Quizzes</h3>
-          {availableQuizzes.map(
-            (quiz, i) =>
-              !isQuizSubmitted(quiz) && (
-                <div className="assignment-card" key={i}>
-                  <strong>{quiz.title}</strong>
-                  <button className="ans-btn" onClick={() => handleStartQuiz(quiz)}>
-                    Answer
-                  </button>
-                </div>
-              )
+          {loading ? (
+            <p>Loading quizzes...</p>
+          ) : availableQuizzes.length === 0 ? (
+            <p>No quizzes available for this subject</p>
+          ) : (
+            availableQuizzes.map(
+              (quiz, i) =>
+                !isQuizSubmitted(quiz) && (
+                  <div className="assignment-card" key={quiz._id || i}>
+                    <strong>{quiz.title}</strong>
+                    <button
+                      className="ans-btn"
+                      onClick={() => handleStartQuiz(quiz)}
+                    >
+                      Answer
+                    </button>
+                  </div>
+                )
+            )
           )}
         </div>
 
@@ -181,7 +234,9 @@ const SubjectPage = () => {
               <strong>{submitted.quiz.title}</strong>
               <div className="buttons">
                 <button onClick={() => handleViewQuiz(submitted)}>View</button>
-                <button onClick={() => handleDeleteSubmittedQuiz(i)}>Delete</button>
+                <button onClick={() => handleDeleteSubmittedQuiz(i)}>
+                  Delete
+                </button>
               </div>
             </div>
           ))}
@@ -194,7 +249,9 @@ const SubjectPage = () => {
             <h2>{activeQuiz?.title}</h2>
 
             {viewOnly && activeSubmitted && (
-              <p className="score-text">Your score: {activeSubmitted.score}/{activeSubmitted.total}</p>
+              <p className="score-text">
+                Your score: {activeSubmitted.score}/{activeSubmitted.total}
+              </p>
             )}
 
             {activeQuiz.questions.map((q, idx) => (
@@ -216,11 +273,11 @@ const SubjectPage = () => {
                         style={{
                           color: viewOnly
                             ? isCorrect
-                              ? 'green'
+                              ? "green"
                               : isWrong
-                              ? 'red'
-                              : 'black'
-                            : 'black',
+                              ? "red"
+                              : "black"
+                            : "black",
                         }}
                       >
                         <input
@@ -244,7 +301,10 @@ const SubjectPage = () => {
                 Submit
               </button>
             ) : (
-              <button className="cancel-btn" onClick={() => setQuizModalOpen(false)}>
+              <button
+                className="cancel-btn"
+                onClick={() => setQuizModalOpen(false)}
+              >
                 Close
               </button>
             )}

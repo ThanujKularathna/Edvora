@@ -11,5 +11,6 @@ router.use(authController.restrictTo('student'));
 router.get('/dashboard', studentController.getStudentDashboard);
 router.get('/subjects', studentController.getStudentSubjects);
 router.get('/assignments', studentController.getStudentAssignments);
+router.get('/subject/:subjectName/class/:className', studentController.getSubjectData);
 
 module.exports = router;

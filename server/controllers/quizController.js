@@ -118,3 +118,28 @@ exports.getQuiz = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+/**
+ * Get quizzes by class
+ * @route GET /api/v1/quizzes/class/:className
+ */
+exports.getQuizzesByClass = catchAsync(async (req, res, next) => {
+  const { className } = req.params;
+
+  if (!className) {
+    return next(new AppError('Class name is required', 400));
+  }
+
+  const quizzes = await Quiz.find({ class: className })
+    .populate('teacherId', 'name')
+    .populate('subject', 'name')
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    status: 'success',
+    results: quizzes.length,
+    data: {
+      quizzes
+    }
+  });
+});

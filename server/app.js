@@ -18,7 +18,12 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 //global middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+  })
+);
 
 //serving static files
 app.use(express.static(path.join(__dirname, 'public')));
