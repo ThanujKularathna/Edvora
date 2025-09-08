@@ -23,6 +23,7 @@ const SubjectPage = () => {
   const [viewOnly, setViewOnly] = useState(false);
   const [submittedQuizTitles, setSubmittedQuizTitles] = useState([]);
   const [activeSubmitted, setActiveSubmitted] = useState(null);
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
 
   // Fetch subject data when component mounts
   useEffect(() => {
@@ -81,6 +82,7 @@ const SubjectPage = () => {
     setActiveQuiz(quiz);
     setAnswers({});
     setViewOnly(false);
+    setQuizSubmitted(false);
     setQuizModalOpen(true);
   };
 
@@ -115,8 +117,9 @@ const SubjectPage = () => {
 
     setSubmittedQuizzes([...submittedQuizzes, submitted]);
     setSubmittedQuizTitles([...submittedQuizTitles, activeQuiz.title]);
-    setActiveQuiz(null);
-    setQuizModalOpen(false);
+    setActiveSubmitted(submitted);
+    setQuizSubmitted(true);
+    setViewOnly(true);
   };
 
   const handleViewQuiz = (submitted) => {
@@ -249,11 +252,11 @@ const SubjectPage = () => {
           <div className="modal-box">
             <h2>{activeQuiz?.title}</h2>
 
-            {viewOnly && activeSubmitted && (
+            {(viewOnly && activeSubmitted) || quizSubmitted ? (
               <p className="score-text">
-                Your score: {activeSubmitted.score}/{activeSubmitted.total}
+                Your score: {activeSubmitted?.score || 0}/{activeSubmitted?.total || activeQuiz?.questions?.length || 0}
               </p>
-            )}
+            ) : null}
 
             {activeQuiz?.questions?.map((q, idx) => (
               <div key={idx} className="question-block">
@@ -300,7 +303,7 @@ const SubjectPage = () => {
             ))}
 
             <div className="modal-buttons">
-              {!viewOnly ? (
+              {!quizSubmitted && !viewOnly ? (
                 <>
                   <button className="submit-btn" onClick={handleSubmitQuiz}>
                     Submit
