@@ -18,10 +18,10 @@ const SubjectPage = () => {
 
   const [activeQuiz, setActiveQuiz] = useState(null);
   const [answers, setAnswers] = useState({});
-  const [submittedQuizzes, setSubmittedQuizzes] = useState([]);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
   const [viewOnly, setViewOnly] = useState(false);
   const [submittedQuizTitles, setSubmittedQuizTitles] = useState([]);
+  const [submittedQuizData, setSubmittedQuizData] = useState([]);
   const [activeSubmitted, setActiveSubmitted] = useState(null);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
 
@@ -90,15 +90,9 @@ const SubjectPage = () => {
     setAnswers({ ...answers, [qIndex]: answer });
   };
 
-  const handleSubmitQuiz = () => {
+  const handleSubmitQuiz = async () => {
     const total = activeQuiz.questions.length;
     let score = 0;
-
-    activeQuiz.questions.forEach((q, i) => {
-      if (answers[i] === q.correctAnswerIndex) {
-        score++;
-      }
-    });
 
     // Prevent submission if not all answers are selected
     if (Object.keys(answers).length < total) {
@@ -106,38 +100,60 @@ const SubjectPage = () => {
       return;
     }
 
-    console.log(`🎯 Student scored: ${score}/${total}`);
+    // Format answers according to quiz result model
+    const formattedAnswers = activeQuiz.questions.map((q, i) => {
+      const isCorrect = answers[i] === q.correctAnswerIndex;
+      if (isCorrect) score++;
+      
+      return {
+        questionId: q._id,
+        selectedOption: answers[i],
+        isCorrect: isCorrect
+      };
+    });
 
-    const submitted = {
-      quiz: activeQuiz,
-      answers: answers,
+    const quizResult = {
+      quizId: activeQuiz._id,
+      answers: formattedAnswers,
       score: score,
-      total: total,
+      totalQuestions: total
     };
 
-    setSubmittedQuizzes([...submittedQuizzes, submitted]);
-    setSubmittedQuizTitles([...submittedQuizTitles, activeQuiz.title]);
-    setActiveSubmitted(submitted);
-    setQuizSubmitted(true);
-    setViewOnly(true);
+    try {
+      const response = await fetch('/api/v1/quizzes/submit-result', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(quizResult)
+      });
+
+      if (response.ok) {
+        console.log(`🎯 Student scored: ${score}/${total}`);
+        
+        const submitted = {
+          quiz: activeQuiz,
+          answers: answers,
+          score: score,
+          total: total,
+        };
+
+        setSubmittedQuizTitles([...submittedQuizTitles, activeQuiz.title]);
+        setSubmittedQuizData([...submittedQuizData, submitted]);
+        setActiveSubmitted(submitted);
+        setQuizSubmitted(true);
+        setViewOnly(true);
+      } else {
+        alert('Failed to submit quiz. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      alert('Failed to submit quiz. Please try again.');
+    }
   };
 
-  const handleViewQuiz = (submitted) => {
-    setActiveQuiz(submitted.quiz);
-    setAnswers(submitted.answers);
-    setActiveSubmitted(submitted);
-    setViewOnly(true);
-    setQuizModalOpen(true);
-  };
 
-  const handleDeleteSubmittedQuiz = (index) => {
-    const updated = [...submittedQuizzes];
-    const updatedTitles = [...submittedQuizTitles];
-    updated.splice(index, 1);
-    updatedTitles.splice(index, 1);
-    setSubmittedQuizzes(updated);
-    setSubmittedQuizTitles(updatedTitles);
-  };
 
   const isQuizSubmitted = (quiz) => submittedQuizTitles.includes(quiz.title);
 
@@ -208,43 +224,46 @@ const SubjectPage = () => {
         </div>
 
         <div className="section-block">
-          <h3 className="sub-page-title">Available Quizzes</h3>
+          <h3 className="sub-page-title">Quizzes</h3>
           {loading ? (
             <p>Loading quizzes...</p>
           ) : availableQuizzes.length === 0 ? (
             <p>No quizzes available for this subject</p>
           ) : (
-            availableQuizzes.map(
-              (quiz, i) =>
-                !isQuizSubmitted(quiz) && (
-                  <div className="assignment-card" key={quiz._id || i}>
-                    <strong>{quiz.title}</strong>
-                    <button
-                      className="ans-btn"
-                      onClick={() => handleStartQuiz(quiz)}
-                    >
-                      Answer
-                    </button>
-                  </div>
-                )
-            )
+            availableQuizzes.map((quiz, i) => (
+              <div className="assignment-card" key={quiz._id || i}>
+                <strong>{quiz.title}</strong>
+                {isQuizSubmitted(quiz) ? (
+                  <button
+                    className="completed-status"
+                    onClick={() => {
+                      const submittedQuiz = submittedQuizData.find(sq => sq.quiz.title === quiz.title);
+                      if (submittedQuiz) {
+                        setActiveQuiz(submittedQuiz.quiz);
+                        setAnswers(submittedQuiz.answers);
+                        setActiveSubmitted(submittedQuiz);
+                        setViewOnly(true);
+                        setQuizSubmitted(false);
+                        setQuizModalOpen(true);
+                      }
+                    }}
+                  >
+                    View Results
+                  </button>
+                ) : (
+                  <button
+                    className="ans-btn"
+                    onClick={() => handleStartQuiz(quiz)}
+                  >
+                    Answer
+                  </button>
+                )}
+              </div>
+            ))
           )}
         </div>
 
-        <div className="section-block">
-          <h3 className="sub-page-title">Previous Quizzes</h3>
-          {submittedQuizzes.map((submitted, i) => (
-            <div className="assignment-card" key={i}>
-              <strong>{submitted.quiz.title}</strong>
-              <div className="buttons">
-                <button onClick={() => handleViewQuiz(submitted)}>View</button>
-                <button onClick={() => handleDeleteSubmittedQuiz(i)}>
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+
       </div>
 
       {quizModalOpen && (

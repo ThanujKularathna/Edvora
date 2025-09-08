@@ -189,3 +189,27 @@
   padding-bottom: 20px;
   color: #0c3e39;
 }
+
+.completed-status {
+  position: absolute;
+  right: 12px;
+  bottom: 9px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  height: 30px;
+  line-height: 1;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 5px 10px;
+}
+
+.completed-status:hover {
+  background-color: #45a049;
+}

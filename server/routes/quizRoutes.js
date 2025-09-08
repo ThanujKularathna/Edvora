@@ -16,6 +16,14 @@ router
     quizController.createQuiz
   );
 
+router
+  .route('/submit-result')
+  .post(
+    authController.protect,
+    authController.restrictTo('student'),
+    quizController.submitQuizResult
+  );
+
 // Route to get quizzes by teacher ID and class
 router
   .route('/teacher/:teacherId/class/:className')
