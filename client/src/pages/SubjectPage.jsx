@@ -53,6 +53,28 @@ const SubjectPage = () => {
           setHomeworkAssignments(data.data.assignments);
           setVideoMaterials(data.data.videos);
           setAvailableQuizzes(data.data.quizzes);
+          
+          // Set submitted quiz titles and data from backend
+          const completedQuizzes = data.data.quizzes.filter(quiz => quiz.isCompleted);
+          const submittedTitles = completedQuizzes.map(quiz => quiz.title);
+          const submittedData = completedQuizzes.map(quiz => {
+            // Convert backend format to frontend format
+            const frontendAnswers = {};
+            if (quiz.result && quiz.result.answers) {
+              quiz.result.answers.forEach((answer, index) => {
+                frontendAnswers[index] = answer.selectedOption;
+              });
+            }
+            return {
+              quiz: quiz,
+              answers: frontendAnswers,
+              score: quiz.result?.score || 0,
+              total: quiz.result?.totalQuestions || 0
+            };
+          });
+          
+          setSubmittedQuizTitles(submittedTitles);
+          setSubmittedQuizData(submittedData);
         } else {
           setError("Failed to load subject data");
         }
@@ -155,7 +177,7 @@ const SubjectPage = () => {
 
 
 
-  const isQuizSubmitted = (quiz) => submittedQuizTitles.includes(quiz.title);
+  const isQuizSubmitted = (quiz) => quiz.isCompleted || submittedQuizTitles.includes(quiz.title);
 
   return (
     <div>
