@@ -6,6 +6,7 @@ server/node_modules/
 # Package lock files
 /package-lock.json
 /package.json
+response.json
 
 # Logs
 *.log

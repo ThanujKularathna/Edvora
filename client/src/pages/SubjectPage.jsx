@@ -77,6 +77,7 @@ const SubjectPage = () => {
   };
 
   const handleStartQuiz = (quiz) => {
+    console.log('Starting quiz:', quiz);
     setActiveQuiz(quiz);
     setAnswers({});
     setViewOnly(false);
@@ -92,7 +93,7 @@ const SubjectPage = () => {
     let score = 0;
 
     activeQuiz.questions.forEach((q, i) => {
-      if (answers[i] === q.correctAnswer) {
+      if (answers[i] === q.correctAnswerIndex) {
         score++;
       }
     });
@@ -254,17 +255,17 @@ const SubjectPage = () => {
               </p>
             )}
 
-            {activeQuiz.questions.map((q, idx) => (
+            {activeQuiz?.questions?.map((q, idx) => (
               <div key={idx} className="question-block">
                 <p>
                   <strong>
-                    {idx + 1}. {q.text}
+                    {idx + 1}. {q.questionText || q.text}
                   </strong>
                 </p>
                 <div className="option-group column-options">
-                  {q.options.map((opt, i) => {
-                    const isCorrect = q.correctAnswer === opt;
-                    const isSelected = answers[idx] === opt;
+                  {q.options?.map((opt, i) => {
+                    const isCorrect = q.correctAnswerIndex === i;
+                    const isSelected = answers[idx] === i;
                     const isWrong = isSelected && !isCorrect;
 
                     return (
@@ -278,15 +279,17 @@ const SubjectPage = () => {
                               ? "red"
                               : "black"
                             : "black",
+                          fontWeight: isSelected ? "bold" : "normal"
                         }}
                       >
                         <input
                           type="radio"
-                          name={`q-${idx}`}
-                          value={opt}
-                          checked={answers[idx] === opt}
+                          name={`question-${idx}`}
+                          value={i}
+                          checked={answers[idx] === i}
+                          onChange={() => !viewOnly && handleAnswerChange(idx, i)}
                           disabled={viewOnly}
-                          onChange={() => handleAnswerChange(idx, opt)}
+                          style={{ marginRight: '10px' }}
                         />
                         {opt}
                       </label>
@@ -296,18 +299,25 @@ const SubjectPage = () => {
               </div>
             ))}
 
-            {!viewOnly ? (
-              <button className="submit-btn" onClick={handleSubmitQuiz}>
-                Submit
-              </button>
-            ) : (
-              <button
-                className="cancel-btn"
-                onClick={() => setQuizModalOpen(false)}
-              >
-                Close
-              </button>
-            )}
+            <div className="modal-buttons">
+              {!viewOnly ? (
+                <>
+                  <button className="submit-btn" onClick={handleSubmitQuiz}>
+                    Submit
+                  </button>
+                  <button className="close-btn" onClick={() => setQuizModalOpen(false)}>
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="close-btn"
+                  onClick={() => setQuizModalOpen(false)}
+                >
+                  Close
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

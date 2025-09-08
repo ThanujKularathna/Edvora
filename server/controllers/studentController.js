@@ -114,7 +114,7 @@ exports.getSubjectData = catchAsync(async (req, res, next) => {
   // Get class and subject ObjectIds
   const classDoc = await Class.findOne({ className });
   const subjectDoc = await Subject.findOne({ name: subjectName });
-  
+
   if (!classDoc) {
     return next(new AppError('Class not found', 404));
   }
