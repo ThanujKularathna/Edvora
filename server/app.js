@@ -10,6 +10,7 @@ const quizRoutes = require('./routes/quizRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 const classRoutes = require('./routes/classRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const submissionRoutes = require('./routes/submissionRoutes');
 
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -43,6 +44,7 @@ app.use('/api/v1/quizzes', quizRoutes);
 app.use('/api/v1/videos', videoRoutes);
 app.use('/api/v1/class', classRoutes);
 app.use('/api/v1/student', studentRoutes);
+app.use('/api/v1/submissions', submissionRoutes);
 
 app.all('*', (req, res, next) => {
   res.status(404).json({

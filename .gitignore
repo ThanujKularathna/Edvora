@@ -12,6 +12,7 @@ response.json
 *.log
 
 #static files
+submissions
 pdf
 videos
 dev-data

@@ -153,10 +153,17 @@ exports.getSubjectData = catchAsync(async (req, res, next) => {
     };
   });
 
+  // Ensure assignments have id field for frontend
+  const assignmentsWithId = assignments.map(assignment => {
+    const assignmentObj = assignment.toObject();
+    assignmentObj.id = assignmentObj._id;
+    return assignmentObj;
+  });
+
   res.status(200).json({
     status: 'success',
     data: {
-      assignments: assignments,
+      assignments: assignmentsWithId,
       videos: videos,
       quizzes: quizzesWithStatus
     }

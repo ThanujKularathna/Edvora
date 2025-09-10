@@ -13,6 +13,7 @@ const SubjectPage = () => {
   const [videoMaterials, setVideoMaterials] = useState([]);
   const [homeworkAssignments, setHomeworkAssignments] = useState([]);
   const [availableQuizzes, setAvailableQuizzes] = useState([]);
+  const [submissions, setSubmissions] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -49,15 +50,48 @@ const SubjectPage = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
+          console.log('Subject data:', data);
+          console.log('Assignments:', data.data.assignments);
           setHomeworkAssignments(data.data.assignments);
           setVideoMaterials(data.data.videos);
           setAvailableQuizzes(data.data.quizzes);
-          
+
+          // Fetch submission status for each assignment
+          const submissionPromises = data.data.assignments.map(
+            async (assignment) => {
+              const assignmentId = assignment.id || assignment._id;
+              try {
+                const submissionResponse = await fetch(
+                  `/api/v1/submissions/assignment/${assignmentId}`,
+                  { credentials: "include" }
+                );
+                if (submissionResponse.ok) {
+                  const submissionData = await submissionResponse.json();
+                  return { [assignmentId]: submissionData.data };
+                }
+              } catch (error) {
+                console.log(
+                  "No submission found for assignment:",
+                  assignmentId
+                );
+              }
+              return { [assignmentId]: null };
+            }
+          );
+
+          const submissionResults = await Promise.all(submissionPromises);
+          const submissionsMap = submissionResults.reduce(
+            (acc, curr) => ({ ...acc, ...curr }),
+            {}
+          );
+          setSubmissions(submissionsMap);
+
           // Set submitted quiz titles and data from backend
-          const completedQuizzes = data.data.quizzes.filter(quiz => quiz.isCompleted);
-          const submittedTitles = completedQuizzes.map(quiz => quiz.title);
-          const submittedData = completedQuizzes.map(quiz => {
+          const completedQuizzes = data.data.quizzes.filter(
+            (quiz) => quiz.isCompleted
+          );
+          const submittedTitles = completedQuizzes.map((quiz) => quiz.title);
+          const submittedData = completedQuizzes.map((quiz) => {
             // Convert backend format to frontend format
             const frontendAnswers = {};
             if (quiz.result && quiz.result.answers) {
@@ -69,10 +103,10 @@ const SubjectPage = () => {
               quiz: quiz,
               answers: frontendAnswers,
               score: quiz.result?.score || 0,
-              total: quiz.result?.totalQuestions || 0
+              total: quiz.result?.totalQuestions || 0,
             };
           });
-          
+
           setSubmittedQuizTitles(submittedTitles);
           setSubmittedQuizData(submittedData);
         } else {
@@ -96,11 +130,12 @@ const SubjectPage = () => {
   };
 
   const handleUpload = (file) => {
+    // This function is now handled within AssignmentCard component
     console.log("Uploading:", file.name);
   };
 
   const handleStartQuiz = (quiz) => {
-    console.log('Starting quiz:', quiz);
+    console.log("Starting quiz:", quiz);
     setActiveQuiz(quiz);
     setAnswers({});
     setViewOnly(false);
@@ -126,11 +161,11 @@ const SubjectPage = () => {
     const formattedAnswers = activeQuiz.questions.map((q, i) => {
       const isCorrect = answers[i] === q.correctAnswerIndex;
       if (isCorrect) score++;
-      
+
       return {
         questionId: q._id,
         selectedOption: answers[i],
-        isCorrect: isCorrect
+        isCorrect: isCorrect,
       };
     });
 
@@ -138,22 +173,22 @@ const SubjectPage = () => {
       quizId: activeQuiz._id,
       answers: formattedAnswers,
       score: score,
-      totalQuestions: total
+      totalQuestions: total,
     };
 
     try {
-      const response = await fetch('/api/v1/quizzes/submit-result', {
-        method: 'POST',
+      const response = await fetch("/api/v1/quizzes/submit-result", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
-        body: JSON.stringify(quizResult)
+        credentials: "include",
+        body: JSON.stringify(quizResult),
       });
 
       if (response.ok) {
         console.log(`🎯 Student scored: ${score}/${total}`);
-        
+
         const submitted = {
           quiz: activeQuiz,
           answers: answers,
@@ -167,17 +202,16 @@ const SubjectPage = () => {
         setQuizSubmitted(true);
         setViewOnly(true);
       } else {
-        alert('Failed to submit quiz. Please try again.');
+        alert("Failed to submit quiz. Please try again.");
       }
     } catch (error) {
-      console.error('Error submitting quiz:', error);
-      alert('Failed to submit quiz. Please try again.');
+      console.error("Error submitting quiz:", error);
+      alert("Failed to submit quiz. Please try again.");
     }
   };
 
-
-
-  const isQuizSubmitted = (quiz) => quiz.isCompleted || submittedQuizTitles.includes(quiz.title);
+  const isQuizSubmitted = (quiz) =>
+    quiz.isCompleted || submittedQuizTitles.includes(quiz.title);
 
   return (
     <div>
@@ -233,6 +267,9 @@ const SubjectPage = () => {
                     ? new Date(a.deadline).toLocaleDateString()
                     : "No deadline"
                 }
+                assignmentId={a.id || a._id}
+                isSubmitted={!!submissions[a.id || a._id]}
+                submissionFile={submissions[a.id || a._id]}
                 onUpload={handleUpload}
                 onDownload={() =>
                   window.open(
@@ -259,7 +296,9 @@ const SubjectPage = () => {
                   <button
                     className="completed-status"
                     onClick={() => {
-                      const submittedQuiz = submittedQuizData.find(sq => sq.quiz.title === quiz.title);
+                      const submittedQuiz = submittedQuizData.find(
+                        (sq) => sq.quiz.title === quiz.title
+                      );
                       if (submittedQuiz) {
                         setActiveQuiz(submittedQuiz.quiz);
                         setAnswers(submittedQuiz.answers);
@@ -284,8 +323,6 @@ const SubjectPage = () => {
             ))
           )}
         </div>
-
-
       </div>
 
       {quizModalOpen && (
@@ -295,7 +332,8 @@ const SubjectPage = () => {
 
             {(viewOnly && activeSubmitted) || quizSubmitted ? (
               <p className="score-text">
-                Your score: {activeSubmitted?.score || 0}/{activeSubmitted?.total || activeQuiz?.questions?.length || 0}
+                Your score: {activeSubmitted?.score || 0}/
+                {activeSubmitted?.total || activeQuiz?.questions?.length || 0}
               </p>
             ) : null}
 
@@ -323,7 +361,7 @@ const SubjectPage = () => {
                               ? "red"
                               : "black"
                             : "black",
-                          fontWeight: isSelected ? "bold" : "normal"
+                          fontWeight: isSelected ? "bold" : "normal",
                         }}
                       >
                         <input
@@ -331,9 +369,11 @@ const SubjectPage = () => {
                           name={`question-${idx}`}
                           value={i}
                           checked={answers[idx] === i}
-                          onChange={() => !viewOnly && handleAnswerChange(idx, i)}
+                          onChange={() =>
+                            !viewOnly && handleAnswerChange(idx, i)
+                          }
                           disabled={viewOnly}
-                          style={{ marginRight: '10px' }}
+                          style={{ marginRight: "10px" }}
                         />
                         {opt}
                       </label>
@@ -349,7 +389,10 @@ const SubjectPage = () => {
                   <button className="submit-btn" onClick={handleSubmitQuiz}>
                     Submit
                   </button>
-                  <button className="close-btn" onClick={() => setQuizModalOpen(false)}>
+                  <button
+                    className="close-btn"
+                    onClick={() => setQuizModalOpen(false)}
+                  >
                     Cancel
                   </button>
                 </>

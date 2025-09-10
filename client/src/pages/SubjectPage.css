@@ -213,3 +213,22 @@
 .completed-status:hover {
   background-color: #45a049;
 }
+
+/* Submission status styles */
+.assignment-card p[style*="color: green"] {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.assignment-card .buttons button[style*="backgroundColor: '#28a745'"] {
+  background-color: #28a745 !important;
+}
+
+.assignment-card .buttons button[style*="backgroundColor: '#28a745'"]:hover {
+  background-color: #218838 !important;
+}
+
+.assignment-card .buttons button:disabled {
+  background-color: #ccc !important;
+  cursor: not-allowed;
+}
