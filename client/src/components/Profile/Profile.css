@@ -1,0 +1,388 @@
+/* Container for the entire profile page */
+.profile-container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: Arial, sans-serif;
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+  margin-bottom: 50px;
+  background-color:rgb(217,217,217,97) ; /* gray-100 */
+  /* padding: 16px; */
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.profile-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 20px;
+}
+
+/* Profile image container in header */
+.profile-header-left img {
+  margin-left: 12px;
+  width: 120px;          /* sets the width of the image */
+  height: 120px;         /* sets the height */
+  border-radius: 50%;   /* makes it circular */
+  border: 2px solid #cbd2df; /* optional border */
+  object-fit: cover;    /* ensures the image fills the circle without distortion */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease;
+  margin-right: 12px;
+}
+
+.profile-header-left img:hover {
+  transform: scale(1.05); /* slightly enlarge on hover */
+}
+
+
+.profile-header-left h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937; /* gray-800 */
+}
+
+.profile-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-buttons button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+  /* margin-top: 130px; */
+}
+
+.profile-buttons .customize {
+  background-color: #3b82f6; /* blue-500 */
+  color: white;
+}
+
+.profile-buttons .customize:hover {
+  background-color: #2563eb; /* blue-600 */
+}
+
+.profile-buttons .reset {
+  background-color: #ef4444; /* red-500 */
+  color: white;
+}
+
+.profile-buttons .reset:hover {
+  background-color: #dc2626; /* red-600 */
+}
+
+
+/* reset password popup view */
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Box */
+.modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 320px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+.modal h3 {
+  margin-bottom: 15px;
+}
+
+.modal input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.save-btn {
+  background: #377777;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #377777;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+
+
+
+
+
+
+/* Cards (UserDetails, ActivityLog, CourseDetails, Reports) */
+
+/* Header inside card */
+
+.card1{
+    background-color: rgb(217,217,217);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+
+.card1-header {
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.edit-link {
+  font-size: 0.9rem;
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.edit-link:hover {
+  text-decoration: underline;
+}
+
+/* Each row (label + value box) */
+.details-row {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.details-row label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151; /* gray-700 */
+}
+
+.details-value {
+  background-color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db; /* gray-300 */
+  font-size: 0.95rem;
+  color: #111827; /* gray-900 */
+}
+
+/* profile-picture edit */
+
+.profile-pic-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.profile-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.change-photo-btn {
+  display: inline-block;
+  margin-top: 8px;
+  width: 141px;
+  font-size: 0.9rem;
+  color: white;
+  border-radius: 6px;
+  background-color: #377777;
+  cursor: pointer;
+  transition: background 0.2s;
+  padding: 6px 12px;
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+.change-photo-btn:hover {
+  background-color: #306c6c;
+}
+
+
+
+
+
+.card {
+  background-color: #f3f4f6; /* gray-100 */
+  padding: 16px;
+  height: 300px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* card2- Activity log */
+
+.card2 {
+  background-color:rgb(217,217,217);
+  padding: 16px;
+  height: 200px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card2 p {
+  margin-bottom: 8px;
+  color: #374151; /* gray-700 */
+}
+
+.card2 h3 {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #374151; /* gray-700 */
+  margin-bottom: 20px;
+}
+
+.card2 ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.card2 ul li {
+  margin-bottom: 6px;
+}   
+
+
+/* card3-course details */
+
+/* CourseDetails Card */
+.card3 {
+  background:rgb(217,217,217);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card3 h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 6px;
+}
+
+.card3 ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.card3 li {
+  padding: 8px 0;
+  font-size: 0.95rem;
+  color: #444;
+  border-bottom: 1px dashed #ddd;
+}
+
+.card3 li:last-child {
+  border-bottom: none;
+}
+
+.card3 .teacher {
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+  margin-left: 4px;
+}
+
+
+
+
+
+
+
+
+.card h3 {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #374151; /* gray-700 */
+}
+
+.card ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.card ul li {
+  margin-bottom: 6px;
+}
+
+.card a {
+  display: block;
+  color: #3b82f6;
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+
+.card a:hover {
+  text-decoration: underline;
+}
+
+/* Grid for UserDetails and ActivityLog */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

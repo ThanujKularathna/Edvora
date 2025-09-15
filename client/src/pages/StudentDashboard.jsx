@@ -5,6 +5,7 @@ import "./StudentDashboard.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
+
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();

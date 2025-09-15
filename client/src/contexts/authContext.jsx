@@ -44,27 +44,34 @@ function AuthProvider({ children }) {
     initialState
   );
 
+  // ✅ check logged in user on app load
   useEffect(() => {
     async function checkAuth() {
       const currentPath = window.location.pathname;
-      console.log(currentPath);
       const isLoginPage =
         currentPath === "/" ||
         currentPath === "/forgot-password" ||
         currentPath.startsWith("/reset-password");
 
-      // Skip auth check on login-related pages
+      // Skip check on login/forgot/reset pages
       if (isLoginPage) {
         dispatch({ type: "logout" });
         return;
       }
 
-      // Check auth for protected routes
       try {
         const response = await axios.get("/api/v1/users/me", {
           withCredentials: true,
         });
-        dispatch({ type: "login", payload: response.data.user });
+
+        let userData = response.data.user;
+
+        // ✅ Normalize role to lowercase
+        if (userData.role) {
+          userData = { ...userData, role: userData.role.toLowerCase() };
+        }
+
+        dispatch({ type: "login", payload: userData });
       } catch (err) {
         dispatch({ type: "logout" });
       }
@@ -73,14 +80,22 @@ function AuthProvider({ children }) {
     checkAuth();
   }, []);
 
+  // ✅ login
   async function login(email, password) {
     try {
       const response = await axios.post(
-        "api/v1/users/login",
+        "/api/v1/users/login",
         { email, password },
         { withCredentials: true }
       );
-      const userData = response.data.user;
+
+      let userData = response.data.user;
+
+      // normalize role
+      if (userData.role) {
+        userData = { ...userData, role: userData.role.toLowerCase() };
+      }
+
       dispatch({ type: "login", payload: userData });
     } catch (err) {
       const message =
@@ -89,9 +104,10 @@ function AuthProvider({ children }) {
     }
   }
 
+  // ✅ logout
   async function logout() {
     try {
-      await axios.get("api/v1/users/logout", {}, { withCredentials: true });
+      await axios.get("/api/v1/users/logout", { withCredentials: true });
     } catch (err) {
       console.log("Logout API failed:", err);
     } finally {

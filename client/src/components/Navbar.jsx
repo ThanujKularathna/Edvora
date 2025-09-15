@@ -1,5 +1,5 @@
 import React from "react";
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Navbar.css"; // Optional: for styling
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faUser, faPowerOff } from "@fortawesome/free-solid-svg-icons";
@@ -53,9 +53,9 @@ const Navbar = () => {
             <FontAwesomeIcon icon={faUser} className="icon" />
           </div>
           <a className="nav-link" href="/profile">
-            Profile
+            {/* Profile */}
           </a>
-          {/* <Link to="/profile">Profile</Link> */}
+          <Link to="/profile" className="text-white">Profile</Link>
         </div>
 
         <div className="nav-item">
