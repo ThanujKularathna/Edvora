@@ -67,8 +67,13 @@ exports.downloadQuizResults = catchAsync(async (req, res, next) => {
   const { quizId } = req.params;
 
   // Find the quiz
-  const quiz = await Quiz.findById(quizId);
-  if (!quiz) {
+  const {
+    subject,
+    class: classObj,
+    title,
+    questions
+  } = await Quiz.findById(quizId);
+  if (!title) {
     return next(new AppError('Quiz not found', 404));
   }
 
@@ -82,7 +87,7 @@ exports.downloadQuizResults = catchAsync(async (req, res, next) => {
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader(
     'Content-Disposition',
-    `attachment; filename=quiz-results-${quiz.title}-${quiz.class}.pdf`
+    `attachment; filename="quiz-results-${title.replace(/[^a-zA-Z0-9]/g, '-')}-${classObj.toString().replace(/[^a-zA-Z0-9]/g, '-')}.pdf"`
   );
 
   doc.pipe(res);
@@ -90,12 +95,12 @@ exports.downloadQuizResults = catchAsync(async (req, res, next) => {
   // Add content to the PDF
   doc
     .fontSize(20)
-    .text(`Quiz Results Report - ${quiz.subject}`, { align: 'center' });
+    .text(`Quiz Results Report - ${subject.name}`, { align: 'center' });
   doc.moveDown();
 
-  doc.fontSize(12).text(`Class: ${quiz.class}`);
-  doc.text(`Quiz Title: ${quiz.title}`);
-  doc.text(`Total Questions: ${quiz.questions.length}`);
+  doc.fontSize(12).text(`Class: ${classObj.className}`);
+  doc.text(`Quiz Title: ${title}`);
+  doc.text(`Total Questions: ${questions.length}`);
   doc.text(`Total Participants: ${results.length}`);
   doc.text(`Date: ${new Date().toLocaleDateString()}`);
   doc.moveDown();

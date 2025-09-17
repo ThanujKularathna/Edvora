@@ -22,6 +22,7 @@ const ClassToolPage = () => {
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showHomeworkModal, setShowHomeworkModal] = useState(false);
   const [showQuizModal, setShowQuizModal] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const [uploadedVideos, setUploadedVideos] = useState([]);
   // uploadedHomework state removed - now handled by HomeworkSection
@@ -241,6 +242,18 @@ const ClassToolPage = () => {
     fetchQuizzes();
   }, [user, className]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.quiz-dropdown-container')) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   const addQuestion = () => {
     setQuestions([
       ...questions,
@@ -402,30 +415,44 @@ const ClassToolPage = () => {
                     )}
                   </div>
                 </div>
-                <div className="card-buttons">
+                <div className="quiz-dropdown-container">
                   <button
-                    className="delete-btn"
-                    onClick={() => showVideoDeleteConfirmation(idx)}
+                    className="quiz-dropdown-btn"
+                    onClick={() => setOpenDropdown(openDropdown === `video-${idx}` ? null : `video-${idx}`)}
                   >
-                    Delete
+                    Options ▼
                   </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => {
-                      const videoId = video._id || video.id;
-                      if (videoId) {
-                        window.open(
-                          `${API_BASE_URL}/api/v1/videos/stream/${videoId}`,
-                          "_blank"
-                        );
-                      } else {
-                        console.error("Video ID not found:", video);
-                        alert("Cannot play video: ID not found");
-                      }
-                    }}
-                  >
-                    View
-                  </button>
+                  {openDropdown === `video-${idx}` && (
+                    <div className="quiz-dropdown-menu">
+                      <button
+                        className="dropdown-item"
+                        onClick={() => {
+                          const videoId = video._id || video.id;
+                          if (videoId) {
+                            window.open(
+                              `${API_BASE_URL}/api/v1/videos/stream/${videoId}`,
+                              "_blank"
+                            );
+                          } else {
+                            console.error("Video ID not found:", video);
+                            alert("Cannot play video: ID not found");
+                          }
+                          setOpenDropdown(null);
+                        }}
+                      >
+                        View
+                      </button>
+                      <button
+                        className="dropdown-item delete-item"
+                        onClick={() => {
+                          showVideoDeleteConfirmation(idx);
+                          setOpenDropdown(null);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -437,6 +464,8 @@ const ClassToolPage = () => {
           className={className}
           showModal={showHomeworkModal}
           setShowModal={setShowHomeworkModal}
+          openDropdown={openDropdown}
+          setOpenDropdown={setOpenDropdown}
         />
 
         <div className="content-section">
@@ -457,28 +486,45 @@ const ClassToolPage = () => {
                       </span>
                     )}
                   </div>
-                  <div className="card-buttons">
+                  <div className="quiz-dropdown-container">
                     <button
-                      className="delete-btn"
-                      onClick={() => showDeleteConfirmation(idx)}
+                      className="quiz-dropdown-btn"
+                      onClick={() => setOpenDropdown(openDropdown === idx ? null : idx)}
                     >
-                      Delete
+                      Options ▼
                     </button>
-                    <button
-                      className="delete-btn"
-                      onClick={() => {
-                        setSelectedQuiz(quiz);
-                        setViewQuizModal(true);
-                      }}
-                    >
-                      View
-                    </button>
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDownloadQuizResults(quiz.id)}
-                    >
-                      Download Results
-                    </button>
+                    {openDropdown === idx && (
+                      <div className="quiz-dropdown-menu">
+                        <button
+                          className="dropdown-item"
+                          onClick={() => {
+                            setSelectedQuiz(quiz);
+                            setViewQuizModal(true);
+                            setOpenDropdown(null);
+                          }}
+                        >
+                          View
+                        </button>
+                        <button
+                          className="dropdown-item"
+                          onClick={() => {
+                            handleDownloadQuizResults(quiz.id);
+                            setOpenDropdown(null);
+                          }}
+                        >
+                          Download Results
+                        </button>
+                        <button
+                          className="dropdown-item delete-item"
+                          onClick={() => {
+                            showDeleteConfirmation(idx);
+                            setOpenDropdown(null);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))

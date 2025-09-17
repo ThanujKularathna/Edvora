@@ -3,6 +3,7 @@ const util = require('util');
 const fs = require('fs');
 const catchAsync = require('../utils/catchAsync');
 const Assignment = require('../models/assignmentModel');
+const Submission = require('../models/submissionModel');
 const AppError = require('../utils/appError');
 
 const multerStorage = multer.diskStorage({
@@ -193,4 +194,29 @@ exports.downloadAssignment = catchAsync(async (req, res, next) => {
   // Stream the file to the response
   const fileStream = fs.createReadStream(filePath);
   fileStream.pipe(res);
+});
+
+/**
+ * Get all submissions for a specific assignment (for teachers)
+ * @route GET /api/v1/assignments/:id/submissions
+ */
+exports.getAssignmentSubmissions = catchAsync(async (req, res, next) => {
+  const assignment = await Assignment.findById(req.params.id);
+  
+  if (!assignment) {
+    return next(new AppError('Assignment not found', 404));
+  }
+  
+  // Check if the teacher owns this assignment
+  if (assignment.teacher.toString() !== req.user.id) {
+    return next(new AppError('You can only view submissions for your own assignments', 403));
+  }
+  
+  const submissions = await Submission.find({ assignment: req.params.id });
+  
+  res.status(200).json({
+    status: 'success',
+    results: submissions.length,
+    data: submissions
+  });
 });

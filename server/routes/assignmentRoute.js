@@ -44,4 +44,13 @@ router
     assignmentController.deleteAssignment
   );
 
+// Route for teachers to get all submissions for their assignment
+router
+  .route('/:id/submissions')
+  .get(
+    authController.protect,
+    authController.restrictTo('teacher'),
+    assignmentController.getAssignmentSubmissions
+  );
+
 module.exports = router;

@@ -6,7 +6,7 @@ import { capitalCase } from "change-case";
 import "./HomeworkSection.css";
 import "../styles/Modal.css";
 
-const HomeworkSection = ({ className, showModal, setShowModal }) => {
+const HomeworkSection = ({ className, showModal, setShowModal, openDropdown, setOpenDropdown }) => {
   const { user } = useAuth();
   const [homeworks, setHomeworks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -128,28 +128,40 @@ const HomeworkSection = ({ className, showModal, setShowModal }) => {
                   )}
                 </div>
               </div>
-              <div className="card-buttons">
+              <div className="quiz-dropdown-container">
                 <button
-                  className="delete-btn"
-                  onClick={() => showDeleteConfirmation(hw.id)}
+                  className="quiz-dropdown-btn"
+                  onClick={() => setOpenDropdown(openDropdown === `homework-${hw.id}` ? null : `homework-${hw.id}`)}
                 >
-                  Delete
+                  Options ▼
                 </button>
-                <button
-                  className="delete-btn"
-                  onClick={() => {
-                    window.open(
-                      `${
-                        process.env.REACT_APP_API_BASE_URL
-                      }/api/v1/assignments/download/${encodeURIComponent(
-                        hw.fileName
-                      )}`,
-                      "_blank"
-                    );
-                  }}
-                >
-                  View
-                </button>
+                {openDropdown === `homework-${hw.id}` && (
+                  <div className="quiz-dropdown-menu">
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        window.open(
+                          `http://localhost:8000/api/v1/assignments/download/${encodeURIComponent(
+                            hw.fileName
+                          )}`,
+                          "_blank"
+                        );
+                        setOpenDropdown(null);
+                      }}
+                    >
+                      View
+                    </button>
+                    <button
+                      className="dropdown-item delete-item"
+                      onClick={() => {
+                        showDeleteConfirmation(hw.id);
+                        setOpenDropdown(null);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))
