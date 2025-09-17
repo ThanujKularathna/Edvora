@@ -16,6 +16,7 @@ const SubjectPage = () => {
   const [submissions, setSubmissions] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const [activeQuiz, setActiveQuiz] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -124,6 +125,18 @@ const SubjectPage = () => {
       fetchSubjectData();
     }
   }, [user, subjectName]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.homework-dropdown-container')) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const handleDownload = (url) => {
     window.open(url, "_blank");
@@ -258,26 +271,97 @@ const SubjectPage = () => {
             <p>No homeworks available for this subject</p>
           ) : (
             homeworkAssignments.map((a, i) => (
-              <AssignmentCard
-                key={a.id || i}
-                teacher={a.teacher?.name || "Unknown Teacher"}
-                assignmentTitle={a.title}
-                dueDate={
-                  a.deadline
-                    ? new Date(a.deadline).toLocaleDateString()
-                    : "No deadline"
-                }
-                assignmentId={a.id || a._id}
-                isSubmitted={!!submissions[a.id || a._id]}
-                submissionFile={submissions[a.id || a._id]}
-                onUpload={handleUpload}
-                onDownload={() =>
-                  window.open(
-                    `${process.env.REACT_APP_API_BASE_URL}/api/v1/assignments/download/${a.fileName}`,
-                    "_blank"
-                  )
-                }
-              />
+              <div key={a.id || i} className="assignment-card">
+                <div>
+                  <h4>
+                    {a.teacher?.name || "Unknown Teacher"} | {a.title}
+                  </h4>
+                  <p>Due date: {a.deadline ? new Date(a.deadline).toLocaleDateString() : "No deadline"}</p>
+                  {submissions[a.id || a._id] && (
+                    <p style={{ color: 'green', fontSize: '12px' }}>
+                      Submitted: {submissions[a.id || a._id].originalFileName}
+                    </p>
+                  )}
+                </div>
+                <div className="homework-dropdown-container">
+                  <button
+                    className="homework-dropdown-btn"
+                    onClick={() => {
+                      console.log('Assignment:', a.id || a._id, 'Submission:', submissions[a.id || a._id]);
+                      setOpenDropdown(openDropdown === `homework-${i}` ? null : `homework-${i}`);
+                    }}
+                  >
+                    Options ▼
+                  </button>
+                  {openDropdown === `homework-${i}` && (
+                    <div className="homework-dropdown-menu">
+                      <button
+                        className="dropdown-item"
+                        onClick={() => {
+                          window.open(
+                            `http://localhost:8000/api/v1/assignments/download/${a.fileName}`,
+                            "_blank"
+                          );
+                          setOpenDropdown(null);
+                        }}
+                      >
+                        Download Assignment
+                      </button>
+                      {submissions[a.id || a._id] ? (
+                        <button
+                          className="dropdown-item"
+                          onClick={() => {
+                            window.open(
+                              `http://localhost:8000/api/v1/submissions/download/${submissions[a.id || a._id].fileName}`,
+                              "_blank"
+                            );
+                            setOpenDropdown(null);
+                          }}
+                        >
+                          View My Submission
+                        </button>
+                      ) : (
+                        <button
+                          className="dropdown-item upload-item"
+                          onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = '.pdf';
+                            input.onchange = async (e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                const formData = new FormData();
+                                formData.append('pdf', file);
+                                try {
+                                  const response = await fetch(`/api/v1/submissions/assignment/${a.id || a._id}`, {
+                                    method: 'POST',
+                                    credentials: 'include',
+                                    body: formData
+                                  });
+                                  if (response.ok) {
+                                    const data = await response.json();
+                                    setSubmissions(prev => ({ ...prev, [a.id || a._id]: data.data }));
+                                    alert('Homework submitted successfully!');
+                                  } else {
+                                    const error = await response.json();
+                                    alert(error.message || 'Failed to submit homework');
+                                  }
+                                } catch (error) {
+                                  alert('Failed to submit homework');
+                                }
+                              }
+                            };
+                            input.click();
+                            setOpenDropdown(null);
+                          }}
+                        >
+                          Upload Homework
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             ))
           )}
         </div>
