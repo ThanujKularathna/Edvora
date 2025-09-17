@@ -59,8 +59,10 @@ exports.getQuizzesByTeacherAndClass = catchAsync(async (req, res, next) => {
     return next(new AppError('Teacher ID and class name are required', 400));
   }
 
-  // Log the query we're about to execute
-  console.log('Executing query:', { teacherId, class: className });
+  const classDoc = await Class.findOne({ className });
+  if (!classDoc) {
+    return next(new AppError('Class not found', 404));
+  }
 
   const quizzes = await Quiz.find({
     teacherId,
@@ -115,6 +117,61 @@ exports.getQuiz = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       quiz
+    }
+  });
+});
+
+/**
+ * Get quizzes by class
+ * @route GET /api/v1/quizzes/class/:className
+ */
+exports.getQuizzesByClass = catchAsync(async (req, res, next) => {
+  const { className } = req.params;
+
+  if (!className) {
+    return next(new AppError('Class name is required', 400));
+  }
+
+  const quizzes = await Quiz.find({ class: className })
+    .populate('teacherId', 'name')
+    .populate('subject', 'name')
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    status: 'success',
+    results: quizzes.length,
+    data: {
+      quizzes
+    }
+  });
+});
+
+/**
+ * Submit quiz result
+ * @route POST /api/v1/quizzes/submit-result
+ */
+exports.submitQuizResult = catchAsync(async (req, res, next) => {
+  const { quizId, answers, score, totalQuestions } = req.body;
+  const studentId = req.user._id;
+
+  const QuizResult = require('../models/quizResultModel');
+
+  // Create quiz result
+  const result = await QuizResult.findOneAndUpdate(
+    { quizId, studentId },
+    {
+      answers,
+      score,
+      totalQuestions,
+      submittedAt: Date.now()
+    },
+    { new: true, upsert: true, runValidators: true }
+  );
+
+  res.status(201).json({
+    status: 'success',
+    data: {
+      result
     }
   });
 });

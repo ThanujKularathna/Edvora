@@ -16,6 +16,14 @@ router
     quizController.createQuiz
   );
 
+router
+  .route('/submit-result')
+  .post(
+    authController.protect,
+    authController.restrictTo('student'),
+    quizController.submitQuizResult
+  );
+
 // Route to get quizzes by teacher ID and class
 router
   .route('/teacher/:teacherId/class/:className')
@@ -25,6 +33,11 @@ router
 router
   .route('/teacher/:teacherId')
   .get(authController.protect, quizController.getQuizzesByTeacher);
+
+// Route to get quizzes by class
+router
+  .route('/class/:className')
+  .get(authController.protect, quizController.getQuizzesByClass);
 
 // Route to get, update or delete a specific quiz
 router

@@ -10,6 +10,7 @@ const quizRoutes = require('./routes/quizRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 const classRoutes = require('./routes/classRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const submissionRoutes = require('./routes/submissionRoutes');
 
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -18,7 +19,12 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 //global middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+  })
+);
 
 //serving static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -38,6 +44,7 @@ app.use('/api/v1/quizzes', quizRoutes);
 app.use('/api/v1/videos', videoRoutes);
 app.use('/api/v1/class', classRoutes);
 app.use('/api/v1/student', studentRoutes);
+app.use('/api/v1/submissions', submissionRoutes);
 
 app.all('*', (req, res, next) => {
   res.status(404).json({
