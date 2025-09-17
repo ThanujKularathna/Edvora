@@ -22,6 +22,8 @@ const LoginForm = () => {
         navigate("/student-dashboard"); //{replace: true} not need
       } else if (userRole === "teacher") {
         navigate("/teacher-dashboard");
+      } else if (userRole === "admin") {
+        navigate("/admin");
       }
     }
   }, [isAuthenticated, user, navigate]);
