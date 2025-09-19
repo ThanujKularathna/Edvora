@@ -144,6 +144,9 @@ exports.updateAssignment = catchAsync(async (req, res, next) => {
     }
   );
 
+  // Log assignment update activity
+  await logActivity(req.user._id, 'Assignment Updated', `Updated assignment: ${assignment.title}`, req);
+
   return res.status(200).json({
     status: 'success',
     data: assignment
@@ -156,6 +159,9 @@ exports.deleteAssignment = catchAsync(async (req, res, next) => {
   if (!assignment) {
     return next(new AppError('No assignment found with that ID', 404));
   }
+
+  // Log assignment deletion activity
+  await logActivity(req.user._id, 'Assignment Deleted', `Deleted assignment: ${assignment.title}`, req);
 
   //Deleting assignment file from the directory
   if (assignment.fileName) {
@@ -189,6 +195,11 @@ exports.downloadAssignment = catchAsync(async (req, res, next) => {
     await util.promisify(fs.access)(filePath, fs.constants.F_OK);
   } catch (error) {
     return next(new AppError('File not found', 404));
+  }
+
+  // Log assignment download activity
+  if (req.user) {
+    await logActivity(req.user._id, 'Assignment Downloaded', `Downloaded assignment file: ${filename}`, req);
   }
 
   // Set headers for PDF viewing in browser (not downloading)

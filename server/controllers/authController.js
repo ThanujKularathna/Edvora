@@ -201,6 +201,9 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   await user.save();
 
+  // Log password reset activity
+  await logActivity(user._id, 'Password Reset', 'Password reset successfully', req);
+
   createSendToken(user, 200, res);
 });
 
@@ -233,6 +236,9 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
+
+  // Log password update activity
+  await logActivity(user._id, 'Password Updated', 'Password changed successfully', req);
 
   createSendToken(user, 200, res);
 });

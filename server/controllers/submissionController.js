@@ -5,6 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const Submission = require('../models/submissionModel');
 const Assignment = require('../models/assignmentModel');
 const AppError = require('../utils/appError');
+const { logActivity } = require('../utils/activityLogger');
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -69,6 +70,9 @@ exports.submitHomework = catchAsync(async (req, res, next) => {
     fileName: req.file.filename,
     originalFileName: req.file.originalname
   });
+
+  // Log assignment submission activity
+  await logActivity(req.user.id, 'Assignment Submitted', `Submitted assignment: ${assignment.title}`, req);
 
   res.status(201).json({
     status: 'success',

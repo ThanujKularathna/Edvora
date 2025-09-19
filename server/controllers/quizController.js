@@ -2,6 +2,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Quiz = require('../models/quizModel');
 const Class = require('../models/classModel');
+const { logActivity } = require('../utils/activityLogger');
 
 exports.createQuiz = catchAsync(async (req, res, next) => {
   const teacherClass = await Class.findOne({ className: req.body.class });
@@ -11,6 +12,9 @@ exports.createQuiz = catchAsync(async (req, res, next) => {
   };
   const newQuiz = await Quiz.create(quizDetails);
   if (!newQuiz) return next(new AppError('Quiz not created', 400));
+
+  // Log quiz creation activity
+  await logActivity(req.user._id, 'Quiz Created', `Created quiz: ${newQuiz.title}`, req);
 
   // Send notification to all users
   // sendQuizNotification(req, newQuiz);
@@ -27,6 +31,10 @@ exports.createQuiz = catchAsync(async (req, res, next) => {
 exports.deleteQuiz = catchAsync(async (req, res, next) => {
   const deleteQ = await Quiz.findByIdAndDelete(req.params.id);
   if (!deleteQ) return next(new AppError('Quiz not found', 404));
+  
+  // Log quiz deletion activity
+  await logActivity(req.user._id, 'Quiz Deleted', `Deleted quiz: ${deleteQ.title}`, req);
+  
   res.status(204).json({
     status: 'success',
     data: null
@@ -167,6 +175,9 @@ exports.submitQuizResult = catchAsync(async (req, res, next) => {
     },
     { new: true, upsert: true, runValidators: true }
   );
+
+  // Log quiz submission activity
+  await logActivity(studentId, 'Quiz Submitted', `Submitted quiz with score: ${score}/${totalQuestions}`, req);
 
   res.status(201).json({
     status: 'success',

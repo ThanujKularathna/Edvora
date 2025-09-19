@@ -4,6 +4,7 @@ const fs = require('fs');
 const Video = require('../models/videoModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { logActivity } = require('../utils/activityLogger');
 
 // Configure multer for video uploads
 const multerStorage = multer.diskStorage({
@@ -54,6 +55,9 @@ exports.createVideo = catchAsync(async (req, res, next) => {
     class: className
   });
 
+  // Log video upload activity
+  await logActivity(req.user.id, 'Video Uploaded', `Uploaded video: ${title}`, req);
+
   res.status(201).json({
     status: 'success',
     data: newVideo
@@ -79,6 +83,11 @@ exports.streamVideo = catchAsync(async (req, res, next) => {
 
   if (!video) {
     return next(new AppError('No video found with that ID', 404));
+  }
+
+  // Log video viewing activity (only for authenticated users)
+  if (req.user) {
+    await logActivity(req.user.id, 'Video Viewed', `Watched video: ${video.title}`, req);
   }
 
   const videoPath = path.join(__dirname, '..', 'public', 'videos', video.fileName);
@@ -121,6 +130,9 @@ exports.deleteVideo = catchAsync(async (req, res, next) => {
   if (!video) {
     return next(new AppError('No video found with that ID', 404));
   }
+
+  // Log video deletion activity
+  await logActivity(req.user.id, 'Video Deleted', `Deleted video: ${video.title}`, req);
 
   // Delete the video file from the filesystem
   if (video.fileName) {
