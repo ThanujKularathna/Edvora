@@ -5,6 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const Assignment = require('../models/assignmentModel');
 const Submission = require('../models/submissionModel');
 const AppError = require('../utils/appError');
+const { logActivity } = require('../utils/activityLogger');
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -89,6 +90,9 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
     req.body.deadline = newDeadline;
   }
   const assignment = await Assignment.create(req.body);
+
+  // Log assignment creation activity
+  await logActivity(req.user._id, 'Assignment Created', `Created assignment: ${assignment.title}`, req);
 
   // Send notification to all users
   // sendAssignmentNotification(req, assignment);

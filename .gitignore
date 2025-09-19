@@ -23,6 +23,11 @@ dev-data
 #not completed functions
 notificationController.js
 notificationContext.jsx
+test.json
+ACTIVITY_TRACKING.md
+middleware
+activityMiddleware.js
+
 
 #tested functions
 test.js

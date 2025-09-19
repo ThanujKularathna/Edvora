@@ -1,27 +1,53 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./AdminDashboard.css";
-import { useAdmin } from "../../contexts/adminContext";
 
 function AdminDashboard() {
-  // ✅ Get data from AdminContext
-  const { users = [], classes = [], logs = [] } = useAdmin();
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalTeachers: 0,
+    totalClasses: 0,
+    totalUsers: 0,
+  });
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Count users by role
-  const totalStudents = users.filter((u) => u.role === "student").length;
-  const totalTeachers = users.filter((u) => u.role === "teacher").length;
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  const stats = [
-    { label: "Total Students", value: totalStudents, icon: "🎓" },
-    { label: "Total Teachers", value: totalTeachers, icon: "👨‍🏫" },
-    { label: "Total Classes", value: classes.length, icon: "🏫" },
-    { label: "Total Users", value: users.length, icon: "👥" },
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch("/api/admin/dashboard", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      console.log(data);
+      setStats(data.stats);
+      setRecentActivities(data.recentActivities || []);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="admin-dashboard">Loading...</div>;
+  }
+
+  const statsArray = [
+    { label: "Total Students", value: stats.totalStudents, icon: "🎓" },
+    { label: "Total Teachers", value: stats.totalTeachers, icon: "👨🏫" },
+    { label: "Total Classes", value: stats.totalClasses, icon: "🏫" },
+    { label: "Total Users", value: stats.totalUsers, icon: "👥" },
   ];
 
   return (
     <div className="admin-dashboard">
-      {/* Stats Section */}
       <div className="stats-grid">
-        {stats.map((stat, index) => (
+        {statsArray.map((stat, index) => (
           <div key={index} className="stat-card">
             <h2>
               {stat.icon} {stat.value}
@@ -31,47 +57,38 @@ function AdminDashboard() {
         ))}
       </div>
 
-      {/* Recent Updates Section */}
       <div className="recent-updates">
         <div className="recent-header">
-          <h3>Recent Updates</h3>
-          <a href="#">View All</a>
+          <h3>Recent Activities</h3>
         </div>
-
         <table className="recent-table">
           <thead>
             <tr>
               <th>Time</th>
               <th>User</th>
-              <th>Activity Description</th>
+              <th>Activity</th>
+              <th>Details</th>
             </tr>
           </thead>
           <tbody>
-            {logs.length > 0 ? (
-              logs.map((act, idx) => (
+            {recentActivities.length > 0 ? (
+              recentActivities.map((activity, idx) => (
                 <tr key={idx}>
-                  <td>{act.time}</td>
-                  <td>{act.user}</td>
-                  <td>{act.action}</td>
+                  <td>{new Date(activity.createdAt).toLocaleString()}</td>
+                  <td>{activity.user}</td>
+                  <td>{activity.action}</td>
+                  <td>{activity.details || '-'}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="3" style={{ textAlign: "center" }}>
-                  No recent updates.
+                <td colSpan="4" style={{ textAlign: "center" }}>
+                  No recent activities.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="quick-actions">
-        <button>+ Add New Student</button>
-        <button>+ Add New Teacher</button>
-        <button>+ Create New Class</button>
-        <button>📅 Class Timetable</button>
       </div>
     </div>
   );

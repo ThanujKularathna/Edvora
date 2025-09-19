@@ -89,6 +89,8 @@ const userSchema = new mongoose.Schema({
       message: 'Admins cannot have subjects'
     }
   }
+}, {
+  timestamps: true
 });
 
 userSchema.pre('save', async function (next) {

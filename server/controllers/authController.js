@@ -8,6 +8,7 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const User = require('../models/userModel');
 const { path } = require('../models/questionModel');
+const { logActivity } = require('../utils/activityLogger');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECURITY_KEY, {
@@ -50,6 +51,9 @@ exports.signup = catchAsync(async (req, res, next) => {
     class: req.body.class
   });
 
+  // Log signup activity
+  await logActivity(newUser._id, 'User Registration', `New ${newUser.role} account created`, req);
+
   createSendToken(newUser, 200, res);
 });
 
@@ -70,10 +74,18 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
+  // Log login activity
+  await logActivity(user._id, 'User Login', `${user.role} logged in`, req);
+
   createSendToken(user, 200, res);
 });
 
-exports.logout = (req, res, next) => {
+exports.logout = catchAsync(async (req, res, next) => {
+  // Log logout activity if user is authenticated
+  if (req.user) {
+    await logActivity(req.user._id, 'User Logout', `${req.user.role} logged out`, req);
+  }
+
   res.cookie('jwt', 'loggedout', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true
@@ -82,7 +94,7 @@ exports.logout = (req, res, next) => {
   res.status(200).json({
     status: 'success'
   });
-};
+});
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
