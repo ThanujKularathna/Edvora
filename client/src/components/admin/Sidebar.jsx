@@ -9,16 +9,17 @@ function Sidebar() {
       <h2 className="sidebar-title">⚙️ Admin Panel</h2>
       <nav className="sidebar-nav">
         <NavLink
-          to="/admin/dashboard"
+          to="/admin"
           className={({ isActive }) =>
             isActive ? "sidebar-link active" : "sidebar-link"
           }
+          end
         >
           📊 Dashboard
         </NavLink>
 
         <NavLink
-          to="/admin/users"
+          to="/admin/manage-users"
           className={({ isActive }) =>
             isActive ? "sidebar-link active" : "sidebar-link"
           }

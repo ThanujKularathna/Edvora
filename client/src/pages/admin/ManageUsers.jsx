@@ -1,10 +1,31 @@
-import React, { useState } from "react";
-import "./ManageUsers.css"; // Import CSS file
-import { useAdmin } from "../../contexts/adminContext"; // ✅ use shared context
+import React, { useState, useEffect } from "react";
+import "./ManageUsers.css";
 
 function ManageUsers() {
-  const { users, setUsers } = useAdmin(); // ✅ shared users from context
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
   const roles = ["admin", "teacher", "student"];
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/admin/users', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        setUsers(data.data.users);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [formData, setFormData] = useState({
     name: "",
@@ -20,7 +41,7 @@ function ManageUsers() {
   };
 
   // Handle create user with validation
-  const handleCreateUser = (e) => {
+  const handleCreateUser = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -36,40 +57,102 @@ function ManageUsers() {
       return;
     }
 
-    const nameExists = users.some(
-      (u) => u.name.toLowerCase() === formData.name.toLowerCase()
-    );
-    if (nameExists) {
-      alert("❌ Username already exists!");
+    setLoading(true);
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          passwordConfirm: formData.confirmPassword,
+          role: formData.role
+        })
+      });
+
+      const data = await response.json();
+      if (data.status === 'success') {
+        setUsers([...users, data.data.user]);
+        setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "" });
+        alert("✅ User created successfully!");
+      } else {
+        alert("❌ Failed to create user: " + (data.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error creating user:', error);
+      alert("❌ Error creating user");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle delete user
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) {
       return;
     }
 
-    const newUser = {
-      id: users.length + 1000,
-      name: formData.name,
-      email: formData.email,
-      role: formData.role,
-      status: "Active",
-    };
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
 
-    setUsers([...users, newUser]);
-    setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "" });
-  };
-
-  // Handle activate/deactivate/delete
-  const handleAction = (id, action) => {
-    if (action === "delete") {
-      setUsers(users.filter((u) => u.id !== id));
-    } else if (action === "toggleStatus") {
-      setUsers(
-        users.map((u) =>
-          u.id === id
-            ? { ...u, status: u.status === "Active" ? "Inactive" : "Active" }
-            : u
-        )
-      );
+      if (response.status === 204) {
+        setUsers(users.filter((u) => u._id !== userId));
+        alert("✅ User deleted successfully!");
+      } else {
+        alert("❌ Failed to delete user");
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert("❌ Error deleting user");
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Handle update user status (simplified - just for demo)
+  const handleToggleStatus = async (userId) => {
+    const user = users.find(u => u._id === userId);
+    const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
+
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      const data = await response.json();
+      if (data.status === 'success') {
+        setUsers(users.map(u => 
+          u._id === userId ? { ...u, status: newStatus } : u
+        ));
+        alert(`✅ User ${newStatus.toLowerCase()} successfully!`);
+      } else {
+        alert("❌ Failed to update user status");
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert("❌ Error updating user");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading && users.length === 0) {
+    return <div className="manage-users"><p>Loading users...</p></div>;
+  }
 
   return (
     <div className="manage-users">
@@ -87,12 +170,15 @@ function ManageUsers() {
               <option key={idx} value={role}>{role}</option>
             ))}
           </select>
-          <button type="submit" className="btn btn-green">Create User</button>
+          <button type="submit" className="btn btn-green" disabled={loading}>
+            {loading ? 'Creating...' : 'Create User'}
+          </button>
         </form>
       </div>
 
       {/* User List */}
       <div className="card">
+        <h2>👥 All Users ({users.length})</h2>
         <div className="table-container">
           <table className="user-table">
             <thead>
@@ -102,22 +188,24 @@ function ManageUsers() {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
+                <tr key={user._id}>
+                  <td>{user._id?.slice(-6) || 'N/A'}</td>
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>{user.role}</td>
-                  <td>{user.status}</td>
+                  <td>{user.status || 'Active'}</td>
                   <td className="actions">
                     <button
-                      onClick={() => handleAction(user.id, "toggleStatus")}
-                      className={user.status === "Active" ? "btn btn-yellow" : "btn btn-green"}
+                      onClick={() => handleToggleStatus(user._id)}
+                      className={user.status === "Inactive" ? "btn btn-green" : "btn btn-yellow"}
+                      disabled={loading}
                     >
-                      {user.status === "Active" ? "Deactivate" : "Activate"}
+                      {user.status === "Inactive" ? "Activate" : "Deactivate"}
                     </button>
                     <button
-                      onClick={() => handleAction(user.id, "delete")}
+                      onClick={() => handleDeleteUser(user._id)}
                       className="btn btn-red"
+                      disabled={loading}
                     >
                       Delete
                     </button>

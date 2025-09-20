@@ -3,6 +3,7 @@ const Class = require('../models/classModel');
 const Subject = require('../models/subjectModel');
 const Activity = require('../models/activityModel');
 const catchAsync = require('../utils/catchAsync');
+const { logActivity } = require('../utils/activityLogger');
 
 exports.getDashboardStats = catchAsync(async (req, res, next) => {
   const totalUsers = await User.countDocuments();
@@ -16,7 +17,7 @@ exports.getDashboardStats = catchAsync(async (req, res, next) => {
     .sort({ createdAt: -1 })
     .limit(10);
 
-  const formattedActivities = recentActivities.map(activity => ({
+  const formattedActivities = recentActivities.map((activity) => ({
     user: activity.user?.name || 'Unknown User',
     action: activity.action,
     details: activity.details,
@@ -37,7 +38,10 @@ exports.getDashboardStats = catchAsync(async (req, res, next) => {
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select('-password');
-  
+
+  // Log user viewing activity
+  await logActivity(req.user._id, 'Users Viewed', 'Viewed all users list', req);
+
   res.status(200).json({
     status: 'success',
     results: users.length,
@@ -45,9 +49,83 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.createUser = catchAsync(async (req, res, next) => {
+  const { name, email, password, passwordConfirm, role, classes, subjects } =
+    req.body;
+
+  const newUser = await User.create({
+    name,
+    email,
+    password,
+    passwordConfirm,
+    role,
+    classes,
+    subjects
+  });
+
+  // Log user creation activity
+  await logActivity(
+    req.user._id,
+    'User Created',
+    `Created ${role}: ${name}`,
+    req
+  );
+
+  res.status(201).json({
+    status: 'success',
+    data: { user: newUser }
+  });
+});
+
+exports.updateUser = catchAsync(async (req, res, next) => {
+  const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+    select: '-password'
+  });
+
+  if (!updatedUser) {
+    return next(new AppError('No user found with that ID', 404));
+  }
+
+  // Log user update activity
+  await logActivity(
+    req.user._id,
+    'User Updated',
+    `Updated user: ${updatedUser.name}`,
+    req
+  );
+
+  res.status(200).json({
+    status: 'success',
+    data: { user: updatedUser }
+  });
+});
+
+exports.deleteUser = catchAsync(async (req, res, next) => {
+  const deletedUser = await User.findByIdAndDelete(req.params.id);
+
+  if (!deletedUser) {
+    return next(new AppError('No user found with that ID', 404));
+  }
+
+  // Log user deletion activity
+  await logActivity(
+    req.user._id,
+    'User Deleted',
+    `Deleted user: ${deletedUser.name}`,
+    req
+  );
+
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
+});
+
 exports.getAllClasses = catchAsync(async (req, res, next) => {
   const classes = await Class.find();
-  
+
   res.status(200).json({
     status: 'success',
     results: classes.length,
@@ -57,7 +135,7 @@ exports.getAllClasses = catchAsync(async (req, res, next) => {
 
 exports.getAllSubjects = catchAsync(async (req, res, next) => {
   const subjects = await Subject.find();
-  
+
   res.status(200).json({
     status: 'success',
     results: subjects.length,
