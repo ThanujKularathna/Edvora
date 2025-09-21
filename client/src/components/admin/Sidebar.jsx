@@ -1,11 +1,36 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/authContext";
 import "./Sidebar.css";
-import ManageSubjects from './../../pages/admin/ManageSubjects';
 
 function Sidebar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+  
   return (
     <div className="sidebar">
+      {/* User Profile Section */}
+      <NavLink to="/admin/profile" className="sidebar-profile">
+        <div className="profile-image">
+          <img 
+            src={user?.photo ? `/img/users/${user.photo}` : '/default-avatar.png'} 
+            alt="Profile" 
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/50x50/4a5568/ffffff?text=' + (user?.name?.charAt(0) || 'A');
+            }}
+          />
+        </div>
+        <div className="profile-info">
+          <h3>{user?.name || 'Admin'}</h3>
+          <span className="profile-role">{user?.role || 'admin'}</span>
+        </div>
+      </NavLink>
+      
       <h2 className="sidebar-title">⚙️ Admin Panel</h2>
       <nav className="sidebar-nav">
         <NavLink
@@ -72,6 +97,13 @@ function Sidebar() {
           📝 Manage Grades
         </NavLink>
       </nav>
+      
+      {/* Logout Button */}
+      <div className="sidebar-logout">
+        <button onClick={handleLogout} className="logout-btn">
+          🚪 Logout
+        </button>
+      </div>
     </div>
   );
 }

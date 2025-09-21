@@ -33,6 +33,8 @@ function ManageUsers() {
     password: "",
     confirmPassword: "",
     role: "",
+    phoneNumber: "",
+    city: "",
   });
 
   // Handle form changes
@@ -70,14 +72,16 @@ function ManageUsers() {
           email: formData.email,
           password: formData.password,
           passwordConfirm: formData.confirmPassword,
-          role: formData.role
+          role: formData.role,
+          phoneNumber: formData.phoneNumber,
+          city: formData.city
         })
       });
 
       const data = await response.json();
       if (data.status === 'success') {
         setUsers([...users, data.data.user]);
-        setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "" });
+        setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "", phoneNumber: "", city: "" });
         alert("✅ User created successfully!");
       } else {
         alert("❌ Failed to create user: " + (data.message || 'Unknown error'));
@@ -164,6 +168,8 @@ function ManageUsers() {
           <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
           <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
           <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required />
+          <input type="tel" name="phoneNumber" placeholder="Phone Number" value={formData.phoneNumber} onChange={handleChange} />
+          <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleChange} />
           <select name="role" value={formData.role} onChange={handleChange} required>
             <option value="">Select Role</option>
             {roles.map((role, idx) => (
@@ -183,7 +189,7 @@ function ManageUsers() {
           <table className="user-table">
             <thead>
               <tr>
-                <th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th>
+                <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Role</th><th>Status</th><th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -192,6 +198,8 @@ function ManageUsers() {
                   <td>{user._id?.slice(-6) || 'N/A'}</td>
                   <td>{user.name}</td>
                   <td>{user.email}</td>
+                  <td>{user.phoneNumber || 'N/A'}</td>
+                  <td>{user.city || 'N/A'}</td>
                   <td>{user.role}</td>
                   <td>{user.status || 'Active'}</td>
                   <td className="actions">

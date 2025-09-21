@@ -12,7 +12,7 @@ const AdminLayout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="admin-content flex-1 p-6 bg-gray-100 overflow-y-auto">
+      <div className="admin-content">
         <Outlet /> 
       </div>
     </div>

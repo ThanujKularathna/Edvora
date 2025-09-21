@@ -20,19 +20,55 @@
 /* Form Grid */
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
 }
 
 .form-grid input,
 .form-grid select {
+  height: 40px;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 14px;
+  vertical-align: top;
+  margin: 0;
 }
 
 .form-grid .btn {
   grid-column: span 2;
+}
+
+/* Table responsive */
+.table-container {
+  max-height: 275px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.user-table th,
+.user-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.user-table th {
+  background: #f2f2f2;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 /* Table Styles */

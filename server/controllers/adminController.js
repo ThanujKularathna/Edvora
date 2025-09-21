@@ -37,10 +37,11 @@ exports.getDashboardStats = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find().select('-password');
-
+  const users = await User.find()
+    .select('name email _id role city phoneNumber')
+    .limit(5);
   // Log user viewing activity
-  await logActivity(req.user._id, 'Users Viewed', 'Viewed all users list', req);
+  // await logActivity(req.user._id, 'Users Viewed', 'Viewed all users list', req);
 
   res.status(200).json({
     status: 'success',
@@ -64,12 +65,12 @@ exports.createUser = catchAsync(async (req, res, next) => {
   });
 
   // Log user creation activity
-  await logActivity(
-    req.user._id,
-    'User Created',
-    `Created ${role}: ${name}`,
-    req
-  );
+  // await logActivity(
+  //   req.user._id,
+  //   'User Created',
+  //   `Created ${role}: ${name}`,
+  //   req
+  // );
 
   res.status(201).json({
     status: 'success',

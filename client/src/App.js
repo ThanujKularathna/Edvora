@@ -106,6 +106,7 @@ const App = () => {
             <Route path="manage-students" element={<ManageStudents />} />
             <Route path="manage-subjects" element={<ManageSubjects />} />
             <Route path="manage-classes" element={<ManageClasses />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Routes>
       </Router>
