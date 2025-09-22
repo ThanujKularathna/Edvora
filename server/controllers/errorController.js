@@ -7,6 +7,12 @@ function handleDuplicateKeyError(err) {
   return new AppError(message, code);
 }
 
+function handlePasswordValidation(err) {
+  const code = 400;
+  const message = `password is too short`;
+  return new AppError(message, code);
+}
+
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
@@ -16,7 +22,11 @@ module.exports = (err, req, res, next) => {
     err = handleDuplicateKeyError(err);
   }
 
-  console.log(err);
+  if (err._message === 'User validation failed') {
+    err = handlePasswordValidation(err);
+  }
+
+  console.log('consolling=>', err);
 
   res.status(err.statusCode).json({
     status: err.status,

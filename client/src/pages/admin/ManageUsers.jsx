@@ -194,8 +194,8 @@ function ManageUsers() {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user._id}>
-                  <td>{user._id?.slice(-6) || 'N/A'}</td>
+                <tr key={user._id || user.id}>
+                  <td>{user._id?.slice(-6) || user.id?.slice(-6) || 'N/A'}</td>
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>{user.phoneNumber || 'N/A'}</td>

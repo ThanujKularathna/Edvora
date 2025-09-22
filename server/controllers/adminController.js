@@ -51,7 +51,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 });
 
 exports.createUser = catchAsync(async (req, res, next) => {
-  const { name, email, password, passwordConfirm, role, classes, subjects } =
+  const { name, email, password, passwordConfirm, role, classes, subjects, phoneNumber, city } =
     req.body;
 
   const newUser = await User.create({
@@ -61,7 +61,9 @@ exports.createUser = catchAsync(async (req, res, next) => {
     passwordConfirm,
     role,
     classes,
-    subjects
+    subjects,
+    phoneNumber,
+    city
   });
 
   // Log user creation activity

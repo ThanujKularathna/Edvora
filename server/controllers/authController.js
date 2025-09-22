@@ -42,17 +42,28 @@ const createSendToken = async (user, statusCode, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  const { name, email, password, passwordConfirm, role, classes, subjects, phoneNumber, city } =
+    req.body;
+
   const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-    role: req.body.role,
-    class: req.body.class
+    name,
+    email,
+    password,
+    passwordConfirm,
+    role,
+    classes,
+    subjects,
+    phoneNumber,
+    city
   });
 
   // Log signup activity
-  await logActivity(newUser._id, 'User Registration', `New ${newUser.role} account created`, req);
+  await logActivity(
+    newUser._id,
+    'User Registration',
+    `New ${newUser.role} account created`,
+    req
+  );
 
   createSendToken(newUser, 200, res);
 });
@@ -83,7 +94,12 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.logout = catchAsync(async (req, res, next) => {
   // Log logout activity if user is authenticated
   if (req.user) {
-    await logActivity(req.user._id, 'User Logout', `${req.user.role} logged out`, req);
+    await logActivity(
+      req.user._id,
+      'User Logout',
+      `${req.user.role} logged out`,
+      req
+    );
   }
 
   res.cookie('jwt', 'loggedout', {
@@ -202,7 +218,12 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // Log password reset activity
-  await logActivity(user._id, 'Password Reset', 'Password reset successfully', req);
+  await logActivity(
+    user._id,
+    'Password Reset',
+    'Password reset successfully',
+    req
+  );
 
   createSendToken(user, 200, res);
 });
@@ -238,7 +259,12 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // Log password update activity
-  await logActivity(user._id, 'Password Updated', 'Password changed successfully', req);
+  await logActivity(
+    user._id,
+    'Password Updated',
+    'Password changed successfully',
+    req
+  );
 
   createSendToken(user, 200, res);
 });

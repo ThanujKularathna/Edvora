@@ -12,10 +12,12 @@ response.json
 *.log
 
 #static files
+/server/public/img/users
 submissions
 pdf
 videos
 dev-data
+
 
 # OS files
 .DS_Store

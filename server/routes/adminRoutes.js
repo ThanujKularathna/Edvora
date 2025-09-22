@@ -11,11 +11,13 @@ router.use(authController.protect);
 router.get('/dashboard', adminController.getDashboardStats);
 
 // Data routes
-router.route('/users')
+router
+  .route('/users')
   .get(adminController.getAllUsers)
   .post(adminController.createUser);
 
-router.route('/users/:id')
+router
+  .route('/users/:id')
   .put(adminController.updateUser)
   .delete(adminController.deleteUser);
 
