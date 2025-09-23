@@ -270,8 +270,6 @@ exports.getTeacherAssignments = catchAsync(async (req, res, next) => {
     .populate('subjects', 'name')
     .select('email');
 
-
-
   const assignments = {};
   teachers.forEach((teacher) => {
     assignments[teacher.email.toLowerCase()] = {
@@ -289,8 +287,10 @@ exports.getTeacherAssignments = catchAsync(async (req, res, next) => {
 exports.getTeacherClasses = catchAsync(async (req, res, next) => {
   const { email } = req.params;
 
-  const teacher = await User.findOne({ email, role: 'teacher' })
-    .populate('classes', 'className');
+  const teacher = await User.findOne({ email, role: 'teacher' }).populate(
+    'classes',
+    'className'
+  );
 
   if (!teacher) {
     return res.status(404).json({

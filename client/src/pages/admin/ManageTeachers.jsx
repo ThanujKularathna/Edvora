@@ -7,6 +7,10 @@ function ManageTeachers() {
   const [subjects, setSubjects] = useState([]);
   const [teacherAssignments, setTeacherAssignments] = useState({});
   const [loading, setLoading] = useState(false);
+  const [assignSubjectLoading, setAssignSubjectLoading] = useState(false);
+  const [assignClassLoading, setAssignClassLoading] = useState(false);
+  const [removeClassLoading, setRemoveClassLoading] = useState(false);
+  const [csvLoading, setCsvLoading] = useState(false);
 
   const [teacherClass, setTeacherClass] = useState({ email: "", class: "" });
   const [removeTeacher, setRemoveTeacher] = useState({ email: "", class: "" });
@@ -106,7 +110,7 @@ function ManageTeachers() {
 
   const handleAssignClass = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setAssignClassLoading(true);
     try {
       const response = await fetch("/api/admin/assign-teacher-class", {
         method: "POST",
@@ -133,13 +137,13 @@ function ManageTeachers() {
     } catch (error) {
       alert("❌ Error assigning teacher");
     } finally {
-      setLoading(false);
+      setAssignClassLoading(false);
     }
   };
 
   const handleRemoveClass = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setRemoveClassLoading(true);
     try {
       const response = await fetch("/api/admin/remove-teacher-class", {
         method: "POST",
@@ -169,13 +173,13 @@ function ManageTeachers() {
     } catch (error) {
       alert("❌ Error removing teacher");
     } finally {
-      setLoading(false);
+      setRemoveClassLoading(false);
     }
   };
 
   const handleAssignSubjects = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setAssignSubjectLoading(true);
     try {
       const response = await fetch("/api/admin/assign-teacher-subject", {
         method: "POST",
@@ -197,14 +201,14 @@ function ManageTeachers() {
     } catch (error) {
       alert("❌ Error assigning subject");
     } finally {
-      setLoading(false);
+      setAssignSubjectLoading(false);
     }
   };
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     setCsvFile(file);
-    
+
     if (file) {
       Papa.parse(file, {
         header: true,
@@ -213,21 +217,21 @@ function ManageTeachers() {
           const rows = result.data;
           const seen = new Set();
           const dupes = [];
-          
+
           rows.forEach((row, i) => {
             const email = row.email?.trim().toLowerCase();
             const key = `${email}-${row.class}-${row.subject}`;
-            
+
             if (seen.has(key)) {
               dupes.push({ ...row, rowNumber: i + 2 });
             }
             seen.add(key);
           });
-          
+
           setCsvPreview(rows);
           setDuplicates(dupes);
           setShowPreview(true);
-        }
+        },
       });
     } else {
       setCsvPreview([]);
@@ -242,7 +246,7 @@ function ManageTeachers() {
       return;
     }
 
-    setLoading(true);
+    setCsvLoading(true);
     const seen = new Set();
     let successCount = 0;
     let errorCount = 0;
@@ -257,7 +261,7 @@ function ManageTeachers() {
       try {
         if (row.class) {
           const classResponse = await fetch(
-            "/api/admin/assign-teacher-class",
+            `${process.env.REACT_APP_API_BASE_URL}/api/admin/assign-teacher-class`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -265,7 +269,12 @@ function ManageTeachers() {
               body: JSON.stringify({ email, className: row.class }),
             }
           );
-          if (classResponse.ok) successCount++;
+          const classData = await classResponse.json();
+
+          if (!classResponse.ok) {
+            console.log(classResponse);
+          }
+          if (classData.status === "success") successCount++;
           else errorCount++;
         }
 
@@ -279,22 +288,24 @@ function ManageTeachers() {
               body: JSON.stringify({ email, subjectName: row.subject }),
             }
           );
-          if (subjectResponse.ok) successCount++;
+          const subjectData = await subjectResponse.json();
+          if (subjectData.status === "success") successCount++;
           else errorCount++;
         }
       } catch (error) {
+        console.error(error);
         errorCount++;
       }
     }
 
     setCsvData(csvPreview);
     alert(`✅ CSV processed! Success: ${successCount}, Errors: ${errorCount}`);
-    
+
     setCsvFile(null);
     setCsvPreview([]);
     setShowPreview(false);
     fetchData();
-    setLoading(false);
+    setCsvLoading(false);
   };
 
   return (
@@ -326,8 +337,12 @@ function ManageTeachers() {
               </option>
             ))}
           </select>
-          <button type="submit" className="btn btn-blue" disabled={loading}>
-            {loading ? "Assigning..." : "Assign"}
+          <button
+            type="submit"
+            className="btn btn-green"
+            disabled={assignSubjectLoading}
+          >
+            {assignSubjectLoading ? "Assigning..." : "Assign"}
           </button>
         </form>
       </div>
@@ -359,8 +374,12 @@ function ManageTeachers() {
               </option>
             ))}
           </select>
-          <button type="submit" className="btn btn-green" disabled={loading}>
-            {loading ? "Assigning..." : "Assign"}
+          <button
+            type="submit"
+            className="btn btn-green"
+            disabled={assignClassLoading}
+          >
+            {assignClassLoading ? "Assigning..." : "Assign"}
           </button>
         </form>
       </div>
@@ -406,8 +425,12 @@ function ManageTeachers() {
                 )
               )}
           </select>
-          <button type="submit" className="btn btn-red" disabled={loading}>
-            {loading ? "Removing..." : "Remove"}
+          <button
+            type="submit"
+            className="btn btn-red"
+            disabled={removeClassLoading}
+          >
+            {removeClassLoading ? "Removing..." : "Remove"}
           </button>
         </form>
       </div>
@@ -416,14 +439,14 @@ function ManageTeachers() {
       <div className="card_t">
         <h2>📂 Assign Teachers to Classes (CSV)</h2>
         <form onSubmit={handleUploadCSV} className="form">
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleFileSelect}
-          />
+          <input type="file" accept=".csv" onChange={handleFileSelect} />
           {showPreview && (
-            <button type="submit" className="btn btn-green" disabled={loading}>
-              {loading ? "Processing..." : "Confirm Upload"}
+            <button
+              type="submit"
+              className="btn btn-green"
+              disabled={csvLoading}
+            >
+              {csvLoading ? "Processing..." : "Confirm Upload"}
             </button>
           )}
         </form>
