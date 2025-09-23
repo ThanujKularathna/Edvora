@@ -25,4 +25,11 @@ router.get('/classes', adminController.getAllClasses);
 router.get('/subjects', adminController.getAllSubjects);
 router.get('/activities', adminController.getUserActivities);
 
+// Teacher management routes
+router.post('/assign-teacher-class', adminController.assignTeacherToClass);
+router.post('/remove-teacher-class', adminController.removeTeacherFromClass);
+router.post('/assign-teacher-subject', adminController.assignSubjectToTeacher);
+router.get('/teacher-assignments', adminController.getTeacherAssignments);
+router.get('/teacher-classes/:email', adminController.getTeacherClasses);
+
 module.exports = router;

@@ -3,6 +3,7 @@ const Class = require('../models/classModel');
 const Subject = require('../models/subjectModel');
 const Activity = require('../models/activityModel');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 const { logActivity } = require('../utils/activityLogger');
 
 exports.getDashboardStats = catchAsync(async (req, res, next) => {
@@ -51,8 +52,17 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 });
 
 exports.createUser = catchAsync(async (req, res, next) => {
-  const { name, email, password, passwordConfirm, role, classes, subjects, phoneNumber, city } =
-    req.body;
+  const {
+    name,
+    email,
+    password,
+    passwordConfirm,
+    role,
+    classes,
+    subjects,
+    phoneNumber,
+    city
+  } = req.body;
 
   const newUser = await User.create({
     name,
@@ -165,5 +175,134 @@ exports.getUserActivities = catchAsync(async (req, res, next) => {
     totalPages: Math.ceil(totalActivities / limit),
     currentPage: page,
     data: { activities }
+  });
+});
+
+// Teacher management methods
+exports.assignTeacherToClass = catchAsync(async (req, res, next) => {
+  const { email, className } = req.body;
+
+  const teacher = await User.findOne({ email, role: 'teacher' });
+  if (!teacher) {
+    return res
+      .status(404)
+      .json({ status: 'fail', message: 'Teacher not found' });
+  }
+
+  const classDoc = await Class.findOne({ className });
+  if (!classDoc) {
+    return res.status(404).json({ status: 'fail', message: 'Class not found' });
+  }
+
+  await User.findByIdAndUpdate(teacher._id, {
+    $addToSet: { classes: classDoc._id }
+  });
+
+  await Class.findByIdAndUpdate(classDoc._id, {
+    $addToSet: { teachers: teacher._id }
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Teacher assigned to class successfully'
+  });
+});
+
+exports.removeTeacherFromClass = catchAsync(async (req, res, next) => {
+  const { email, className } = req.body;
+
+  const teacher = await User.findOne({ email, role: 'teacher' });
+  if (!teacher) {
+    return res
+      .status(404)
+      .json({ status: 'fail', message: 'Teacher not found' });
+  }
+
+  const classDoc = await Class.findOne({ className });
+  if (!classDoc) {
+    return res.status(404).json({ status: 'fail', message: 'Class not found' });
+  }
+
+  await User.findByIdAndUpdate(teacher._id, {
+    $pull: { classes: classDoc._id }
+  });
+
+  await Class.findByIdAndUpdate(classDoc._id, {
+    $pull: { teachers: teacher._id }
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Teacher removed from class successfully'
+  });
+});
+
+exports.assignSubjectToTeacher = catchAsync(async (req, res, next) => {
+  const { email, subjectName } = req.body;
+
+  const teacher = await User.findOne({ email, role: 'teacher' });
+  if (!teacher) {
+    return res
+      .status(404)
+      .json({ status: 'fail', message: 'Teacher not found' });
+  }
+
+  const subject = await Subject.findOne({ name: subjectName });
+  if (!subject) {
+    return res
+      .status(404)
+      .json({ status: 'fail', message: 'Subject not found' });
+  }
+
+  await User.findByIdAndUpdate(teacher._id, {
+    $addToSet: { subjects: subject._id }
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Subject assigned to teacher successfully'
+  });
+});
+
+exports.getTeacherAssignments = catchAsync(async (req, res, next) => {
+  const teachers = await User.find({ role: 'teacher' })
+    .populate('classes', 'className')
+    .populate('subjects', 'name')
+    .select('email');
+
+
+
+  const assignments = {};
+  teachers.forEach((teacher) => {
+    assignments[teacher.email.toLowerCase()] = {
+      classes: teacher.classes?.map((c) => c.className) || [],
+      subjects: teacher.subjects?.map((s) => s.name) || []
+    };
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: { assignments }
+  });
+});
+
+exports.getTeacherClasses = catchAsync(async (req, res, next) => {
+  const { email } = req.params;
+
+  const teacher = await User.findOne({ email, role: 'teacher' })
+    .populate('classes', 'className');
+
+  if (!teacher) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Teacher not found'
+    });
+  }
+
+  const classes = teacher.classes?.map((c) => c.className) || [];
+
+  res.status(200).json({
+    status: 'success',
+    data: { classes }
   });
 });

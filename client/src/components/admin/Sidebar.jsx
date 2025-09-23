@@ -50,7 +50,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/admin/teachers"
+          to="/admin/manage-teachers"
           className={({ isActive }) =>
             isActive ? "sidebar-link active" : "sidebar-link"
           }
@@ -59,7 +59,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/admin/students"
+          to="/admin/manage-students"
           className={({ isActive }) =>
             isActive ? "sidebar-link active" : "sidebar-link"
           }
@@ -68,7 +68,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/admin/subjects"
+          to="/admin/manage-subjects"
           className={({ isActive }) =>
             isActive ? "sidebar-link active" : "sidebar-link"
           }
@@ -77,7 +77,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/admin/classes"
+          to="/admin/manage-classes"
           className={({ isActive }) =>
             isActive ? "sidebar-link active" : "sidebar-link"
           }
@@ -86,7 +86,7 @@ function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/admin/grades"
+          to="/admin/manage-grades"
           className={({ isActive }) =>
             isActive ? "sidebar-link active" : "sidebar-link"
           }

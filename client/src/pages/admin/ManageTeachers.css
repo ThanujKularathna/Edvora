@@ -62,3 +62,62 @@
 .btn-blue:hover {
   background: #0069d9;
 }
+
+/* CSV Preview Table Styles */
+.csv-preview {
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.csv-preview h3 {
+  margin: 0;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 16px;
+  color: #495057;
+}
+
+.csv-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.csv-preview th {
+  background: #e9ecef;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.csv-preview td {
+  padding: 10px 15px;
+  border-bottom: 1px solid #dee2e6;
+  color: #212529;
+}
+
+.csv-preview tr:hover {
+  background: #f8f9fa;
+}
+
+.csv-preview tr.duplicate {
+  background: #f8d7da;
+}
+
+.csv-preview tr.duplicate:hover {
+  background: #f5c6cb;
+}
+
+.warning {
+  padding: 10px 20px;
+  background: #fff3cd;
+  border-top: 1px solid #ffeaa7;
+  color: #856404;
+  font-size: 14px;
+}

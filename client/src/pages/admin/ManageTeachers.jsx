@@ -1,131 +1,300 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
 import "./ManageTeachers.css";
-import { useAdmin } from "../../contexts/adminContext";
 
 function ManageTeachers() {
+  const [classes, setClasses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [teacherAssignments, setTeacherAssignments] = useState({});
+  const [loading, setLoading] = useState(false);
+
   const [teacherClass, setTeacherClass] = useState({ email: "", class: "" });
   const [removeTeacher, setRemoveTeacher] = useState({ email: "", class: "" });
-  const [assignSubject, setAssignSubject] = useState({ email: "", subject: "" });
+  const [assignSubject, setAssignSubject] = useState({
+    email: "",
+    subject: "",
+  });
   const [csvFile, setCsvFile] = useState(null);
   const [csvData, setCsvData] = useState([]);
   const [duplicates, setDuplicates] = useState([]);
+  const [fetchingTeacherClasses, setFetchingTeacherClasses] = useState(false);
+  const [csvPreview, setCsvPreview] = useState([]);
+  const [showPreview, setShowPreview] = useState(false);
 
-  const {
-    users = [],
-    classes = [],
-    subjects = [], // ✅ Added subjects list from context
-    teacherAssignments = {},
-    assignTeacherToClass,
-    removeTeacherFromClass,
-    assignSubjectToTeacher,
-  } = useAdmin();
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  // ---------- Assign Teacher to Class ----------
-  const handleAssignClass = (e) => {
-    e.preventDefault();
-    const userExists = users.some(
-      (u) => u.email.toLowerCase() === teacherClass.email.toLowerCase()
-    );
-    if (!userExists) {
-      alert("❌ Teacher not found in Manage Users");
-      return;
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [classesRes, subjectsRes, assignmentsRes] = await Promise.all([
+        fetch("/api/admin/classes", { credentials: "include" }),
+        fetch("/api/admin/subjects", { credentials: "include" }),
+        fetch("/api/admin/teacher-assignments", { credentials: "include" }),
+      ]);
+
+      const [classesData, subjectsData, assignmentsData] = await Promise.all([
+        classesRes.json(),
+        subjectsRes.json(),
+        assignmentsRes.json(),
+      ]);
+
+      if (classesData.status === "success")
+        setClasses(classesData.data.classes.map((c) => c.className));
+      if (subjectsData.status === "success")
+        setSubjects(subjectsData.data.subjects.map((s) => s.name));
+      if (assignmentsData.status === "success") {
+        const assignments = {};
+        Object.entries(assignmentsData.data.assignments).forEach(
+          ([email, data]) => {
+            assignments[email] = data.classes;
+          }
+        );
+        setTeacherAssignments(assignments);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
-    assignTeacherToClass(teacherClass.email, teacherClass.class);
-    setTeacherClass({ email: "", class: "" });
   };
 
-  // ---------- Remove Teacher ----------
-  const handleRemoveClass = (e) => {
-    e.preventDefault();
-    const userExists = users.some(
-      (u) => u.email.toLowerCase() === removeTeacher.email.toLowerCase()
-    );
-    if (!userExists) {
-      alert("❌ Teacher not found in Manage Users");
-      return;
+  const fetchTeacherClasses = async (email) => {
+    if (!email || !email.includes("@")) return;
+
+    setFetchingTeacherClasses(true);
+    try {
+      const response = await fetch(
+        `/api/admin/teacher-classes/${encodeURIComponent(email)}`,
+        {
+          credentials: "include",
+        }
+      );
+      const data = await response.json();
+
+      if (data.status === "success") {
+        setTeacherAssignments((prev) => ({
+          ...prev,
+          [email.toLowerCase()]: data.data.classes || [],
+        }));
+      } else {
+        setTeacherAssignments((prev) => ({
+          ...prev,
+          [email.toLowerCase()]: [],
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching teacher classes:", error);
+      setTeacherAssignments((prev) => ({
+        ...prev,
+        [email.toLowerCase()]: [],
+      }));
+    } finally {
+      setFetchingTeacherClasses(false);
     }
-    removeTeacherFromClass(removeTeacher.email, removeTeacher.class);
-    setRemoveTeacher({ email: "", class: "" });
   };
 
-  // ---------- Assign Subjects ----------
-  const handleAssignSubjects = (e) => {
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (removeTeacher.email) {
+        fetchTeacherClasses(removeTeacher.email);
+      }
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [removeTeacher.email]);
+
+  const handleAssignClass = async (e) => {
     e.preventDefault();
-    const userExists = users.some(
-      (u) => u.email.toLowerCase() === assignSubject.email.toLowerCase()
-    );
-    if (!userExists) {
-      alert("❌ Teacher not found in Manage Users");
-      return;
-    }
+    setLoading(true);
+    try {
+      const response = await fetch("/api/admin/assign-teacher-class", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: teacherClass.email,
+          className: teacherClass.class,
+        }),
+      });
 
-    if (!assignSubject.subject) {
-      alert("❌ Please select a subject");
-      return;
+      const data = await response.json();
+      if (data.status === "success") {
+        setTeacherAssignments((prev) => {
+          const lowerEmail = teacherClass.email.toLowerCase();
+          const current = prev[lowerEmail] || [];
+          return { ...prev, [lowerEmail]: [...current, teacherClass.class] };
+        });
+        setTeacherClass({ email: "", class: "" });
+        alert("✅ Teacher assigned successfully!");
+      } else {
+        alert(`❌ ${data.message}`);
+      }
+    } catch (error) {
+      alert("❌ Error assigning teacher");
+    } finally {
+      setLoading(false);
     }
-
-    assignSubjectToTeacher(assignSubject.email, assignSubject.subject);
-    setAssignSubject({ email: "", subject: "" });
   };
 
-  // ---------- Upload & Parse CSV ----------
-  const handleUploadCSV = (e) => {
+  const handleRemoveClass = async (e) => {
     e.preventDefault();
-    if (!csvFile) {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/admin/remove-teacher-class", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: removeTeacher.email,
+          className: removeTeacher.class,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.status === "success") {
+        setTeacherAssignments((prev) => {
+          const lowerEmail = removeTeacher.email.toLowerCase();
+          const current = prev[lowerEmail] || [];
+          return {
+            ...prev,
+            [lowerEmail]: current.filter((c) => c !== removeTeacher.class),
+          };
+        });
+        setRemoveTeacher({ email: "", class: "" });
+        alert("✅ Teacher removed successfully!");
+      } else {
+        alert(`❌ ${data.message}`);
+      }
+    } catch (error) {
+      alert("❌ Error removing teacher");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAssignSubjects = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await fetch("/api/admin/assign-teacher-subject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: assignSubject.email,
+          subjectName: assignSubject.subject,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.status === "success") {
+        setAssignSubject({ email: "", subject: "" });
+        alert("✅ Subject assigned successfully!");
+      } else {
+        alert(`❌ ${data.message}`);
+      }
+    } catch (error) {
+      alert("❌ Error assigning subject");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    setCsvFile(file);
+    
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (result) => {
+          const rows = result.data;
+          const seen = new Set();
+          const dupes = [];
+          
+          rows.forEach((row, i) => {
+            const email = row.email?.trim().toLowerCase();
+            const key = `${email}-${row.class}-${row.subject}`;
+            
+            if (seen.has(key)) {
+              dupes.push({ ...row, rowNumber: i + 2 });
+            }
+            seen.add(key);
+          });
+          
+          setCsvPreview(rows);
+          setDuplicates(dupes);
+          setShowPreview(true);
+        }
+      });
+    } else {
+      setCsvPreview([]);
+      setShowPreview(false);
+    }
+  };
+
+  const handleUploadCSV = async (e) => {
+    e.preventDefault();
+    if (!csvFile || csvPreview.length === 0) {
       alert("Please select a CSV file.");
       return;
     }
 
-    Papa.parse(csvFile, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (result) => {
-        const rows = result.data;
-        const seen = new Set();
-        const dupes = [];
-        const invalidEmails = [];
+    setLoading(true);
+    const seen = new Set();
+    let successCount = 0;
+    let errorCount = 0;
 
-        rows.forEach((row, i) => {
-          const email = row.email?.trim().toLowerCase();
-          const key = `${email}-${row.class}-${row.subject}`;
+    for (const [i, row] of csvPreview.entries()) {
+      const email = row.email?.trim().toLowerCase();
+      const key = `${email}-${row.class}-${row.subject}`;
 
-          // duplicate check
-          if (seen.has(key)) {
-            dupes.push({ ...row, rowNumber: i + 2 });
-          } else {
-            seen.add(key);
-          }
+      if (seen.has(key)) continue;
+      seen.add(key);
 
-          // check if teacher exists
-          const userExists = users.some((u) => u.email.toLowerCase() === email);
-          if (!userExists) {
-            invalidEmails.push({ ...row, rowNumber: i + 2 });
-          } else {
-            // ✅ Assign automatically
-            if (row.class) assignTeacherToClass(email, row.class);
-            if (row.subject) assignSubjectToTeacher(email, row.subject);
-          }
-        });
-
-        setCsvData(rows);
-        setDuplicates(dupes);
-
-        if (dupes.length > 0) {
-          alert(`⚠️ Found ${dupes.length} duplicate entries!`);
-        } else if (invalidEmails.length > 0) {
-          alert(
-            `❌ These teachers are not in Manage Users:\n${invalidEmails
-              .map((d) => `${d.email} (Row ${d.rowNumber})`)
-              .join("\n")}`
+      try {
+        if (row.class) {
+          const classResponse = await fetch(
+            "/api/admin/assign-teacher-class",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ email, className: row.class }),
+            }
           );
-        } else {
-          alert("✅ CSV processed successfully!");
+          if (classResponse.ok) successCount++;
+          else errorCount++;
         }
-      },
-    });
 
+        if (row.subject) {
+          const subjectResponse = await fetch(
+            "/api/admin/assign-teacher-subject",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ email, subjectName: row.subject }),
+            }
+          );
+          if (subjectResponse.ok) successCount++;
+          else errorCount++;
+        }
+      } catch (error) {
+        errorCount++;
+      }
+    }
+
+    setCsvData(csvPreview);
+    alert(`✅ CSV processed! Success: ${successCount}, Errors: ${errorCount}`);
+    
     setCsvFile(null);
+    setCsvPreview([]);
+    setShowPreview(false);
+    fetchData();
+    setLoading(false);
   };
 
   return (
@@ -157,13 +326,15 @@ function ManageTeachers() {
               </option>
             ))}
           </select>
-          <button type="submit" className="btn btn-blue">Assign</button>
+          <button type="submit" className="btn btn-blue" disabled={loading}>
+            {loading ? "Assigning..." : "Assign"}
+          </button>
         </form>
       </div>
 
       {/* 2️⃣ Assign Teacher to Class */}
       <div className="card_t">
-        <h2>👩‍🏫 Assign Teacher to a Class</h2>
+        <h2>👩🏫 Assign Teacher to a Class</h2>
         <form onSubmit={handleAssignClass} className="form">
           <input
             type="email"
@@ -183,10 +354,14 @@ function ManageTeachers() {
           >
             <option value="">Select Class</option>
             {classes.map((c, i) => (
-              <option key={i} value={c}>{c}</option>
+              <option key={i} value={c}>
+                {c}
+              </option>
             ))}
           </select>
-          <button type="submit" className="btn btn-green">Assign</button>
+          <button type="submit" className="btn btn-green" disabled={loading}>
+            {loading ? "Assigning..." : "Assign"}
+          </button>
         </form>
       </div>
 
@@ -199,7 +374,7 @@ function ManageTeachers() {
             placeholder="Teacher Email"
             value={removeTeacher.email}
             onChange={(e) =>
-              setRemoveTeacher({ ...removeTeacher, email: e.target.value })
+              setRemoveTeacher({ email: e.target.value, class: "" })
             }
             required
           />
@@ -209,34 +384,54 @@ function ManageTeachers() {
               setRemoveTeacher({ ...removeTeacher, class: e.target.value })
             }
             required
+            disabled={!removeTeacher.email || fetchingTeacherClasses}
           >
-            <option value="">Select Class</option>
-            {(teacherAssignments[removeTeacher.email?.toLowerCase()] || []).map(
-              (c, i) => (
-                <option key={i} value={c}>{c}</option>
-              )
-            )}
+            <option value="">
+              {!removeTeacher.email
+                ? "Enter teacher email first"
+                : fetchingTeacherClasses
+                ? "Loading classes..."
+                : teacherAssignments[removeTeacher.email?.toLowerCase()]
+                    ?.length > 0
+                ? "Select Class"
+                : "No classes assigned"}
+            </option>
+            {removeTeacher.email &&
+              !fetchingTeacherClasses &&
+              (teacherAssignments[removeTeacher.email.toLowerCase()] || []).map(
+                (c, i) => (
+                  <option key={i} value={c}>
+                    {c}
+                  </option>
+                )
+              )}
           </select>
-          <button type="submit" className="btn btn-red">Remove</button>
+          <button type="submit" className="btn btn-red" disabled={loading}>
+            {loading ? "Removing..." : "Remove"}
+          </button>
         </form>
       </div>
 
       {/* 4️⃣ Upload CSV */}
       <div className="card_t">
-        <h2>📂 Upload Teachers to Classes (CSV)</h2>
+        <h2>📂 Assign Teachers to Classes (CSV)</h2>
         <form onSubmit={handleUploadCSV} className="form">
           <input
             type="file"
             accept=".csv"
-            onChange={(e) => setCsvFile(e.target.files[0])}
+            onChange={handleFileSelect}
           />
-          <button type="submit" className="btn btn-green">Upload</button>
+          {showPreview && (
+            <button type="submit" className="btn btn-green" disabled={loading}>
+              {loading ? "Processing..." : "Confirm Upload"}
+            </button>
+          )}
         </form>
 
-        {/* CSV Preview */}
-        {csvData.length > 0 && (
+        {/* CSV Preview Before Upload */}
+        {showPreview && csvPreview.length > 0 && (
           <div className="csv-preview">
-            <h3>📋 Uploaded Data</h3>
+            <h3>📋 Preview Data (Review before upload)</h3>
             <table>
               <thead>
                 <tr>
@@ -246,7 +441,7 @@ function ManageTeachers() {
                 </tr>
               </thead>
               <tbody>
-                {csvData.map((row, idx) => (
+                {csvPreview.map((row, idx) => (
                   <tr
                     key={idx}
                     className={
@@ -274,6 +469,31 @@ function ManageTeachers() {
                 {duplicates.map((d) => d.rowNumber).join(", ")}
               </div>
             )}
+          </div>
+        )}
+
+        {/* CSV Results After Upload */}
+        {csvData.length > 0 && !showPreview && (
+          <div className="csv-preview">
+            <h3>📋 Processed Data</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Class</th>
+                  <th>Subject</th>
+                </tr>
+              </thead>
+              <tbody>
+                {csvData.map((row, idx) => (
+                  <tr key={idx}>
+                    <td>{row.email}</td>
+                    <td>{row.class}</td>
+                    <td>{row.subject}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

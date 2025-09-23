@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/authContext";
+import { AdminProvider } from "./contexts/adminContext";
 
 // Auth Pages
 import LoginPage from "./pages/LoginPage";
@@ -27,89 +28,91 @@ import ManageClasses from "./pages/admin/ManageClasses";
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Auth Routes */}
-          <Route index element={<LoginPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route
-            path="/reset-password/:token"
-            element={<ResetPasswordPage />}
-          />
+      <AdminProvider>
+        <Router>
+          <Routes>
+            {/* Auth Routes */}
+            <Route index element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route
+              path="/reset-password/:token"
+              element={<ResetPasswordPage />}
+            />
 
-          {/* Student Routes */}
-          <Route
-            path="/student-dashboard"
-            element={
-              <ProtectedRoute>
-                <StudentDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/subject/:subjectName"
-            element={
-              <ProtectedRoute>
-                <SubjectPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Student Routes */}
+            <Route
+              path="/student-dashboard"
+              element={
+                <ProtectedRoute>
+                  <StudentDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/subject/:subjectName"
+              element={
+                <ProtectedRoute>
+                  <SubjectPage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Teacher Routes */}
-          <Route
-            path="/teacher-dashboard"
-            element={
-              <ProtectedRoute>
-                <TeacherDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/teacher/class/:className"
-            element={
-              <ProtectedRoute>
-                <ClassToolPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/class-tool-page"
-            element={
-              <ProtectedRoute>
-                <ClassToolPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Teacher Routes */}
+            <Route
+              path="/teacher-dashboard"
+              element={
+                <ProtectedRoute>
+                  <TeacherDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/class/:className"
+              element={
+                <ProtectedRoute>
+                  <ClassToolPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/class-tool-page"
+              element={
+                <ProtectedRoute>
+                  <ClassToolPage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Common Routes */}
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Common Routes */}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Admin Routes */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<AdminDashboard />} />
-            <Route path="manage-users" element={<ManageUsers />} />
-            <Route path="manage-teachers" element={<ManageTeachers />} />
-            <Route path="manage-students" element={<ManageStudents />} />
-            <Route path="manage-subjects" element={<ManageSubjects />} />
-            <Route path="manage-classes" element={<ManageClasses />} />
-            <Route path="profile" element={<ProfilePage />} />
-          </Route>
-        </Routes>
-      </Router>
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AdminDashboard />} />
+              <Route path="manage-users" element={<ManageUsers />} />
+              <Route path="manage-teachers" element={<ManageTeachers />} />
+              <Route path="manage-students" element={<ManageStudents />} />
+              <Route path="manage-subjects" element={<ManageSubjects />} />
+              <Route path="manage-classes" element={<ManageClasses />} />
+              <Route path="profile" element={<ProfilePage />} />
+            </Route>
+          </Routes>
+        </Router>
+      </AdminProvider>
     </AuthProvider>
   );
 };
