@@ -32,4 +32,10 @@ router.post('/assign-teacher-subject', adminController.assignSubjectToTeacher);
 router.get('/teacher-assignments', adminController.getTeacherAssignments);
 router.get('/teacher-classes/:email', adminController.getTeacherClasses);
 
+// Student management routes
+router.post('/assign-student-class', adminController.assignStudentToClass);
+router.post('/remove-student-class', adminController.removeStudentFromClass);
+router.get('/student-assignments', adminController.getStudentAssignments);
+router.get('/student-classes/:email', adminController.getStudentClasses);
+
 module.exports = router;

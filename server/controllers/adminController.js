@@ -306,3 +306,118 @@ exports.getTeacherClasses = catchAsync(async (req, res, next) => {
     data: { classes }
   });
 });
+
+// Student management methods
+exports.assignStudentToClass = catchAsync(async (req, res, next) => {
+  const { email, className } = req.body;
+
+  const student = await User.findOne({ email, role: 'student' });
+  if (!student) {
+    return res
+      .status(404)
+      .json({ status: 'fail', message: 'Student not found' });
+  }
+
+  const classDoc = await Class.findOne({ className });
+  if (!classDoc) {
+    return res.status(404).json({ status: 'fail', message: 'Class not found' });
+  }
+
+  await User.findByIdAndUpdate(student._id, {
+    classes: classDoc._id.toString()
+  });
+
+  await Class.findByIdAndUpdate(classDoc._id, {
+    $addToSet: { students: student._id }
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Student assigned to class successfully'
+  });
+});
+
+exports.removeStudentFromClass = catchAsync(async (req, res, next) => {
+  const { email, className } = req.body;
+
+  const student = await User.findOne({ email, role: 'student' });
+  if (!student) {
+    return res
+      .status(404)
+      .json({ status: 'fail', message: 'Student not found' });
+  }
+
+  const classDoc = await Class.findOne({ className });
+  if (!classDoc) {
+    return res.status(404).json({ status: 'fail', message: 'Class not found' });
+  }
+
+  await User.findByIdAndUpdate(student._id, {
+    classes: null
+  });
+
+  await Class.findByIdAndUpdate(classDoc._id, {
+    $pull: { students: student._id }
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Student removed from class successfully'
+  });
+});
+
+exports.getStudentAssignments = catchAsync(async (req, res, next) => {
+  const students = await User.find({ role: 'student' })
+    .select('email classes');
+
+  const assignments = {};
+  for (const student of students) {
+    let classes = [];
+    if (student.classes) {
+      try {
+        const classDoc = await Class.findById(student.classes).select('className');
+        if (classDoc) {
+          classes = [classDoc.className];
+        }
+      } catch (error) {
+        console.error('Error fetching class:', error);
+      }
+    }
+    assignments[student.email.toLowerCase()] = { classes };
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: { assignments }
+  });
+});
+
+exports.getStudentClasses = catchAsync(async (req, res, next) => {
+  const { email } = req.params;
+
+  const student = await User.findOne({ email, role: 'student' }).select('classes');
+
+  if (!student) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Student not found'
+    });
+  }
+
+  let classes = [];
+  if (student.classes) {
+    try {
+      const classDoc = await Class.findById(student.classes).select('className');
+      if (classDoc) {
+        classes = [classDoc.className];
+      }
+    } catch (error) {
+      console.error('Error fetching class:', error);
+    }
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: { classes }
+  });
+});
