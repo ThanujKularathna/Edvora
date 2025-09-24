@@ -12,11 +12,11 @@ export default function ProfileLayout({ user }) {
       <ProfileHeader name={user.name} />
 
       <div className="profile-grid">
-        <UserDetails email={user.email} city={user.city} contact={user.contact} />
+        <UserDetails fullName={user.name} email={user.email} city={user.address} contact={user.phone} />
         <ActivityLog firstAccess={user.firstAccess} lastAccess={user.lastAccess} />
       </div>
 
-      <CourseDetails role={user.role} subjects={user.subjects} />
+      <CourseDetails role={user.role} subjects={user.subjects} classes={user.classes} />
 
       {/* {user.role === "student" && <Reports />} */}
     </div>

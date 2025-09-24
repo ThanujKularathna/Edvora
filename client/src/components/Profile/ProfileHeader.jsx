@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { useAuth } from "../../contexts/authContext";
 import "./Profile.css";
-import defaultImg from "./profile.png";
 
 export default function ProfileHeader({ name }) {
-  const [profileImg, setProfileImg] = useState(defaultImg);
+  const { user, updateUser } = useAuth();
+  const defaultImg = "/img/users/default.jpg";
+  const [profileImg, setProfileImg] = useState(user?.photo ? `/img/users/${user.photo}` : defaultImg);
   const [showModal, setShowModal] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -13,11 +16,35 @@ export default function ProfileHeader({ name }) {
   const [error, setError] = useState("");
 
   // handle when user selects a file
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const imgUrl = URL.createObjectURL(file); // create preview
+      setUploading(true);
+      const imgUrl = URL.createObjectURL(file);
       setProfileImg(imgUrl);
+      
+      // Upload to server
+      const formData = new FormData();
+      formData.append('photo', file);
+      
+      try {
+        const response = await fetch('/api/v1/users/updatePhoto', {
+          method: 'PATCH',
+          credentials: 'include',
+          body: formData
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          updateUser(data.user);
+          setProfileImg(`/img/users/${data.user.photo}`);
+        }
+      } catch (error) {
+        console.error('Error uploading photo:', error);
+        setProfileImg(user?.photo ? `/img/users/${user.photo}` : defaultImg);
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
@@ -57,9 +84,14 @@ export default function ProfileHeader({ name }) {
     <div className="profile-header">
       <div className="profile-header-left">
         <div className="profile-pic-container">
-          <img src={profileImg} alt="profile" className="profile-pic" />
-          
-          
+          <img 
+            src={profileImg} 
+            alt="profile" 
+            className="profile-pic"
+            onError={(e) => {
+              e.target.src = defaultImg;
+            }}
+          />
         </div>
         <h2>{name}</h2>
       </div>
@@ -72,7 +104,7 @@ export default function ProfileHeader({ name }) {
             onChange={handleImageChange}
           />
         <label htmlFor="upload-photo" className="change-photo-btn">
-            Change Photo
+            {uploading ? 'Uploading...' : 'Change Photo'}
           </label>
         <button className="reset" onClick={() => setShowModal(true)}>
           Reset Password

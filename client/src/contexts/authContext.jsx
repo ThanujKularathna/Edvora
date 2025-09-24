@@ -28,6 +28,12 @@ function reducer(state, action) {
         isLoading: false,
         error: action.payload || "",
       };
+    case "updateUser":
+      return {
+        ...state,
+        user: action.payload,
+        error: "",
+      };
     case "error":
       return {
         ...state,
@@ -115,9 +121,14 @@ function AuthProvider({ children }) {
     }
   }
 
+  // ✅ update user
+  function updateUser(userData) {
+    dispatch({ type: "updateUser", payload: userData });
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, isLoading, error, login, logout }}
+      value={{ user, isAuthenticated, isLoading, error, login, logout, updateUser }}
     >
       {children}
     </AuthContext.Provider>

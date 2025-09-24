@@ -50,10 +50,10 @@
   display: flex;
   justify-content: space-between;
   position: relative;
+}
 
-
-  position:relative;
- 
+.assignment-card:hover {
+  background-color: #dce6e6;
 }
 
 .assignment-card .buttons {

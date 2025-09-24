@@ -1,22 +1,22 @@
 import React from "react";
 import "./Profile.css";
 
-export default function CourseDetails({ role, data }) {
+export default function CourseDetails({ role, subjects, classes }) {
   return (
     <div className="card3">
       <h3>{role === "student" ? "Enrolled Subjects" : "Teaching Classes"}</h3>
       <ul>
         {role === "student" &&
-          data?.map((item, i) => (
+          subjects?.map((subject, i) => (
             <li key={i}>
-              {item.subject} <span className="teacher">({item.teacher})</span>
+              {subject}
             </li>
           ))}
 
         {role === "teacher" &&
-          data?.map((item, i) => (
+          classes?.map((classObj, i) => (
             <li key={i}>
-              {item.className} – {item.subject}
+              Grade {classObj.className}
             </li>
           ))}
       </ul>
