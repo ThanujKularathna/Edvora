@@ -84,15 +84,6 @@ function Sidebar() {
         >
           📚 Manage Classes
         </NavLink>
-
-        <NavLink
-          to="/admin/manage-grades"
-          className={({ isActive }) =>
-            isActive ? "sidebar-link active" : "sidebar-link"
-          }
-        >
-          📝 Manage Grades
-        </NavLink>
       </nav>
 
       {/* Logout Button */}

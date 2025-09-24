@@ -407,7 +407,7 @@ const ClassToolPage = () => {
         <div className="content-section">
           <h3>Videos</h3>
           <div className="section-body">
-            {uploadedVideos.length === 0 && <p></p>}
+            {uploadedVideos.length === 0 && <p>No videos available for this class.</p>}
             {uploadedVideos.map((video, idx) => (
               <div key={idx} className="card homework-card">
                 <div className="homework-info">
