@@ -22,3 +22,27 @@ exports.getClasses = catchAsync(async (req, res, next) => {
     data: classes
   });
 });
+
+exports.assignSubjectToClass = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { subjectId } = req.body;
+  
+  const classDoc = await Class.findById(id);
+  
+  if (!classDoc) {
+    return next(new AppError('No class found with that ID', 404));
+  }
+  
+  // Add subject to class if not already assigned
+  if (!classDoc.subjects.includes(subjectId)) {
+    classDoc.subjects.push(subjectId);
+    await classDoc.save();
+  }
+  
+  res.status(200).json({
+    status: 'success',
+    data: {
+      class: classDoc
+    }
+  });
+});

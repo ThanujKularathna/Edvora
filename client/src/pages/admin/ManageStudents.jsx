@@ -264,7 +264,7 @@ function ManageStudents() {
 
       {/* 2️⃣ Remove Student */}
       <div className="card_s">
-        <h2>❌ Remove Student from a Class</h2>
+        <h2 style={{color: 'black'}}>❌ Remove Student from a Class</h2>
         <form onSubmit={handleRemoveStudent} className="form">
           <input
             type="email"
@@ -300,7 +300,7 @@ function ManageStudents() {
 
       {/* 3️⃣ Upload CSV */}
       <div className="card_s">
-        <h2>📂 Assign Students to Classes (CSV)</h2>
+        <h2 style={{color: 'black'}}>📂 Assign Students to Classes (CSV)</h2>
         <form onSubmit={handleUploadCSV} className="form">
           <input type="file" accept=".csv" onChange={handleFileSelect} />
           {showPreview && (

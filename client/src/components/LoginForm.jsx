@@ -48,7 +48,7 @@ const LoginForm = () => {
       <p>Welcome back, Let’s dive into today’s lessons.</p>
       <form onSubmit={handleSubmit}>
         {(error || localError) && (
-          <div className="error-message">{error || localError}</div>
+          <div className="error-message">{error || localError}</div> //Incorrect email or password
         )}
         <input
           type="email"

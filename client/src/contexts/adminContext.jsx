@@ -90,32 +90,65 @@ export function AdminProvider({ children }) {
     });
   };
 
-  const createSubject = (subjectName) => {
-    setSubjects((prev) => {
-      if (!prev.includes(subjectName)) {
-        addActivity("Admin", `Created new subject ${subjectName}`);
-        return [...prev, subjectName];
+  const fetchSubjects = async () => {
+    try {
+      const response = await fetch('/api/v1/subjects', {
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSubjects(data.data.subjects);
       }
-      return prev;
-    });
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+    }
   };
 
-  const removeSubject = (subjectName) => {
-    setSubjects((prev) => {
-      if (prev.includes(subjectName)) {
-        addActivity("Admin", `Removed subject ${subjectName}`);
-        return prev.filter((s) => s !== subjectName);
+  const createSubject = async (subjectName) => {
+    try {
+      const response = await fetch('/api/v1/subjects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ name: subjectName })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSubjects(prev => [...prev, data.data.subject]);
+        addActivity("Admin", `Created new subject ${subjectName}`);
+        return { success: true };
+      } else {
+        const error = await response.json();
+        return { success: false, message: error.message };
       }
-      return prev;
-    });
+    } catch (error) {
+      console.error('Error creating subject:', error);
+      return { success: false, message: 'Failed to create subject' };
+    }
+  };
 
-    setTeacherSubjects((prev) => {
-      const updated = {};
-      for (const [email, subs] of Object.entries(prev)) {
-        updated[email] = subs.filter((s) => s !== subjectName);
+  const removeSubject = async (subjectId) => {
+    try {
+      const response = await fetch(`/api/v1/subjects/${subjectId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        setSubjects(prev => prev.filter(s => s._id !== subjectId));
+        addActivity("Admin", `Removed subject`);
+        return { success: true };
+      } else {
+        const error = await response.json();
+        return { success: false, message: error.message };
       }
-      return updated;
-    });
+    } catch (error) {
+      console.error('Error removing subject:', error);
+      return { success: false, message: 'Failed to remove subject' };
+    }
   };
 
   const addUser = (user) => {
@@ -126,7 +159,7 @@ export function AdminProvider({ children }) {
   const value = { 
     users, setUsers, addUser,
     classes, setClasses, createClass,
-    subjects, setSubjects, createSubject, removeSubject,
+    subjects, setSubjects, createSubject, removeSubject, fetchSubjects,
     teacherAssignments, setTeacherAssignments,
     teacherSubjects, setTeacherSubjects,
     studentAssignments, setStudentAssignments,
