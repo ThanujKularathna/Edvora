@@ -96,6 +96,54 @@ const HomeworkSection = ({ className, showModal, setShowModal, openDropdown, set
     });
   };
 
+  // Handle downloading all submitted answers as zip
+  const handleDownloadAnswers = async (assignmentId, homeworkTitle) => {
+    try {
+      console.log(`Downloading answers for assignment ${assignmentId}...`);
+
+      const response = await fetch(
+        `/api/v1/assignments/${assignmentId}/submissions/download`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/zip",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          alert("No submissions found for this homework.");
+          return;
+        }
+        throw new Error(`Download failed with status: ${response.status}`);
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob();
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary link element
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${homeworkTitle}-submissions-${className}.zip`;
+
+      // Append to body, click, then remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up the URL object
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading homework answers:", error);
+      alert(`Failed to download homework answers: ${error.message}`);
+    }
+  };
+
   return (
     <div className="content-section">
       <div className="section-header">
@@ -150,6 +198,15 @@ const HomeworkSection = ({ className, showModal, setShowModal, openDropdown, set
                       }}
                     >
                       View
+                    </button>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        handleDownloadAnswers(hw.id, hw.title);
+                        setOpenDropdown(null);
+                      }}
+                    >
+                      Download Answers
                     </button>
                     <button
                       className="dropdown-item delete-item"

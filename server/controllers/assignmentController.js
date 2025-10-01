@@ -1,9 +1,12 @@
 const multer = require('multer');
 const util = require('util');
 const fs = require('fs');
+const path = require('path');
+const archiver = require('archiver');
 const catchAsync = require('../utils/catchAsync');
 const Assignment = require('../models/assignmentModel');
 const Submission = require('../models/submissionModel');
+const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const { logActivity } = require('../utils/activityLogger');
 
@@ -92,7 +95,12 @@ exports.createAssignment = catchAsync(async (req, res, next) => {
   const assignment = await Assignment.create(req.body);
 
   // Log assignment creation activity
-  await logActivity(req.user._id, 'Assignment Created', `Created assignment: ${assignment.title}`, req);
+  await logActivity(
+    req.user._id,
+    'Assignment Created',
+    `Created assignment: ${assignment.title}`,
+    req
+  );
 
   // Send notification to all users
   // sendAssignmentNotification(req, assignment);
@@ -145,7 +153,12 @@ exports.updateAssignment = catchAsync(async (req, res, next) => {
   );
 
   // Log assignment update activity
-  await logActivity(req.user._id, 'Assignment Updated', `Updated assignment: ${assignment.title}`, req);
+  await logActivity(
+    req.user._id,
+    'Assignment Updated',
+    `Updated assignment: ${assignment.title}`,
+    req
+  );
 
   return res.status(200).json({
     status: 'success',
@@ -161,7 +174,12 @@ exports.deleteAssignment = catchAsync(async (req, res, next) => {
   }
 
   // Log assignment deletion activity
-  await logActivity(req.user._id, 'Assignment Deleted', `Deleted assignment: ${assignment.title}`, req);
+  await logActivity(
+    req.user._id,
+    'Assignment Deleted',
+    `Deleted assignment: ${assignment.title}`,
+    req
+  );
 
   //Deleting assignment file from the directory
   if (assignment.fileName) {
@@ -199,7 +217,12 @@ exports.downloadAssignment = catchAsync(async (req, res, next) => {
 
   // Log assignment download activity
   if (req.user) {
-    await logActivity(req.user._id, 'Assignment Downloaded', `Downloaded assignment file: ${filename}`, req);
+    await logActivity(
+      req.user._id,
+      'Assignment Downloaded',
+      `Downloaded assignment file: ${filename}`,
+      req
+    );
   }
 
   // Set headers for PDF viewing in browser (not downloading)
@@ -217,21 +240,116 @@ exports.downloadAssignment = catchAsync(async (req, res, next) => {
  */
 exports.getAssignmentSubmissions = catchAsync(async (req, res, next) => {
   const assignment = await Assignment.findById(req.params.id);
-  
+
   if (!assignment) {
     return next(new AppError('Assignment not found', 404));
   }
-  
+
   // Check if the teacher owns this assignment
   if (assignment.teacher.toString() !== req.user.id) {
-    return next(new AppError('You can only view submissions for your own assignments', 403));
+    return next(
+      new AppError(
+        'You can only view submissions for your own assignments',
+        403
+      )
+    );
   }
-  
+
   const submissions = await Submission.find({ assignment: req.params.id });
-  
+
   res.status(200).json({
     status: 'success',
     results: submissions.length,
     data: submissions
   });
+});
+
+/**
+ * Download all submissions for an assignment as a zip file
+ * @route GET /api/v1/assignments/:id/submissions/download
+ */
+exports.downloadSubmissionsZip = catchAsync(async (req, res, next) => {
+  const assignment = await Assignment.findById(req.params.id);
+
+  if (!assignment) {
+    return next(new AppError('Assignment not found', 404));
+  }
+
+  // Check if the teacher owns this assignment
+
+  console.log(assignment.teacher._id.toString());
+  if (assignment.teacher_id !== req.user_id) {
+    return next(
+      new AppError(
+        'You can only download submissions for your own assignments',
+        403
+      )
+    );
+  }
+
+  // Get all submissions for this assignment with student details
+  const submissions = await Submission.find({
+    assignment: req.params.id
+  }).populate('student', 'name email');
+
+  if (submissions.length === 0) {
+    return next(new AppError('No submissions found for this assignment', 404));
+  }
+
+  // Create zip filename
+  const zipFilename = `${assignment.title.replace(/[^a-zA-Z0-9]/g, '_')}_submissions.zip`;
+
+  // Set response headers for zip download
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', `attachment; filename="${zipFilename}"`);
+
+  // Create archiver instance
+  const archive = archiver('zip', {
+    zlib: { level: 9 } // Maximum compression
+  });
+
+  // Handle archiver errors
+  archive.on('error', (err) => {
+    console.error('Archive error:', err);
+    return next(new AppError('Error creating zip file', 500));
+  });
+
+  // Pipe archive to response
+  archive.pipe(res);
+
+  // Add each submission file to the zip
+  for (const submission of submissions) {
+    const submissionPath = path.join(
+      __dirname,
+      '../public/submissions',
+      submission.fileName
+    );
+
+    try {
+      // Check if file exists
+      await util.promisify(fs.access)(submissionPath, fs.constants.F_OK);
+
+      // Create a readable name for the file in the zip
+      const studentName = submission.student.name.replace(/[^a-zA-Z0-9]/g, '_');
+      const fileExtension = path.extname(submission.fileName);
+      const zipEntryName = `${studentName}_${submission.student.email}${fileExtension}`;
+
+      // Add file to zip
+      archive.file(submissionPath, { name: zipEntryName });
+    } catch (error) {
+      console.error(`File not found: ${submissionPath}`);
+      // Continue with other files even if one is missing
+    }
+  }
+
+  // Log download activity
+  await logActivity(
+    req.user._id,
+    'Submissions Downloaded',
+    `Downloaded ${submissions.length} submissions for assignment: ${assignment.title}`,
+    req
+  );
+
+  // Finalize the zip file
+  archive.finalize();
 });

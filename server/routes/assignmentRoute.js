@@ -53,4 +53,13 @@ router
     assignmentController.getAssignmentSubmissions
   );
 
+// Route for teachers to download all submissions as zip
+router
+  .route('/:id/submissions/download')
+  .get(
+    authController.protect,
+    authController.restrictTo('teacher'),
+    assignmentController.downloadSubmissionsZip
+  );
+
 module.exports = router;
