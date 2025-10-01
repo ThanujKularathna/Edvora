@@ -38,7 +38,7 @@ exports.uploadUserPhoto = upload.single('photo');
 
 exports.updateProfile = catchAsync(async (req, res, next) => {
   const { name, phone, address } = req.body;
-  
+
   const updatedUser = await User.findByIdAndUpdate(
     req.user.id,
     { name, phone, address },
@@ -81,16 +81,20 @@ exports.updateMyPassword = catchAsync(async (req, res, next) => {
 
   // 3) Check if new password and confirm password match
   if (newPassword !== confirmPassword) {
-    return next(new AppError('New password and confirm password do not match.', 400));
+    return next(
+      new AppError('New password and confirm password do not match.', 400)
+    );
   }
 
   // 4) Update password
   user.password = newPassword;
   user.passwordConfirm = confirmPassword;
+
   await user.save();
 
   res.status(200).json({
     status: 'success',
-    message: 'Password updated successfully'
+    message: 'Password updated successfully',
+    redirectToLogin: user.role === 'admin'
   });
 });

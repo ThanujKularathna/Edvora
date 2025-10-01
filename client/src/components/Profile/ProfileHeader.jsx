@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/authContext";
 import "./Profile.css";
 
 export default function ProfileHeader({ name }) {
-  const { user, updateUser } = useAuth();
+  const navigate = useNavigate();
+  const { user, updateUser, logout } = useAuth();
   const defaultImg = "/img/users/default.jpg";
   const [profileImg, setProfileImg] = useState(user?.photo ? `/img/users/${user.photo}` : defaultImg);
   const [showModal, setShowModal] = useState(false);
@@ -86,7 +88,15 @@ export default function ProfileHeader({ name }) {
 
       if (response.ok) {
         alert("Password changed successfully!");
-        // reset form and close modal
+        
+        // If admin, logout and redirect to login
+        if (data.redirectToLogin) {
+          await logout();
+          navigate("/");
+          return;
+        }
+        
+        // reset form and close modal for non-admin users
         setFormData({
           currentPassword: "",
           newPassword: "",

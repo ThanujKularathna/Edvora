@@ -105,8 +105,49 @@ userSchema.pre('save', async function (next) {
   // Only hash if password is new or modified
   if (!this.isModified('password')) return next();
 
+  // Restore original ObjectIds if classes/subjects were populated (only during password update)
+  if (this.role === 'teacher' && this.classes && Array.isArray(this.classes)) {
+    // If classes has populated objects with className, find ObjectIds from Class collection
+    if (this.classes[0] && typeof this.classes[0] === 'object' && this.classes[0].className) {
+      const Class = require('./classModel');
+      const classNames = this.classes.map(classObj => classObj.className);
+      const classDocs = await Class.find({ className: { $in: classNames } }).select('_id');
+      this.classes = classDocs.map(classDoc => classDoc._id.toString());
+    }
+    // If classes has populated objects with _id, extract ObjectIds
+    else if (this.classes[0] && typeof this.classes[0] === 'object' && this.classes[0]._id) {
+      this.classes = this.classes.map(classObj => classObj._id.toString());
+    }
+  }
+  
+  if (this.role === 'student' && this.classes && typeof this.classes === 'object') {
+    // If classes has populated object with className, find ObjectId from Class collection
+    if (this.classes.className) {
+      const Class = require('./classModel');
+      const classDoc = await Class.findOne({ className: this.classes.className }).select('_id');
+      this.classes = classDoc ? classDoc._id.toString() : this.classes;
+    }
+    // If classes has populated object with _id, extract ObjectId
+    else if (this.classes._id) {
+      this.classes = this.classes._id.toString();
+    }
+  }
+  
+  if (this.role === 'teacher' && this.subjects && Array.isArray(this.subjects)) {
+    // If subjects is populated objects, extract ObjectIds
+    if (this.subjects[0] && typeof this.subjects[0] === 'object' && this.subjects[0]._id) {
+      this.subjects = this.subjects.map(subjectObj => subjectObj._id.toString());
+    }
+  }
+
   this.password = await bcrypt.hash(this.password, 10);
   this.passwordConfirm = undefined;
+  
+  // Set passwordChangedAt if this is not a new document
+  if (!this.isNew) {
+    this.passwordChangedAt = Date.now() - 1000;
+  }
+  
   console.log('hashed');
   next();
 });
