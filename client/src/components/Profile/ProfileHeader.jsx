@@ -53,9 +53,10 @@ export default function ProfileHeader({ name }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // handle reset password
-  const handleSubmit = (e) => {
+  // handle change password
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (formData.newPassword !== formData.confirmPassword) {
       setError("New password and confirm password do not match!");
@@ -67,17 +68,38 @@ export default function ProfileHeader({ name }) {
       return;
     }
 
-    // ✅ Just frontend validation here
-    alert("Password changed successfully (frontend only).");
+    try {
+      const response = await fetch('/api/v1/users/updateMyPassword', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+          confirmPassword: formData.confirmPassword
+        })
+      });
 
-    // reset form and close modal
-    setFormData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-    setError("");
-    setShowModal(false);
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Password changed successfully!");
+        // reset form and close modal
+        setFormData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setError("");
+        setShowModal(false);
+      } else {
+        setError(data.message || "Failed to change password");
+      }
+    } catch (error) {
+      setError("Network error. Please try again.");
+    }
   };
 
   return (
@@ -107,7 +129,7 @@ export default function ProfileHeader({ name }) {
             {uploading ? 'Uploading...' : 'Change Photo'}
           </label>
         <button className="reset" onClick={() => setShowModal(true)}>
-          Reset Password
+          Change Password
         </button>
       </div>
 
@@ -115,7 +137,7 @@ export default function ProfileHeader({ name }) {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Reset Password</h3>
+            <h3>Change Password</h3>
             <form onSubmit={handleSubmit}>
               <input
                 type="password"

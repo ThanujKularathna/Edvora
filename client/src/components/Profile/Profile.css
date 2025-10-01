@@ -239,13 +239,15 @@
   width: 141px;
   font-size: 0.9rem;
   color: white;
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: #377777;
   cursor: pointer;
   transition: background 0.2s;
   padding: 6px 12px;
   margin-left: 8px;
   font-weight: 500;
+  border: none;
+  text-align: center;
 }
 
 .change-photo-btn:hover {

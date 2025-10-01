@@ -67,3 +67,30 @@ exports.updatePhoto = catchAsync(async (req, res, next) => {
     user: updatedUser
   });
 });
+
+exports.updateMyPassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  // 1) Get user from collection
+  const user = await User.findById(req.user.id).select('+password');
+
+  // 2) Check if POSTed current password is correct
+  if (!(await user.correctPassword(currentPassword, user.password))) {
+    return next(new AppError('Your current password is incorrect.', 401));
+  }
+
+  // 3) Check if new password and confirm password match
+  if (newPassword !== confirmPassword) {
+    return next(new AppError('New password and confirm password do not match.', 400));
+  }
+
+  // 4) Update password
+  user.password = newPassword;
+  user.passwordConfirm = confirmPassword;
+  await user.save();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Password updated successfully'
+  });
+});
