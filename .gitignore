@@ -13,6 +13,7 @@ response.json
 
 #static files
 # /server/public/img/users
+/server/public/lesson-materials
 submissions
 pdf
 videos

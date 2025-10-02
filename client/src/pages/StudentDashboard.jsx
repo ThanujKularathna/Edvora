@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/authContext";
 import "./StudentDashboard.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import LessonMaterialsSection from "../components/LessonMaterialsSection";
 
 
 const StudentDashboard = () => {
@@ -129,6 +130,11 @@ const StudentDashboard = () => {
             ))
           )}
         </div>
+      </div>
+
+      {/* Lesson Materials */}
+      <div className="section">
+        <LessonMaterialsSection user={user} showUploadButton={false} />
       </div>
 
       {/* Footer */}
