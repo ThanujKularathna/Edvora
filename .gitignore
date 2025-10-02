@@ -12,7 +12,7 @@ response.json
 *.log
 
 #static files
-/server/public/img/users
+# /server/public/img/users
 submissions
 pdf
 videos
