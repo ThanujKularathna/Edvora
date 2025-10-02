@@ -1,5 +1,5 @@
 import React from "react";
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Navbar.css"; // Optional: for styling
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome, faUser, faPowerOff } from "@fortawesome/free-solid-svg-icons";
@@ -35,41 +35,25 @@ const Navbar = () => {
       </div>
 
       <div className="navbar-right">
-        <div className="nav-item">
-          <div className="nav-circle">
-            <FontAwesomeIcon icon={faHome} className="icon" />
+        <div className="nav-item" onClick={handleHomeClick} style={{ cursor: "pointer" }}>
+          <div className="nav-circle" onClick={handleHomeClick}>
+            <FontAwesomeIcon icon={faHome} className="nav-icon" />
           </div>
-          <div
-            className="nav-link"
-            onClick={handleHomeClick}
-            style={{ cursor: "pointer" }}
-          >
-            Home
-          </div>
+          <span className="nav-label">Home</span>
         </div>
 
-        <div className="nav-item">
+        <Link to="/profile" className="nav-item" style={{ textDecoration: 'none' }}>
           <div className="nav-circle">
-            <FontAwesomeIcon icon={faUser} className="icon" />
+            <FontAwesomeIcon icon={faUser} className="nav-icon" />
           </div>
-          <a className="nav-link" href="/profile">
-            Profile
-          </a>
-          {/* <Link to="/profile">Profile</Link> */}
-        </div>
+          <span className="nav-label">Profile</span>
+        </Link>
 
-        <div className="nav-item">
-          <div className="nav-circle">
-            <FontAwesomeIcon icon={faPowerOff} className="icon" />
+        <div className="nav-item" onClick={handleLogout} style={{ cursor: "pointer" }}>
+          <div className="nav-circle" onClick={handleLogout}>
+            <FontAwesomeIcon icon={faPowerOff} className="nav-icon" />
           </div>
-          <div
-            style={{ cursor: "pointer" }}
-            className="nav-link"
-            onClick={handleLogout}
-          >
-            Log out
-          </div>
-          {/* <Link to="/">Log out</Link> */}
+          <span className="nav-label">Log out</span>
         </div>
       </div>
     </nav>

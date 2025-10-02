@@ -18,6 +18,20 @@
     margin-bottom: 25px;
 }
 
+.subjects-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+    background-color: #d9e3e6;
+    border-radius: 10px;
+}
+
+.subjects-grid .subject-btn {
+    width: 150px;
+    flex-shrink: 0;
+}
+
 /* Override global button styles for subject buttons */
 .subjects-grid .subject-btn {
     background-color: white;

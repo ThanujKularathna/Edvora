@@ -143,23 +143,17 @@
 
 
 
-.assignment-card-sp{
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+.assignment-card-sp {
+  display: grid;
+  grid-template-columns: 300px 200px 200px 150px;
+  gap: 20px;
+  align-items: start;
+  justify-items: start;
   width: 91%;
-  justify-content: space-between;
   padding: 20px;
-  background-color: rgba(220, 230, 231, 1);
-}
-
-
-.assignment-card-sp{
-  
-  /* padding: 8px 50px; */
   background-color: #ffffff;
   margin-left: 5px;
-  margin-top:20px ;
+  margin-top: 20px;
   color: rgb(0, 0, 0);
   border: none;
   border-radius: 6px;

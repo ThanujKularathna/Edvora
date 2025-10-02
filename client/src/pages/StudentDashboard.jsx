@@ -5,6 +5,7 @@ import "./StudentDashboard.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
+
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -120,12 +121,10 @@ const StudentDashboard = () => {
                   index === 0 ? "highlight" : ""
                 }`}
               >
-                <p>
-                  <strong>{assignment.title}</strong>
-                </p>
-                <p>Subject: {assignment.subject?.name || assignment.subject}</p>
-                <p>Teacher: {assignment.teacher?.name || "Unknown"}</p>
-                <p>Due: {new Date(assignment.deadline).toLocaleDateString()}</p>
+                <div><strong>{assignment.title}</strong></div>
+                <div>Subject: {assignment.subject?.name || assignment.subject}</div>
+                <div>Teacher: {assignment.teacher?.name || "Unknown"}</div>
+                <div>Due: {new Date(assignment.deadline).toLocaleDateString()}</div>
               </button>
             ))
           )}

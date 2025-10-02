@@ -12,10 +12,12 @@ response.json
 *.log
 
 #static files
+/server/public/img/users
 submissions
 pdf
 videos
 dev-data
+
 
 # OS files
 .DS_Store
@@ -23,6 +25,11 @@ dev-data
 #not completed functions
 notificationController.js
 notificationContext.jsx
+test.json
+ACTIVITY_TRACKING.md
+middleware
+activityMiddleware.js
+
 
 #tested functions
 test.js

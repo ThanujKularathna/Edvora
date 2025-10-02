@@ -1,0 +1,20 @@
+.admin-layout {
+  display: flex;
+  height: 100vh; /* full screen height */
+}
+
+.admin-sidebar {
+  width: 16rem; /* same as w-64 in Tailwind */
+  background-color: #1f2937; /* gray-900 */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  /* padding: 1rem; */
+}
+
+.admin-content {
+  flex: 1;
+  padding: 1.5rem; /* same as p-6 */
+  background-color: #f3f4f6; /* gray-100 */
+  overflow-y: auto; /* scroll only inside content */
+}

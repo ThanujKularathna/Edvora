@@ -355,11 +355,16 @@ const ClassToolPage = () => {
       console.log("Quiz created successfully:", result);
 
       // Update local state with the new quiz
+      // Find the subject name from user's subjects
+      const subjectName = user?.subjects?.find(s => 
+        (s._id || s) === quizSubject
+      )?.name || quizSubject;
+      
       const newQuiz = {
         quizTitle: result.data.quiz.title,
         questions: result.data.quiz.questions,
         id: result.data.quiz._id,
-        subject: result.data.quiz.subject,
+        subject: subjectName,
       };
 
       setCreatedQuizzes([newQuiz, ...createdQuizzes]); // Add to beginning of list
@@ -402,7 +407,7 @@ const ClassToolPage = () => {
         <div className="content-section">
           <h3>Videos</h3>
           <div className="section-body">
-            {uploadedVideos.length === 0 && <p></p>}
+            {uploadedVideos.length === 0 && <p>No videos available for this class.</p>}
             {uploadedVideos.map((video, idx) => (
               <div key={idx} className="card homework-card">
                 <div className="homework-info">

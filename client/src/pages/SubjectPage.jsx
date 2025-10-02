@@ -375,34 +375,38 @@ const SubjectPage = () => {
           ) : (
             availableQuizzes.map((quiz, i) => (
               <div className="assignment-card" key={quiz._id || i}>
-                <strong>{quiz.title}</strong>
-                {isQuizSubmitted(quiz) ? (
-                  <button
-                    className="completed-status"
-                    onClick={() => {
-                      const submittedQuiz = submittedQuizData.find(
-                        (sq) => sq.quiz.title === quiz.title
-                      );
-                      if (submittedQuiz) {
-                        setActiveQuiz(submittedQuiz.quiz);
-                        setAnswers(submittedQuiz.answers);
-                        setActiveSubmitted(submittedQuiz);
-                        setViewOnly(true);
-                        setQuizSubmitted(false);
-                        setQuizModalOpen(true);
-                      }
-                    }}
-                  >
-                    View Results
-                  </button>
-                ) : (
-                  <button
-                    className="ans-btn"
-                    onClick={() => handleStartQuiz(quiz)}
-                  >
-                    Answer
-                  </button>
-                )}
+                <div>
+                  <h4><strong>{quiz.title}</strong></h4>
+                </div>
+                <div className="homework-dropdown-container">
+                  {isQuizSubmitted(quiz) ? (
+                    <button
+                      className="homework-dropdown-btn"
+                      onClick={() => {
+                        const submittedQuiz = submittedQuizData.find(
+                          (sq) => sq.quiz.title === quiz.title
+                        );
+                        if (submittedQuiz) {
+                          setActiveQuiz(submittedQuiz.quiz);
+                          setAnswers(submittedQuiz.answers);
+                          setActiveSubmitted(submittedQuiz);
+                          setViewOnly(true);
+                          setQuizSubmitted(false);
+                          setQuizModalOpen(true);
+                        }
+                      }}
+                    >
+                      View Results
+                    </button>
+                  ) : (
+                    <button
+                      className="homework-dropdown-btn"
+                      onClick={() => handleStartQuiz(quiz)}
+                    >
+                      Answer
+                    </button>
+                  )}
+                </div>
               </div>
             ))
           )}

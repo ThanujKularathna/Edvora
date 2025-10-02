@@ -1,0 +1,100 @@
+.admin-dashboard {
+  padding: 20px;
+  background: #f9f9f9;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Stats Section */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.stat-card h2 {
+  font-size: 20px;
+  margin: 0;
+  color: #333;
+}
+
+.stat-card p {
+  color: #666;
+  margin: 5px 0 0;
+}
+
+/* Recent Updates */
+.recent-updates {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.recent-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.recent-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.recent-header a {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.recent-header a:hover {
+  text-decoration: underline;
+}
+
+.recent-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.recent-table th,
+.recent-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.recent-table th {
+  background: #f1f1f1;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.quick-actions button {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: #3ea763;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.quick-actions button:hover {
+  background: #ddd;
+}
