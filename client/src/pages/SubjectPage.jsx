@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "./SubjectPage.css";
 import AssignmentCard from "../components/AssignmentCard";
+import LessonMaterialsForSubject from "../components/LessonMaterialsForSubject";
 
 const SubjectPage = () => {
   const { subjectName } = useParams();
@@ -363,6 +364,15 @@ const SubjectPage = () => {
                 </div>
               </div>
             ))
+          )}
+        </div>
+
+        <div className="section-block">
+          <h3 className="sub-page-title">Lesson Materials</h3>
+          {loading ? (
+            <p>Loading lesson materials...</p>
+          ) : (
+            <LessonMaterialsForSubject subjectName={subjectName} user={user} />
           )}
         </div>
 

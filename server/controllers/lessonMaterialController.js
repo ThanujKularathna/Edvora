@@ -39,9 +39,11 @@ exports.getAllLessonMaterials = catchAsync(async (req, res, next) => {
   if (req.query.class) filter.class = req.query.class;
   if (req.query.subject) filter.subject = req.query.subject;
 
+  // For teachers, show only their own materials
   if (req.user && req.user.role === 'teacher') {
     filter.teacher = req.user.id;
   }
+  // Students can see all materials (no additional filter)
 
   const materials = await LessonMaterial.find(filter)
     .populate({
@@ -78,7 +80,7 @@ exports.createLessonMaterial = catchAsync(async (req, res, next) => {
   }
 
   const material = await LessonMaterial.create(req.body);
-  
+
   // Populate the created material with subject and teacher data
   await material.populate([
     { path: 'subject', select: 'name' },

@@ -4,6 +4,7 @@ const Assignment = require('../models/assignmentModel');
 const Quiz = require('../models/quizModel');
 const Video = require('../models/videoModel');
 const QuizResult = require('../models/quizResultModel');
+const LessonMaterial = require('../models/lessonMaterialModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Subject = require('../models/subjectModel');
@@ -124,7 +125,7 @@ exports.getSubjectData = catchAsync(async (req, res, next) => {
   }
 
   // Fetch all data in parallel using ObjectIds
-  const [assignments, videos, quizzes, submittedQuizResults] = await Promise.all([
+  const [assignments, videos, quizzes, submittedQuizResults, lessonMaterials] = await Promise.all([
     Assignment.find({ class: className, subject: subjectDoc._id })
       .populate('teacher', 'name')
       .populate('subject', 'name'),
@@ -134,7 +135,10 @@ exports.getSubjectData = catchAsync(async (req, res, next) => {
     Quiz.find({ class: classDoc._id, subject: subjectDoc._id })
       .populate('teacherId', 'name')
       .populate('subject', 'name'),
-    QuizResult.find({ studentId })
+    QuizResult.find({ studentId }),
+    LessonMaterial.find({ class: className, subject: subjectDoc._id })
+      .populate('teacher', 'name')
+      .populate('subject', 'name')
   ]);
 
   // Create a map of quiz results by quizId
@@ -160,12 +164,23 @@ exports.getSubjectData = catchAsync(async (req, res, next) => {
     return assignmentObj;
   });
 
+  // Add download URLs to lesson materials
+  const materialsWithUrls = lessonMaterials.map((material) => {
+    const materialObj = material.toObject();
+    materialObj.id = materialObj._id;
+    if (materialObj.fileName) {
+      materialObj.downloadUrl = `/api/v1/lesson-materials/download/${materialObj.fileName}`;
+    }
+    return materialObj;
+  });
+
   res.status(200).json({
     status: 'success',
     data: {
       assignments: assignmentsWithId,
       videos: videos,
-      quizzes: quizzesWithStatus
+      quizzes: quizzesWithStatus,
+      lessonMaterials: materialsWithUrls
     }
   });
 });
