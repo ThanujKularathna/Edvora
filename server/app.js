@@ -13,6 +13,7 @@ const studentRoutes = require('./routes/studentRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const subjectRoutes = require('./routes/subjectRoutes');
+const lessonMaterialRoutes = require('./routes/lessonMaterialRoute');
 
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -49,6 +50,7 @@ app.use('/api/v1/student', studentRoutes);
 app.use('/api/v1/submissions', submissionRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/v1/subjects', subjectRoutes);
+app.use('/api/v1/lesson-materials', lessonMaterialRoutes);
 
 app.all('*', (req, res, next) => {
   res.status(404).json({

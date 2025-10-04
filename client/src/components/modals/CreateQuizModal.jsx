@@ -1,5 +1,6 @@
 import React from "react";
 import "../../styles/Modal.css";
+import "./HomeworkModal.css";
 
 const CreateQuizModal = ({
   quizTitle,
@@ -21,8 +22,8 @@ const CreateQuizModal = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-box">
-        <h2>Create Quiz</h2>
+      <div className="modal-box homework-modal">
+        <h3>Create Quiz</h3>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -88,15 +89,15 @@ const CreateQuizModal = ({
             </div>
           ))}
 
-          <div className="modal-action-buttons">
+          <div className="modal-buttons">
             <button type="button" onClick={addQuestion}>
               Add Question
             </button>
             {safeQuestions.length > 0 && (
               <button type="submit">Submit Quiz</button>
             )}
-            <button type="button" onClick={closeModal} className="close-btn">
-              Close
+            <button type="button" onClick={closeModal}>
+              Cancel
             </button>
           </div>
         </form>

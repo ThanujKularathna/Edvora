@@ -9,6 +9,8 @@ import UploadVideoModal from "../components/modals/UploadVideoModal";
 import CreateQuizModal from "../components/modals/CreateQuizModal";
 import QuizViewModal from "../components/modals/QuizViewModal";
 import HomeworkSection from "../components/HomeworkSection";
+import LessonMaterialsSection from "../components/LessonMaterialsSection";
+import UploadLessonMaterialModal from "../components/modals/UploadLessonMaterialModal";
 import "./ClassToolPage.css";
 
 const ClassToolPage = () => {
@@ -22,6 +24,7 @@ const ClassToolPage = () => {
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showHomeworkModal, setShowHomeworkModal] = useState(false);
   const [showQuizModal, setShowQuizModal] = useState(false);
+  const [showLessonMaterialModal, setShowLessonMaterialModal] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const [uploadedVideos, setUploadedVideos] = useState([]);
@@ -402,6 +405,9 @@ const ClassToolPage = () => {
           <button className="top-btn" onClick={() => setShowQuizModal(true)}>
             Create Quiz
           </button>
+          <button className="top-btn" onClick={() => setShowLessonMaterialModal(true)}>
+            Upload Material
+          </button>
         </div>
 
         <div className="content-section">
@@ -471,6 +477,18 @@ const ClassToolPage = () => {
           setShowModal={setShowHomeworkModal}
           openDropdown={openDropdown}
           setOpenDropdown={setOpenDropdown}
+        />
+
+        {/* Lesson Materials Section */}
+        <LessonMaterialsSection 
+          user={user} 
+          showUploadButton={false}
+          openDropdown={openDropdown}
+          setOpenDropdown={setOpenDropdown}
+          showModal={showLessonMaterialModal}
+          setShowModal={setShowLessonMaterialModal}
+          className={className}
+          teacherSubjects={user?.subjects || []}
         />
 
         <div className="content-section">
@@ -589,6 +607,8 @@ const ClassToolPage = () => {
             onClose={() => setViewQuizModal(false)}
           />
         )}
+
+
       </div>
 
       {/* Quiz Delete Confirmation Dialog */}
