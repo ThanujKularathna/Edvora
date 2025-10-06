@@ -34,7 +34,7 @@ function AdminDashboard() {
   };
 
   if (loading) {
-    return <div className="admin-dashboard">Loading...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   const statsArray = [

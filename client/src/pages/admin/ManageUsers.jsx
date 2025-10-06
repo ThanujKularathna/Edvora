@@ -155,7 +155,7 @@ function ManageUsers() {
   };
 
   if (loading && users.length === 0) {
-    return <div className="manage-users"><p>Loading users...</p></div>;
+    return <div className="loading">Loading users...</div>;
   }
 
   return (

@@ -8,7 +8,7 @@ function ManageSubjects() {
   const [newSubject, setNewSubject] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
 
@@ -110,8 +110,11 @@ function ManageSubjects() {
   };
 
   useEffect(() => {
-    fetchSubjects();
-    fetchClasses();
+    const loadData = async () => {
+      await Promise.all([fetchSubjects(), fetchClasses()]);
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
   // Assign subject to class
@@ -168,6 +171,10 @@ function ManageSubjects() {
     
     setLoading(false);
   };
+
+  if (loading && subjects.length === 0) {
+    return <div className="loading">Loading subjects...</div>;
+  }
 
   return (
     <div className="manage-subjects">

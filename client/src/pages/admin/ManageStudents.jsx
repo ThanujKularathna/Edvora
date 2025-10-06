@@ -5,7 +5,7 @@ import "./ManageStudents.css";
 function ManageStudents() {
   const [classes, setClasses] = useState([]);
   const [studentAssignments, setStudentAssignments] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [assignStudentLoading, setAssignStudentLoading] = useState(false);
   const [removeStudentLoading, setRemoveStudentLoading] = useState(false);
   const [csvLoading, setCsvLoading] = useState(false);
@@ -232,6 +232,10 @@ function ManageStudents() {
     fetchData();
     setCsvLoading(false);
   };
+
+  if (loading) {
+    return <div className="loading">Loading students...</div>;
+  }
 
   return (
     <div className="manage-students">

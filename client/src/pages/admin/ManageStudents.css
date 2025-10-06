@@ -3,6 +3,13 @@
   background: #f9f9f9;
 }
 
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
 .card_s {
   background: #fff;
   padding: 15px;

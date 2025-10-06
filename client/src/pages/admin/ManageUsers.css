@@ -2,6 +2,13 @@
   padding: 20px;
 }
 
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
 /* Card Styles */
 .card {
   background: #fff;

@@ -6,7 +6,7 @@ function ManageTeachers() {
   const [classes, setClasses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [teacherAssignments, setTeacherAssignments] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [assignSubjectLoading, setAssignSubjectLoading] = useState(false);
   const [assignClassLoading, setAssignClassLoading] = useState(false);
   const [removeClassLoading, setRemoveClassLoading] = useState(false);
@@ -307,6 +307,10 @@ function ManageTeachers() {
     fetchData();
     setCsvLoading(false);
   };
+
+  if (loading) {
+    return <div className="loading">Loading teachers...</div>;
+  }
 
   return (
     <div className="manage-teachers">
