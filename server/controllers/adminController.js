@@ -137,12 +137,78 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllClasses = catchAsync(async (req, res, next) => {
-  const classes = await Class.find();
+  const classes = await Class.find()
+    .populate('teachers', 'name email')
+    .populate('students', 'name email')
+    .populate('subjects', 'name');
 
   res.status(200).json({
     status: 'success',
     results: classes.length,
     data: { classes }
+  });
+});
+
+exports.createClass = catchAsync(async (req, res, next) => {
+  const { className, subjects } = req.body;
+
+  // Check if class already exists
+  const existingClass = await Class.findOne({ className });
+  if (existingClass) {
+    return next(new AppError('Class already exists', 400));
+  }
+
+  const newClass = await Class.create({
+    className,
+    subjects: subjects || []
+  });
+
+  await logActivity(
+    req.user._id,
+    'Class Created',
+    `Created class: ${className}`,
+    req
+  );
+
+  res.status(201).json({
+    status: 'success',
+    data: { class: newClass }
+  });
+});
+
+exports.deleteClass = catchAsync(async (req, res, next) => {
+  const classId = req.params.id;
+  
+  const classDoc = await Class.findById(classId);
+  if (!classDoc) {
+    return next(new AppError('Class not found', 404));
+  }
+
+  // Remove class from all teachers
+  await User.updateMany(
+    { role: 'teacher', classes: classId },
+    { $pull: { classes: classId } }
+  );
+
+  // Remove class from all students
+  await User.updateMany(
+    { role: 'student', classes: classId },
+    { $unset: { classes: '' } }
+  );
+
+  // Delete the class
+  await Class.findByIdAndDelete(classId);
+
+  await logActivity(
+    req.user._id,
+    'Class Deleted',
+    `Deleted class: ${classDoc.className}`,
+    req
+  );
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Class deleted successfully'
   });
 });
 

@@ -22,6 +22,8 @@ router
   .delete(adminController.deleteUser);
 
 router.get('/classes', adminController.getAllClasses);
+router.post('/classes', adminController.createClass);
+router.delete('/classes/:id', adminController.deleteClass);
 router.get('/subjects', adminController.getAllSubjects);
 router.get('/activities', adminController.getUserActivities);
 
