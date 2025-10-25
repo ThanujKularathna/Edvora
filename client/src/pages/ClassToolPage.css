@@ -213,12 +213,12 @@ button:hover {
   padding: 20px;
   border-radius: 8px;
   margin-top: 10px;
+  margin-right: 25px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 90%;
+  width: 100% ;
   max-width: 1500px;
-  
 }
 
 

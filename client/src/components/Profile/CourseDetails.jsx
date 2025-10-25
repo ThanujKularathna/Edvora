@@ -2,14 +2,18 @@ import React from "react";
 import "./Profile.css";
 
 export default function CourseDetails({ role, subjects, classes }) {
+  if (role === "admin") {
+    return null;
+  }
+
   return (
     <div className="card3">
       <h3>{role === "student" ? "Enrolled Subjects" : "Teaching Classes"}</h3>
       <ul>
         {role === "student" &&
-          subjects?.map((subject, i) => (
+          classes?.subjects?.map((subject, i) => (
             <li key={i}>
-              {subject}
+              {subject.name}
             </li>
           ))}
 
