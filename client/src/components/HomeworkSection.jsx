@@ -160,7 +160,7 @@ const HomeworkSection = ({ className, showModal, setShowModal, openDropdown, set
           <p>No homeworks available for this class.</p>
         ) : (
           homeworks.map((hw) => (
-            <div key={hw.id} className="card homework-card">
+            <div key={hw.id} className="tool-card homework-card">
               <div className="homework-info">
                 <span className="homework-title">{hw.title}</span>
                 <div className="homework-details">

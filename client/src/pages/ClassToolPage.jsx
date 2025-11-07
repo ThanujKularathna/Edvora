@@ -415,7 +415,7 @@ const ClassToolPage = () => {
           <div className="section-body">
             {uploadedVideos.length === 0 && <p>No videos available for this class.</p>}
             {uploadedVideos.map((video, idx) => (
-              <div key={idx} className="card homework-card">
+              <div key={idx} className="tool-card homework-card">
                 <div className="homework-info">
                   <span className="homework-title">{video.title}</span>
                   <div className="homework-details">
@@ -500,7 +500,7 @@ const ClassToolPage = () => {
               <p>No quizzes available for this class.</p>
             ) : (
               createdQuizzes.map((quiz, idx) => (
-                <div key={quiz.id || idx} className="card">
+                <div key={quiz.id || idx} className="tool-card">
                   <div className="quiz-info">
                     <span className="quiz-title">{quiz.quizTitle}</span>
                     {quiz.subject && (

@@ -25,8 +25,11 @@ const LessonMaterialsForSubject = ({ subjectName, user }) => {
 
         if (response.ok) {
           const data = await response.json();
-          // Extract lesson materials from the response (if available)
-          setMaterials(data.data.lessonMaterials || []);
+          console.log('API Response:', data);
+          console.log('Lesson Materials:', data.data?.lessonMaterials);
+          setMaterials(data.data?.lessonMaterials || []);
+        } else {
+          console.error('API Error:', response.status);
         }
       } catch (error) {
         console.error("Error fetching lesson materials:", error);

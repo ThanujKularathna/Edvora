@@ -35,21 +35,33 @@ const Navbar = () => {
       </div>
 
       <div className="navbar-right">
-        <div className="nav-item" onClick={handleHomeClick} style={{ cursor: "pointer" }}>
+        <div
+          className="nav-item"
+          onClick={handleHomeClick}
+          style={{ cursor: "pointer" }}
+        >
           <div className="nav-circle" onClick={handleHomeClick}>
             <FontAwesomeIcon icon={faHome} className="nav-icon" />
           </div>
           <span className="nav-label">Home</span>
         </div>
 
-        <Link to="/profile" className="nav-item" style={{ textDecoration: 'none' }}>
+        <Link
+          to="/profile"
+          className="nav-item"
+          style={{ textDecoration: "none" }}
+        >
           <div className="nav-circle">
             <FontAwesomeIcon icon={faUser} className="nav-icon" />
           </div>
           <span className="nav-label">Profile</span>
         </Link>
 
-        <div className="nav-item" onClick={handleLogout} style={{ cursor: "pointer" }}>
+        <div
+          className="nav-item"
+          onClick={handleLogout}
+          style={{ cursor: "pointer" }}
+        >
           <div className="nav-circle" onClick={handleLogout}>
             <FontAwesomeIcon icon={faPowerOff} className="nav-icon" />
           </div>

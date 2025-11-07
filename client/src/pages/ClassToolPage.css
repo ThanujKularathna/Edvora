@@ -10,6 +10,11 @@
   flex-direction: column;
   flex: 1;
   min-height: 100vh;
+  text-align: left;
+}
+
+.tool-page * {
+  text-align: left !important;
 }
 
 .tool-page-body{
@@ -198,6 +203,7 @@ button:hover {
 
 .content-section{
   margin: 50px 25px;
+  text-align: left;
 }
 
           /* Section Titles */
@@ -206,6 +212,7 @@ button:hover {
   font-weight: bold;
   font-size: 1.3rem;
   padding-left: 10px;
+  text-align: left;
 }
 
 .section-body {
@@ -219,6 +226,13 @@ button:hover {
   gap: 10px;
   width: 100% ;
   max-width: 1500px;
+  text-align: left;
+}
+
+.section-body p,
+.section-body span,
+.section-body div {
+  text-align: left;
 }
 
 
@@ -247,6 +261,29 @@ button:hover {
   font-size: 1.2rem;
 }
 
+.tool-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f5f7fa;
+  border-radius: 6px;
+  padding: 12px 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  font-size: 1rem;
+  text-align: left;
+}
+
+.tool-card *,
+.tool-card .homework-info,
+.tool-card .quiz-info,
+.tool-card .homework-title,
+.tool-card .quiz-title,
+.tool-card .homework-subject,
+.tool-card .quiz-subject {
+  text-align: left !important;
+}
+
 .card {
   display: flex;
   justify-content: space-between;
@@ -257,6 +294,7 @@ button:hover {
   margin-bottom: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   font-size: 1rem;
+  text-align: left;
 }
 
 .card-buttons {

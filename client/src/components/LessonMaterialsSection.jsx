@@ -1,16 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { capitalCase } from 'change-case';
-import UploadLessonMaterialModal from './modals/UploadLessonMaterialModal';
-import './HomeworkSection.css';
+import React, { useState, useEffect } from "react";
+import { capitalCase } from "change-case";
+import UploadLessonMaterialModal from "./modals/UploadLessonMaterialModal";
+import "./HomeworkSection.css";
 
-const LessonMaterialsSection = ({ user, showUploadButton = true, openDropdown, setOpenDropdown, showModal, setShowModal, className, teacherSubjects }) => {
+const LessonMaterialsSection = ({
+  user,
+  showUploadButton = true,
+  openDropdown,
+  setOpenDropdown,
+  showModal,
+  setShowModal,
+  className,
+  teacherSubjects,
+}) => {
   const [materials, setMaterials] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     show: false,
-    id: null
+    id: null,
   });
 
   useEffect(() => {
@@ -20,23 +29,27 @@ const LessonMaterialsSection = ({ user, showUploadButton = true, openDropdown, s
   const fetchMaterials = async () => {
     try {
       setIsLoading(true);
-      setError('');
-      
-      const response = await fetch('/api/v1/lesson-materials', {
-        credentials: 'include'
+      setError("");
+
+      const response = await fetch("/api/v1/lesson-materials", {
+        credentials: "include",
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch lesson materials: ${response.status}`);
       }
-      
+
       const data = await response.json();
       if (data && data.data) {
-        setMaterials(data.data);
+        const materialsWithUrls = data.data.map((material) => ({
+          ...material,
+          downloadUrl: `http://localhost:8000/api/v1/lesson-materials/download/${material.fileName}`,
+        }));
+        setMaterials(materialsWithUrls);
       }
     } catch (error) {
-      console.error('Error fetching lesson materials:', error);
-      setError('Failed to load lesson materials');
+      console.error("Error fetching lesson materials:", error);
+      setError("Failed to load lesson materials");
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +59,7 @@ const LessonMaterialsSection = ({ user, showUploadButton = true, openDropdown, s
     const formattedMaterial = {
       ...material,
       id: material.id || material._id,
-      downloadUrl: `/api/v1/lesson-materials/download/${material.fileName}`
+      downloadUrl: `http://localhost:8000/api/v1/lesson-materials/download/${material.fileName}`,
     };
     setMaterials([formattedMaterial, ...materials]);
   };
@@ -58,17 +71,17 @@ const LessonMaterialsSection = ({ user, showUploadButton = true, openDropdown, s
   const handleDeleteMaterial = async (id) => {
     try {
       const response = await fetch(`/api/v1/lesson-materials/${id}`, {
-        method: 'DELETE',
-        credentials: 'include'
+        method: "DELETE",
+        credentials: "include",
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to delete lesson material');
+        throw new Error("Failed to delete lesson material");
       }
-      
+
       setMaterials(materials.filter((material) => material.id !== id));
     } catch (error) {
-      console.error('Error deleting lesson material:', error);
+      console.error("Error deleting lesson material:", error);
       alert(`Failed to delete lesson material: ${error.message}`);
     } finally {
       setDeleteConfirmation({ show: false, id: null });
@@ -76,12 +89,12 @@ const LessonMaterialsSection = ({ user, showUploadButton = true, openDropdown, s
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'No date';
+    if (!dateString) return "No date";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -100,13 +113,14 @@ const LessonMaterialsSection = ({ user, showUploadButton = true, openDropdown, s
           <p>No lesson materials available for this class.</p>
         ) : (
           materials.map((material) => (
-            <div key={material.id} className="card homework-card">
+            <div key={material.id} className="tool-card homework-card">
               <div className="homework-info">
                 <span className="homework-title">{material.title}</span>
                 <div className="homework-details">
                   {material.subject && (
                     <span className="homework-subject">
-                      Subject: {capitalCase(material.subject.name || material.subject)}
+                      Subject:{" "}
+                      {capitalCase(material.subject.name || material.subject)}
                     </span>
                   )}
                   <span className="homework-deadline">
@@ -122,7 +136,14 @@ const LessonMaterialsSection = ({ user, showUploadButton = true, openDropdown, s
               <div className="quiz-dropdown-container">
                 <button
                   className="quiz-dropdown-btn"
-                  onClick={() => setOpenDropdown && setOpenDropdown(openDropdown === `material-${material.id}` ? null : `material-${material.id}`)}
+                  onClick={() =>
+                    setOpenDropdown &&
+                    setOpenDropdown(
+                      openDropdown === `material-${material.id}`
+                        ? null
+                        : `material-${material.id}`
+                    )
+                  }
                 >
                   Options ▼
                 </button>
@@ -131,13 +152,13 @@ const LessonMaterialsSection = ({ user, showUploadButton = true, openDropdown, s
                     <button
                       className="dropdown-item"
                       onClick={() => {
-                        window.open(material.downloadUrl, '_blank');
+                        window.open(material.downloadUrl, "_blank");
                         setOpenDropdown && setOpenDropdown(null);
                       }}
                     >
                       View
                     </button>
-                    {user?.role === 'teacher' && (
+                    {user?.role === "teacher" && (
                       <button
                         className="dropdown-item delete-item"
                         onClick={() => {

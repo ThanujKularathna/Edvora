@@ -38,15 +38,41 @@ exports.getDashboardStats = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find()
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search || '';
+  const role = req.query.role || '';
+  
+  const skip = (page - 1) * limit;
+  
+  // Build search query
+  let query = {};
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { email: { $regex: search, $options: 'i' } },
+      { city: { $regex: search, $options: 'i' } }
+    ];
+  }
+  if (role) {
+    query.role = role;
+  }
+  
+  const users = await User.find(query)
     .select('name email _id role city phoneNumber')
-    .limit(5);
-  // Log user viewing activity
-  // await logActivity(req.user._id, 'Users Viewed', 'Viewed all users list', req);
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+    
+  const totalUsers = await User.countDocuments(query);
+  const totalPages = Math.ceil(totalUsers / limit);
 
   res.status(200).json({
     status: 'success',
     results: users.length,
+    totalUsers,
+    totalPages,
+    currentPage: page,
     data: { users }
   });
 });

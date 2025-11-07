@@ -1,31 +1,52 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./ManageUsers.css";
 
 function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalUsers: 0,
+    limit: 10
+  });
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
   const roles = ["admin", "teacher", "student"];
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async (page = 1, searchTerm = '', role = '') => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/users', {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: pagination.limit.toString(),
+        ...(searchTerm && { search: searchTerm }),
+        ...(role && { role })
+      });
+      
+      const response = await fetch(`/api/admin/users?${params}`, {
         credentials: 'include'
       });
       const data = await response.json();
       if (data.status === 'success') {
         setUsers(data.data.users);
+        setPagination({
+          currentPage: data.currentPage,
+          totalPages: data.totalPages,
+          totalUsers: data.totalUsers,
+          limit: pagination.limit
+        });
       }
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.limit]);
+
+  useEffect(() => {
+    fetchUsers(1, search, roleFilter);
+  }, [search, roleFilter]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -51,14 +72,6 @@ function ManageUsers() {
       return;
     }
 
-    const emailExists = users.some(
-      (u) => u.email.toLowerCase() === formData.email.toLowerCase()
-    );
-    if (emailExists) {
-      alert("❌ Email already exists!");
-      return;
-    }
-
     setLoading(true);
     try {
       const response = await fetch('/api/admin/users', {
@@ -80,9 +93,10 @@ function ManageUsers() {
 
       const data = await response.json();
       if (data.status === 'success') {
-        setUsers([...users, data.data.user]);
         setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "", phoneNumber: "", city: "" });
         alert("✅ User created successfully!");
+        // Refresh current page
+        fetchUsers(pagination.currentPage, search, roleFilter);
       } else {
         alert("❌ Failed to create user: " + (data.message || 'Unknown error'));
       }
@@ -108,8 +122,9 @@ function ManageUsers() {
       });
 
       if (response.status === 204) {
-        setUsers(users.filter((u) => u._id !== userId));
         alert("✅ User deleted successfully!");
+        // Refresh current page
+        fetchUsers(pagination.currentPage, search, roleFilter);
       } else {
         alert("❌ Failed to delete user");
       }
@@ -121,37 +136,18 @@ function ManageUsers() {
     }
   };
 
-  // Handle update user status (simplified - just for demo)
-  const handleToggleStatus = async (userId) => {
-    const user = users.find(u => u._id === userId);
-    const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
-
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ status: newStatus })
-      });
-
-      const data = await response.json();
-      if (data.status === 'success') {
-        setUsers(users.map(u => 
-          u._id === userId ? { ...u, status: newStatus } : u
-        ));
-        alert(`✅ User ${newStatus.toLowerCase()} successfully!`);
-      } else {
-        alert("❌ Failed to update user status");
-      }
-    } catch (error) {
-      console.error('Error updating user:', error);
-      alert("❌ Error updating user");
-    } finally {
-      setLoading(false);
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      fetchUsers(newPage, search, roleFilter);
     }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handleRoleFilterChange = (e) => {
+    setRoleFilter(e.target.value);
   };
 
   if (loading && users.length === 0) {
@@ -184,45 +180,84 @@ function ManageUsers() {
 
       {/* User List */}
       <div className="card">
-        <h2>👥 All Users ({users.length})</h2>
-        <div className="table-container">
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Role</th><th>Status</th><th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user._id || user.id}>
-                  <td>{user._id?.slice(-6) || user.id?.slice(-6) || 'N/A'}</td>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phoneNumber || 'N/A'}</td>
-                  <td>{user.city || 'N/A'}</td>
-                  <td>{user.role}</td>
-                  <td>{user.status || 'Active'}</td>
-                  <td className="actions">
-                    <button
-                      onClick={() => handleToggleStatus(user._id)}
-                      className={user.status === "Inactive" ? "btn btn-green" : "btn btn-yellow"}
-                      disabled={loading}
-                    >
-                      {user.status === "Inactive" ? "Activate" : "Deactivate"}
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user._id)}
-                      className="btn btn-red"
-                      disabled={loading}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
+        <div className="user-list-header">
+          <h2>👥 All Users ({pagination.totalUsers})</h2>
+          <div className="filters">
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={search}
+              onChange={handleSearchChange}
+              className="search-input"
+            />
+            <select value={roleFilter} onChange={handleRoleFilterChange} className="role-filter">
+              <option value="">All Roles</option>
+              {roles.map((role) => (
+                <option key={role} value={role}>{role}</option>
               ))}
-            </tbody>
-          </table>
+            </select>
+          </div>
         </div>
+        
+        {loading ? (
+          <div className="loading">Loading users...</div>
+        ) : (
+          <>
+            <div className="table-container">
+              <table className="user-table">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Role</th><th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user._id}>
+                      <td>{user._id?.slice(-6) || 'N/A'}</td>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>{user.phoneNumber || 'N/A'}</td>
+                      <td>{user.city || 'N/A'}</td>
+                      <td>{user.role}</td>
+                      <td className="actions">
+                        <button
+                          onClick={() => handleDeleteUser(user._id)}
+                          className="btn btn-red"
+                          disabled={loading}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination */}
+            <div className="pagination">
+              <button 
+                onClick={() => handlePageChange(pagination.currentPage - 1)}
+                disabled={pagination.currentPage === 1}
+                className="btn btn-secondary"
+              >
+                Previous
+              </button>
+              
+              <span className="page-info">
+                Page {pagination.currentPage} of {pagination.totalPages}
+              </span>
+              
+              <button 
+                onClick={() => handlePageChange(pagination.currentPage + 1)}
+                disabled={pagination.currentPage === pagination.totalPages}
+                className="btn btn-secondary"
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
