@@ -5,6 +5,7 @@ export default function CourseDetails({ role, subjects, classes }) {
   if (role === "admin") {
     return null;
   }
+  console.log(subjects);
 
   return (
     <div className="card3">
@@ -12,16 +13,12 @@ export default function CourseDetails({ role, subjects, classes }) {
       <ul>
         {role === "student" &&
           classes?.subjects?.map((subject, i) => (
-            <li key={i}>
-              {subject.name}
-            </li>
+            <li key={i}>{subject.name}</li>
           ))}
 
         {role === "teacher" &&
           classes?.map((classObj, i) => (
-            <li key={i}>
-              Grade {classObj.className}
-            </li>
+            <li key={i}>Grade {classObj.className}</li>
           ))}
       </ul>
     </div>

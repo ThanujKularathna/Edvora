@@ -5,7 +5,6 @@ import "./StudentDashboard.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -49,6 +48,7 @@ const StudentDashboard = () => {
         if (data.status === "success") {
           setSubjects(data.data.subjects || []);
           setStudentName(data.data.student.name || "Student");
+          console.log("student subject", data.data.subjects);
           setUpcomingAssignments(data.data.upcomingAssignments || []);
           console.log(data.data.upcomingAssignments);
         }
@@ -121,17 +121,21 @@ const StudentDashboard = () => {
                   index === 0 ? "highlight" : ""
                 }`}
               >
-                <div><strong>{assignment.title}</strong></div>
-                <div>Subject: {assignment.subject?.name || assignment.subject}</div>
+                <div>
+                  <strong>{assignment.title}</strong>
+                </div>
+                <div>
+                  Subject: {assignment.subject?.name || assignment.subject}
+                </div>
                 <div>Teacher: {assignment.teacher?.name || "Unknown"}</div>
-                <div>Due: {new Date(assignment.deadline).toLocaleDateString()}</div>
+                <div>
+                  Due: {new Date(assignment.deadline).toLocaleDateString()}
+                </div>
               </button>
             ))
           )}
         </div>
       </div>
-
-
 
       {/* Footer */}
       <Footer />

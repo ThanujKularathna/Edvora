@@ -57,7 +57,7 @@ exports.getStudentDashboard = catchAsync(async (req, res, next) => {
         email: student.email,
         class: studentClass
       },
-      subjects: student.classes?.subjects || [],
+      subjects: classDoc.subjects,
       upcomingAssignments
     }
   });
