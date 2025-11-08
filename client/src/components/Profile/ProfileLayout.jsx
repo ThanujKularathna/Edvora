@@ -24,13 +24,12 @@ export default function ProfileLayout({ user }) {
           lastAccess={user.lastAccess}
         />
       </div>
-      {user.role !== "student" && (
-        <CourseDetails
-          role={user.role}
-          subjects={user.subjects}
-          classes={user.classes}
-        />
-      )}
+
+      <CourseDetails
+        role={user.role}
+        subjects={user.subjects}
+        classes={user.classes}
+      />
 
       {/* {user.role === "student" && <Reports />} */}
     </div>

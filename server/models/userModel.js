@@ -82,7 +82,13 @@ const userSchema = new mongoose.Schema(
       type: [
         {
           type: mongoose.Schema.ObjectId,
-          ref: 'Subject'
+          ref: 'Subject',
+          validate: {
+            validator: function(value) {
+              return mongoose.Types.ObjectId.isValid(value);
+            },
+            message: 'Invalid ObjectId for subject'
+          }
         }
       ],
       validate: {
@@ -193,33 +199,41 @@ userSchema.post(/^find/, async function (docs) {
   const populateDoc = async (doc) => {
     // Populate classes
     if (doc.role === 'student' && typeof doc.classes === 'string') {
-      const classDoc = await Class.findOne({ _id: doc.classes }).select(
-        'className subjects'
-      );
-      if (classDoc) {
-        doc.classes = {
-          className: classDoc.className,
-          subjects: classDoc.subjects
-        };
+      if (mongoose.Types.ObjectId.isValid(doc.classes)) {
+        const classDoc = await Class.findOne({ _id: doc.classes })
+          .select('className subjects')
+          .populate('subjects', 'name');
+        if (classDoc) {
+          doc.classes = {
+            className: classDoc.className,
+            subjects: classDoc.subjects
+          };
+        }
       }
     }
 
     if (doc.role === 'teacher' && Array.isArray(doc.classes)) {
-      const classDocs = await Class.find({
-        _id: { $in: doc.classes }
-      }).select('className subjects');
-      doc.classes = classDocs.map((classDoc) => ({
-        className: classDoc.className,
-        subjects: classDoc.subjects
-      }));
+      const validClassIds = doc.classes.filter(id => mongoose.Types.ObjectId.isValid(id));
+      if (validClassIds.length > 0) {
+        const classDocs = await Class.find({
+          _id: { $in: validClassIds }
+        }).select('className subjects');
+        doc.classes = classDocs.map((classDoc) => ({
+          className: classDoc.className,
+          subjects: classDoc.subjects
+        }));
+      }
     }
 
     // Populate subjects for teachers
     if (doc.role === 'teacher' && doc.subjects && doc.subjects.length > 0) {
-      const subjectDocs = await Subject.find({
-        _id: { $in: doc.subjects }
-      }).select('name');
-      doc.subjects = subjectDocs;
+      const validSubjectIds = doc.subjects.filter(id => mongoose.Types.ObjectId.isValid(id));
+      if (validSubjectIds.length > 0) {
+        const subjectDocs = await Subject.find({
+          _id: { $in: validSubjectIds }
+        }).select('name');
+        doc.subjects = subjectDocs;
+      }
     }
   };
 

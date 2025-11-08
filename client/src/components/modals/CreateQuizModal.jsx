@@ -105,7 +105,7 @@ const CreateQuizModal = ({
           </div>
 
           <div className="modal-buttons">
-            {safeQuestions.length > 0 && <button type="submit">Submit Quiz</button>}
+            {safeQuestions.length > 0 && <button type="submit">Submit</button>}
             <button type="button" onClick={closeModal}>
               Cancel
             </button>
