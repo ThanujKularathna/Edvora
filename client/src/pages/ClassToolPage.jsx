@@ -269,6 +269,13 @@ const ClassToolPage = () => {
     ]);
   };
 
+  // Add first question when modal opens
+  useEffect(() => {
+    if (showQuizModal && questions.length === 0) {
+      addQuestion();
+    }
+  }, [showQuizModal]);
+
   const deleteQuestion = (id) => {
     setQuestions(questions.filter((q) => q.id !== id));
   };

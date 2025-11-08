@@ -163,6 +163,16 @@
   transition: background-color 0.3s ease;
 }
 
+.homework-modal button {
+  width: 180px !important;
+  height: 44px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 .modal-box button:hover {
   background-color: #226b6b;
 }
@@ -178,28 +188,58 @@
 
 .modal-buttons {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: center;
   gap: 10px;
   width: 100%;
   margin-top: 20px;
 }
 
-/* Specific styling for Add Question button */
-.modal-buttons button[type="button"]:first-child {
-  background-color: #28a745 !important;
-  color: white !important;
-  border: none !important;
-  padding: 12px 20px !important;
-  border-radius: 4px !important;
-  cursor: pointer !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  display: inline-block !important;
-  visibility: visible !important;
+/* Add Question Section Styling */
+.add-question-section {
+  margin: 20px 0;
+  text-align: center;
 }
 
-.modal-buttons button[type="button"]:first-child:hover {
-  background-color: #218838 !important;
+.add-question-btn {
+  background-color: #265d5c !important;
+  color: white !important;
+  border: none !important;
+  padding: 12px 80px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  font-weight: normal !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  transition: background-color 0.3s ease !important;
+  margin-right: 10px !important;
+  margin-top: 10px !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.modal-buttons .add-question-btn {
+  order: -1;
+}
+
+.add-question-btn:hover {
+  background-color: #226b6b !important;
+}
+
+/* Specific styling for Add Question button (fallback) */
+.modal-buttons button[type="button"]:not(.add-question-btn) {
+  background-color: #777 !important;
+  color: white !important;
+  padding: 12px 80px !important;
+  border-radius: 6px !important;
+  font-size: 16px !important;
+  margin-right: 10px !important;
+  margin-top: 10px !important;
+}
+
+.modal-buttons button[type="button"]:not(.add-question-btn):hover {
+  background-color: #555 !important;
 }
 
 .modal-action-buttons {

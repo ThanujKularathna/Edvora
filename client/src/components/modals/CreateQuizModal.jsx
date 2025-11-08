@@ -42,7 +42,10 @@ const CreateQuizModal = ({
               required
             >
               {teacherSubjects.map((subject) => (
-                <option key={subject._id || subject} value={subject._id || subject}>
+                <option
+                  key={subject._id || subject}
+                  value={subject._id || subject}
+                >
                   {subject.name || subject}
                 </option>
               ))}
@@ -52,13 +55,15 @@ const CreateQuizModal = ({
           {safeQuestions.map((q, idx) => (
             <div key={q.id} className="question-block">
               <h3>Question {idx + 1}</h3>
-              <button
-                type="button"
-                className="delete-btn"
-                onClick={() => deleteQuestion(q.id)}
-              >
-                Delete
-              </button>
+              {safeQuestions.length > 1 && (
+                <button
+                  type="button"
+                  className="delete-btn"
+                  onClick={() => deleteQuestion(q.id)}
+                >
+                  Delete
+                </button>
+              )}
               <textarea
                 placeholder="Enter question"
                 value={q.text || ""}
@@ -89,13 +94,18 @@ const CreateQuizModal = ({
             </div>
           ))}
 
-          <div className="modal-buttons">
-            <button type="button" onClick={addQuestion}>
+          <div className="add-question-section">
+            <button
+              type="button"
+              className="add-question-btn"
+              onClick={addQuestion}
+            >
               Add Question
             </button>
-            {safeQuestions.length > 0 && (
-              <button type="submit">Submit Quiz</button>
-            )}
+          </div>
+
+          <div className="modal-buttons">
+            {safeQuestions.length > 0 && <button type="submit">Submit Quiz</button>}
             <button type="button" onClick={closeModal}>
               Cancel
             </button>
