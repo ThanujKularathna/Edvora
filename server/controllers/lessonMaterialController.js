@@ -39,9 +39,13 @@ exports.getAllLessonMaterials = catchAsync(async (req, res, next) => {
   if (req.query.class) filter.class = req.query.class;
   if (req.query.subject) filter.subject = req.query.subject;
 
-  // For teachers, show only their own materials
+  // For teachers, show only their own materials for the specific class
   if (req.user && req.user.role === 'teacher') {
     filter.teacher = req.user.id;
+    // If class is specified in query, filter by that class only
+    if (req.query.class) {
+      filter.class = req.query.class;
+    }
   }
   // Students can see all materials (no additional filter)
 

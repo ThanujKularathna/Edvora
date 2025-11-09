@@ -24,14 +24,23 @@ const LessonMaterialsSection = ({
 
   useEffect(() => {
     fetchMaterials();
-  }, []);
+  }, [className]);
 
   const fetchMaterials = async () => {
     try {
       setIsLoading(true);
       setError("");
 
-      const response = await fetch("/api/v1/lesson-materials", {
+      // Build query parameters
+      const queryParams = new URLSearchParams();
+      if (className) {
+        queryParams.append('class', className);
+      }
+      
+      const queryString = queryParams.toString();
+      const url = queryString ? `/api/v1/lesson-materials?${queryString}` : '/api/v1/lesson-materials';
+
+      const response = await fetch(url, {
         credentials: "include",
       });
 
