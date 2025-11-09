@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Papa from "papaparse";
+// import Papa from "papaparse";
 import "./ManageTeachers.css";
 
 function ManageTeachers() {
@@ -10,7 +10,7 @@ function ManageTeachers() {
   const [assignSubjectLoading, setAssignSubjectLoading] = useState(false);
   const [assignClassLoading, setAssignClassLoading] = useState(false);
   const [removeClassLoading, setRemoveClassLoading] = useState(false);
-  const [csvLoading, setCsvLoading] = useState(false);
+  // const [csvLoading, setCsvLoading] = useState(false);
 
   const [teacherClass, setTeacherClass] = useState({ email: "", class: "" });
   const [removeTeacher, setRemoveTeacher] = useState({ email: "", class: "" });
@@ -18,12 +18,12 @@ function ManageTeachers() {
     email: "",
     subject: "",
   });
-  const [csvFile, setCsvFile] = useState(null);
-  const [csvData, setCsvData] = useState([]);
-  const [duplicates, setDuplicates] = useState([]);
   const [fetchingTeacherClasses, setFetchingTeacherClasses] = useState(false);
-  const [csvPreview, setCsvPreview] = useState([]);
-  const [showPreview, setShowPreview] = useState(false);
+  // const [csvFile, setCsvFile] = useState(null);
+  // const [csvData, setCsvData] = useState([]);
+  // const [duplicates, setDuplicates] = useState([]);
+  // const [csvPreview, setCsvPreview] = useState([]);
+  // const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetchData();

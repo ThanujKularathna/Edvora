@@ -8,16 +8,16 @@ function ManageStudents() {
   const [loading, setLoading] = useState(true);
   const [assignStudentLoading, setAssignStudentLoading] = useState(false);
   const [removeStudentLoading, setRemoveStudentLoading] = useState(false);
-  const [csvLoading, setCsvLoading] = useState(false);
+  // const [csvLoading, setCsvLoading] = useState(false);
   const [fetchingStudentClasses, setFetchingStudentClasses] = useState(false);
-  
+
   const [assignStudent, setAssignStudent] = useState({ email: "", class: "" });
   const [removeStudent, setRemoveStudent] = useState({ email: "", class: "" });
-  const [csvFile, setCsvFile] = useState(null);
-  const [csvData, setCsvData] = useState([]);
-  const [duplicates, setDuplicates] = useState([]);
-  const [csvPreview, setCsvPreview] = useState([]);
-  const [showPreview, setShowPreview] = useState(false);
+  // const [csvFile, setCsvFile] = useState(null);
+  // const [csvData, setCsvData] = useState([]);
+  // const [duplicates, setDuplicates] = useState([]);
+  // const [csvPreview, setCsvPreview] = useState([]);
+  // const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -27,56 +27,64 @@ function ManageStudents() {
     setLoading(true);
     try {
       const [classesRes, assignmentsRes] = await Promise.all([
-        fetch('/api/admin/classes', { credentials: 'include' }),
-        fetch('/api/admin/student-assignments', { credentials: 'include' })
+        fetch("/api/admin/classes", { credentials: "include" }),
+        fetch("/api/admin/student-assignments", { credentials: "include" }),
       ]);
 
       const [classesData, assignmentsData] = await Promise.all([
         classesRes.json(),
-        assignmentsRes.json()
+        assignmentsRes.json(),
       ]);
 
-      if (classesData.status === 'success') setClasses(classesData.data.classes.map(c => c.className));
-      if (assignmentsData.status === 'success') {
+      if (classesData.status === "success")
+        setClasses(classesData.data.classes.map((c) => c.className));
+      if (assignmentsData.status === "success") {
         const assignments = {};
-        Object.entries(assignmentsData.data.assignments).forEach(([email, data]) => {
-          assignments[email.toLowerCase()] = (data.classes || []).filter(c => c !== null && c !== undefined);
-        });
+        Object.entries(assignmentsData.data.assignments).forEach(
+          ([email, data]) => {
+            assignments[email.toLowerCase()] = (data.classes || []).filter(
+              (c) => c !== null && c !== undefined
+            );
+          }
+        );
         setStudentAssignments(assignments);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const fetchStudentClasses = async (email) => {
-    if (!email || !email.includes('@')) return;
-    
+    if (!email || !email.includes("@")) return;
+
     setFetchingStudentClasses(true);
     try {
-      const response = await fetch(`/api/admin/student-classes/${encodeURIComponent(email)}`, {
-        credentials: 'include'
-      });
+      const response = await fetch(
+        `/api/admin/student-classes/${encodeURIComponent(email)}`,
+        {
+          credentials: "include",
+        }
+      );
       const data = await response.json();
-      
-      if (data.status === 'success') {
-        setStudentAssignments(prev => ({
+
+      if (data.status === "success") {
+        setStudentAssignments((prev) => ({
           ...prev,
-          [email.toLowerCase()]: data.data.classes || []
+          [email.toLowerCase()]: data.data.classes || [],
         }));
       } else {
-        setStudentAssignments(prev => ({
+        setStudentAssignments((prev) => ({
           ...prev,
-          [email.toLowerCase()]: []
+          [email.toLowerCase()]: [],
         }));
       }
     } catch (error) {
-      console.error('Error fetching student classes:', error);
-      setStudentAssignments(prev => ({
+      console.error("Error fetching student classes:", error);
+      setStudentAssignments((prev) => ({
         ...prev,
-        [email.toLowerCase()]: []
+        [email.toLowerCase()]: [],
       }));
     } finally {
       setFetchingStudentClasses(false);
@@ -96,16 +104,19 @@ function ManageStudents() {
     e.preventDefault();
     setAssignStudentLoading(true);
     try {
-      const response = await fetch('/api/admin/assign-student-class', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email: assignStudent.email, className: assignStudent.class })
+      const response = await fetch("/api/admin/assign-student-class", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: assignStudent.email,
+          className: assignStudent.class,
+        }),
       });
 
       const data = await response.json();
-      if (data.status === 'success') {
-        setStudentAssignments(prev => {
+      if (data.status === "success") {
+        setStudentAssignments((prev) => {
           const lowerEmail = assignStudent.email.toLowerCase();
           const current = prev[lowerEmail] || [];
           return { ...prev, [lowerEmail]: [...current, assignStudent.class] };
@@ -126,19 +137,25 @@ function ManageStudents() {
     e.preventDefault();
     setRemoveStudentLoading(true);
     try {
-      const response = await fetch('/api/admin/remove-student-class', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email: removeStudent.email, className: removeStudent.class })
+      const response = await fetch("/api/admin/remove-student-class", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: removeStudent.email,
+          className: removeStudent.class,
+        }),
       });
 
       const data = await response.json();
-      if (data.status === 'success') {
-        setStudentAssignments(prev => {
+      if (data.status === "success") {
+        setStudentAssignments((prev) => {
           const lowerEmail = removeStudent.email.toLowerCase();
           const current = prev[lowerEmail] || [];
-          return { ...prev, [lowerEmail]: current.filter(c => c !== removeStudent.class) };
+          return {
+            ...prev,
+            [lowerEmail]: current.filter((c) => c !== removeStudent.class),
+          };
         });
         setRemoveStudent({ email: "", class: "" });
         alert("✅ Student removed successfully!");
@@ -155,7 +172,7 @@ function ManageStudents() {
   // const handleFileSelect = (e) => {
   //   const file = e.target.files[0];
   //   setCsvFile(file);
-    
+
   //   if (file) {
   //     Papa.parse(file, {
   //       header: true,
@@ -164,17 +181,17 @@ function ManageStudents() {
   //         const rows = result.data;
   //         const seen = new Set();
   //         const dupes = [];
-          
+
   //         rows.forEach((row, i) => {
   //           const email = row.email?.trim().toLowerCase();
   //           const key = `${email}-${row.class}`;
-            
+
   //           if (seen.has(key)) {
   //             dupes.push({ ...row, rowNumber: i + 2 });
   //           }
   //           seen.add(key);
   //         });
-          
+
   //         setCsvPreview(rows);
   //         setDuplicates(dupes);
   //         setShowPreview(true);
@@ -225,7 +242,7 @@ function ManageStudents() {
 
   //   setCsvData(csvPreview);
   //   alert(`✅ CSV processed! Success: ${successCount}, Errors: ${errorCount}`);
-    
+
   //   setCsvFile(null);
   //   setCsvPreview([]);
   //   setShowPreview(false);
@@ -247,20 +264,30 @@ function ManageStudents() {
             type="email"
             placeholder="Student Email"
             value={assignStudent.email}
-            onChange={(e) => setAssignStudent({ ...assignStudent, email: e.target.value })}
+            onChange={(e) =>
+              setAssignStudent({ ...assignStudent, email: e.target.value })
+            }
             required
           />
           <select
             value={assignStudent.class}
-            onChange={(e) => setAssignStudent({ ...assignStudent, class: e.target.value })}
+            onChange={(e) =>
+              setAssignStudent({ ...assignStudent, class: e.target.value })
+            }
             required
           >
             <option value="">Select Class</option>
             {classes.map((c, i) => (
-              <option key={i} value={c}>{c}</option>
+              <option key={i} value={c}>
+                {c}
+              </option>
             ))}
           </select>
-          <button type="submit" className="btn btn-green" disabled={assignStudentLoading}>
+          <button
+            type="submit"
+            className="btn btn-green"
+            disabled={assignStudentLoading}
+          >
             {assignStudentLoading ? "Assigning..." : "Assign"}
           </button>
         </form>
@@ -268,35 +295,50 @@ function ManageStudents() {
 
       {/* 2️⃣ Remove Student */}
       <div className="card_s">
-        <h2 style={{color: 'black'}}>❌ Remove Student from a Class</h2>
+        <h2 style={{ color: "black" }}>❌ Remove Student from a Class</h2>
         <form onSubmit={handleRemoveStudent} className="form">
           <input
             type="email"
             placeholder="Student Email"
             value={removeStudent.email}
-            onChange={(e) => setRemoveStudent({ email: e.target.value, class: "" })}
+            onChange={(e) =>
+              setRemoveStudent({ email: e.target.value, class: "" })
+            }
             required
           />
           <select
             value={removeStudent.class}
-            onChange={(e) => setRemoveStudent({ ...removeStudent, class: e.target.value })}
+            onChange={(e) =>
+              setRemoveStudent({ ...removeStudent, class: e.target.value })
+            }
             required
             disabled={!removeStudent.email || fetchingStudentClasses}
           >
             <option value="">
-              {!removeStudent.email 
-                ? "Enter student email first" 
+              {!removeStudent.email
+                ? "Enter student email first"
                 : fetchingStudentClasses
                 ? "Loading classes..."
-                : (studentAssignments[removeStudent.email?.toLowerCase()]?.length > 0 
-                    ? "Select Class" 
-                    : "No classes assigned")}
+                : studentAssignments[removeStudent.email?.toLowerCase()]
+                    ?.length > 0
+                ? "Select Class"
+                : "No classes assigned"}
             </option>
-            {removeStudent.email && !fetchingStudentClasses && (studentAssignments[removeStudent.email.toLowerCase()] || []).map((c, i) => (
-              <option key={i} value={c}>{c}</option>
-            ))}
+            {removeStudent.email &&
+              !fetchingStudentClasses &&
+              (studentAssignments[removeStudent.email.toLowerCase()] || []).map(
+                (c, i) => (
+                  <option key={i} value={c}>
+                    {c}
+                  </option>
+                )
+              )}
           </select>
-          <button type="submit" className="btn btn-red" disabled={removeStudentLoading}>
+          <button
+            type="submit"
+            className="btn btn-red"
+            disabled={removeStudentLoading}
+          >
             {removeStudentLoading ? "Removing..." : "Remove"}
           </button>
         </form>
