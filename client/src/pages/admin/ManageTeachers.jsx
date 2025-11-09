@@ -205,108 +205,108 @@ function ManageTeachers() {
     }
   };
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    setCsvFile(file);
+  // const handleFileSelect = (e) => {
+  //   const file = e.target.files[0];
+  //   setCsvFile(file);
 
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (result) => {
-          const rows = result.data;
-          const seen = new Set();
-          const dupes = [];
+  //   if (file) {
+  //     Papa.parse(file, {
+  //       header: true,
+  //       skipEmptyLines: true,
+  //       complete: (result) => {
+  //         const rows = result.data;
+  //         const seen = new Set();
+  //         const dupes = [];
 
-          rows.forEach((row, i) => {
-            const email = row.email?.trim().toLowerCase();
-            const key = `${email}-${row.class}-${row.subject}`;
+  //         rows.forEach((row, i) => {
+  //           const email = row.email?.trim().toLowerCase();
+  //           const key = `${email}-${row.class}-${row.subject}`;
 
-            if (seen.has(key)) {
-              dupes.push({ ...row, rowNumber: i + 2 });
-            }
-            seen.add(key);
-          });
+  //           if (seen.has(key)) {
+  //             dupes.push({ ...row, rowNumber: i + 2 });
+  //           }
+  //           seen.add(key);
+  //         });
 
-          setCsvPreview(rows);
-          setDuplicates(dupes);
-          setShowPreview(true);
-        },
-      });
-    } else {
-      setCsvPreview([]);
-      setShowPreview(false);
-    }
-  };
+  //         setCsvPreview(rows);
+  //         setDuplicates(dupes);
+  //         setShowPreview(true);
+  //       },
+  //     });
+  //   } else {
+  //     setCsvPreview([]);
+  //     setShowPreview(false);
+  //   }
+  // };
 
-  const handleUploadCSV = async (e) => {
-    e.preventDefault();
-    if (!csvFile || csvPreview.length === 0) {
-      alert("Please select a CSV file.");
-      return;
-    }
+  // const handleUploadCSV = async (e) => {
+  //   e.preventDefault();
+  //   if (!csvFile || csvPreview.length === 0) {
+  //     alert("Please select a CSV file.");
+  //     return;
+  //   }
 
-    setCsvLoading(true);
-    const seen = new Set();
-    let successCount = 0;
-    let errorCount = 0;
+  //   setCsvLoading(true);
+  //   const seen = new Set();
+  //   let successCount = 0;
+  //   let errorCount = 0;
 
-    for (const [i, row] of csvPreview.entries()) {
-      const email = row.email?.trim().toLowerCase();
-      const key = `${email}-${row.class}-${row.subject}`;
+  //   for (const [i, row] of csvPreview.entries()) {
+  //     const email = row.email?.trim().toLowerCase();
+  //     const key = `${email}-${row.class}-${row.subject}`;
 
-      if (seen.has(key)) continue;
-      seen.add(key);
+  //     if (seen.has(key)) continue;
+  //     seen.add(key);
 
-      try {
-        if (row.class) {
-          const classResponse = await fetch(
-            `${process.env.REACT_APP_API_BASE_URL}/api/admin/assign-teacher-class`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ email, className: row.class }),
-            }
-          );
-          const classData = await classResponse.json();
+  //     try {
+  //       if (row.class) {
+  //         const classResponse = await fetch(
+  //           `${process.env.REACT_APP_API_BASE_URL}/api/admin/assign-teacher-class`,
+  //           {
+  //             method: "POST",
+  //             headers: { "Content-Type": "application/json" },
+  //             credentials: "include",
+  //             body: JSON.stringify({ email, className: row.class }),
+  //           }
+  //         );
+  //         const classData = await classResponse.json();
 
-          if (!classResponse.ok) {
-            console.log(classResponse);
-          }
-          if (classData.status === "success") successCount++;
-          else errorCount++;
-        }
+  //         if (!classResponse.ok) {
+  //           console.log(classResponse);
+  //         }
+  //         if (classData.status === "success") successCount++;
+  //         else errorCount++;
+  //       }
 
-        if (row.subject) {
-          const subjectResponse = await fetch(
-            "/api/admin/assign-teacher-subject",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ email, subjectName: row.subject }),
-            }
-          );
-          const subjectData = await subjectResponse.json();
-          if (subjectData.status === "success") successCount++;
-          else errorCount++;
-        }
-      } catch (error) {
-        console.error(error);
-        errorCount++;
-      }
-    }
+  //       if (row.subject) {
+  //         const subjectResponse = await fetch(
+  //           "/api/admin/assign-teacher-subject",
+  //           {
+  //             method: "POST",
+  //             headers: { "Content-Type": "application/json" },
+  //             credentials: "include",
+  //             body: JSON.stringify({ email, subjectName: row.subject }),
+  //           }
+  //         );
+  //         const subjectData = await subjectResponse.json();
+  //         if (subjectData.status === "success") successCount++;
+  //         else errorCount++;
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //       errorCount++;
+  //     }
+  //   }
 
-    setCsvData(csvPreview);
-    alert(`✅ CSV processed! Success: ${successCount}, Errors: ${errorCount}`);
+  //   setCsvData(csvPreview);
+  //   alert(`✅ CSV processed! Success: ${successCount}, Errors: ${errorCount}`);
 
-    setCsvFile(null);
-    setCsvPreview([]);
-    setShowPreview(false);
-    fetchData();
-    setCsvLoading(false);
-  };
+  //   setCsvFile(null);
+  //   setCsvPreview([]);
+  //   setShowPreview(false);
+  //   fetchData();
+  //   setCsvLoading(false);
+  // };
 
   if (loading) {
     return <div className="loading">Loading teachers...</div>;
@@ -439,8 +439,8 @@ function ManageTeachers() {
         </form>
       </div>
 
-      {/* 4️⃣ Upload CSV */}
-      <div className="card_t">
+      {/* 4️⃣ Upload CSV - COMMENTED OUT */}
+      {/* <div className="card_t">
         <h2>📂 Assign Teachers to Classes (CSV)</h2>
         <form onSubmit={handleUploadCSV} className="form">
           <input type="file" accept=".csv" onChange={handleFileSelect} />
@@ -455,7 +455,6 @@ function ManageTeachers() {
           )}
         </form>
 
-        {/* CSV Preview Before Upload */}
         {showPreview && csvPreview.length > 0 && (
           <div className="csv-preview">
             <h3>📋 Preview Data (Review before upload)</h3>
@@ -499,7 +498,6 @@ function ManageTeachers() {
           </div>
         )}
 
-        {/* CSV Results After Upload */}
         {csvData.length > 0 && !showPreview && (
           <div className="csv-preview">
             <h3>📋 Processed Data</h3>
@@ -523,7 +521,7 @@ function ManageTeachers() {
             </table>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
