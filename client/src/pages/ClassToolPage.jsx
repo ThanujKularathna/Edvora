@@ -32,8 +32,8 @@ const ClassToolPage = () => {
   const [createdQuizzes, setCreatedQuizzes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [viewQuizModal, setViewQuizModal] = useState(false); // ✅ For view modal
-  const [selectedQuiz, setSelectedQuiz] = useState(null); // ✅ Selected quiz
+  const [viewQuizModal, setViewQuizModal] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     show: false,
     index: null,
@@ -248,13 +248,13 @@ const ClassToolPage = () => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!event.target.closest('.quiz-dropdown-container')) {
+      if (!event.target.closest(".quiz-dropdown-container")) {
         setOpenDropdown(null);
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   const addQuestion = () => {
@@ -366,10 +366,10 @@ const ClassToolPage = () => {
 
       // Update local state with the new quiz
       // Find the subject name from user's subjects
-      const subjectName = user?.subjects?.find(s => 
-        (s._id || s) === quizSubject
-      )?.name || quizSubject;
-      
+      const subjectName =
+        user?.subjects?.find((s) => (s._id || s) === quizSubject)?.name ||
+        quizSubject;
+
       const newQuiz = {
         quizTitle: result.data.quiz.title,
         questions: result.data.quiz.questions,
@@ -412,7 +412,10 @@ const ClassToolPage = () => {
           <button className="top-btn" onClick={() => setShowQuizModal(true)}>
             Create Quiz
           </button>
-          <button className="top-btn" onClick={() => setShowLessonMaterialModal(true)}>
+          <button
+            className="top-btn"
+            onClick={() => setShowLessonMaterialModal(true)}
+          >
             Upload Material
           </button>
         </div>
@@ -420,7 +423,9 @@ const ClassToolPage = () => {
         <div className="content-section">
           <h3>Videos</h3>
           <div className="section-body">
-            {uploadedVideos.length === 0 && <p>No videos available for this class.</p>}
+            {uploadedVideos.length === 0 && (
+              <p>No videos available for this class.</p>
+            )}
             {uploadedVideos.map((video, idx) => (
               <div key={idx} className="tool-card homework-card">
                 <div className="homework-info">
@@ -428,7 +433,8 @@ const ClassToolPage = () => {
                   <div className="homework-details">
                     {video.subject && (
                       <span className="homework-subject">
-                        Subject: {capitalCase(video.subject.name || video.subject)}
+                        Subject:{" "}
+                        {capitalCase(video.subject.name || video.subject)}
                       </span>
                     )}
                   </div>
@@ -436,7 +442,11 @@ const ClassToolPage = () => {
                 <div className="quiz-dropdown-container">
                   <button
                     className="quiz-dropdown-btn"
-                    onClick={() => setOpenDropdown(openDropdown === `video-${idx}` ? null : `video-${idx}`)}
+                    onClick={() =>
+                      setOpenDropdown(
+                        openDropdown === `video-${idx}` ? null : `video-${idx}`
+                      )
+                    }
                   >
                     Options ▼
                   </button>
@@ -487,8 +497,8 @@ const ClassToolPage = () => {
         />
 
         {/* Lesson Materials Section */}
-        <LessonMaterialsSection 
-          user={user} 
+        <LessonMaterialsSection
+          user={user}
           showUploadButton={false}
           openDropdown={openDropdown}
           setOpenDropdown={setOpenDropdown}
@@ -519,7 +529,9 @@ const ClassToolPage = () => {
                   <div className="quiz-dropdown-container">
                     <button
                       className="quiz-dropdown-btn"
-                      onClick={() => setOpenDropdown(openDropdown === idx ? null : idx)}
+                      onClick={() =>
+                        setOpenDropdown(openDropdown === idx ? null : idx)
+                      }
                     >
                       Options ▼
                     </button>
@@ -569,9 +581,12 @@ const ClassToolPage = () => {
             onUpload={async (video) => {
               // Refetch videos to get populated subject data
               try {
-                const response = await fetch(`/api/v1/videos/class/${className}`, {
-                  credentials: "include",
-                });
+                const response = await fetch(
+                  `/api/v1/videos/class/${className}`,
+                  {
+                    credentials: "include",
+                  }
+                );
                 if (response.ok) {
                   const data = await response.json();
                   setUploadedVideos(data.data || []);
@@ -614,8 +629,6 @@ const ClassToolPage = () => {
             onClose={() => setViewQuizModal(false)}
           />
         )}
-
-
       </div>
 
       {/* Quiz Delete Confirmation Dialog */}

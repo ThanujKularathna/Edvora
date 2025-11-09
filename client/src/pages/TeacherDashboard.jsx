@@ -10,7 +10,7 @@ import { useAuth } from "../contexts/authContext";
 const TeacherDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  console.log('User data:', user);
+  console.log("User data:", user);
 
   // const [assignedClasses, setAssignedClasses] = useState([]);
   // const [teacherName, setTeacherName] = useState("Teacher");
@@ -25,29 +25,6 @@ const TeacherDashboard = () => {
   const handleClassClick = (className) => {
     navigate(`/teacher/class/${className}`);
   };
-
-  // useEffect(() => {
-  //   // Mock teacher data
-  //   const mockClasses = {
-  //     "teacher1@example.com": {
-  //       name: "Mr. Silva",
-  //       classes: [
-  //         "Grade 6-A",
-  //         "Grade 6-B",
-  //         "Grade 6-C",
-  //         "Grade 10-A",
-  //         "Grade 9-C",
-  //       ],
-  //     },
-  //   };
-
-  //   const email =
-  //     localStorage.getItem("teacherEmail") || "teacher1@example.com";
-  //   const teacherData = mockClasses[email] || { name: "Teacher", classes: [] };
-
-  //   // setAssignedClasses(teacherData.classes);
-  //   // setTeacherName(teacherData.name);
-  // }, []);
 
   return (
     <div className="dashboard-container">
