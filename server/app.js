@@ -2,6 +2,8 @@ const path = require('path');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const xss = require('xss-clean');
+const mongoSanitize = require('express-mongo-sanitize');
 const express = require('express');
 
 const userRoutes = require('./routes/userRoutes');
@@ -40,6 +42,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use(cookieParser());
+
+//Data snitization agains NOSQL query injection
+app.use(mongoSanitize());
+
+//data sanitization against XSS
+app.use(xss());
 
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/assignments', assignmentRoutes);
