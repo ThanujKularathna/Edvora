@@ -34,9 +34,7 @@ const Footer = () => {
                 padding: "6px",
               }}
             >
-              <a href="/student-dashboard">
-                <FontAwesomeIcon icon={faGlobe} size="2x" color="#111" />
-              </a>
+              <FontAwesomeIcon icon={faGlobe} size="2x" color="#111" />
             </div>
             <div
               style={{
@@ -45,9 +43,7 @@ const Footer = () => {
                 padding: "6px",
               }}
             >
-              <a href="/student-dashboard">
-                <FontAwesomeIcon icon={faEnvelope} size="2x" color="#111" />
-              </a>
+              <FontAwesomeIcon icon={faEnvelope} size="2x" color="#111" />
             </div>
             <div
               style={{
@@ -56,9 +52,7 @@ const Footer = () => {
                 padding: "6px",
               }}
             >
-              <a href="student-dashboard">
-                <FontAwesomeIcon icon={faPhoneVolume} size="2x" color="#111" />
-              </a>
+              <FontAwesomeIcon icon={faPhoneVolume} size="2x" color="#111" />
             </div>
           </div>
         </div>
@@ -84,18 +78,10 @@ const Footer = () => {
                 marginTop: "10px",
               }}
             >
-              <a href="/student-dashboard">
-                <FontAwesomeIcon icon={faHouse} size="2x" color="#111" />
-              </a>
-              <a href="student-dashboard">
-                <FontAwesomeIcon icon={faUser} size="2x" color="#111" />
-              </a>
-              <a href="student-dashboard">
-                <FontAwesomeIcon icon={faTableColumns} size="2x" color="#111" />
-              </a>
-              <a href="student-dashboard">
-                <FontAwesomeIcon icon={faBell} size="2x" color="#111" />
-              </a>
+              <FontAwesomeIcon icon={faHouse} size="2x" color="#111" />
+              <FontAwesomeIcon icon={faUser} size="2x" color="#111" />
+              <FontAwesomeIcon icon={faTableColumns} size="2x" color="#111" />
+              <FontAwesomeIcon icon={faBell} size="2x" color="#111" />
             </div>
           </div>
         </div>
@@ -118,9 +104,7 @@ const Footer = () => {
                   padding: "6px",
                 }}
               >
-                <a href="student-dashboard">
-                  <FontAwesomeIcon icon={faInstagram} size="2x" color="#111" />
-                </a>
+                <FontAwesomeIcon icon={faInstagram} size="2x" color="#111" />
               </div>
               <div
                 style={{
@@ -129,13 +113,7 @@ const Footer = () => {
                   padding: "6px",
                 }}
               >
-                <a href="student-dashboard">
-                  <FontAwesomeIcon
-                    icon={faCommentDots}
-                    size="2x"
-                    color="#111"
-                  />
-                </a>
+                <FontAwesomeIcon icon={faCommentDots} size="2x" color="#111" />
               </div>
             </div>
           </div>

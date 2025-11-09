@@ -52,8 +52,8 @@ const SubjectPage = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('Subject data:', data);
-          console.log('Assignments:', data.data.assignments);
+          console.log("Subject data:", data);
+          console.log("Assignments:", data.data.assignments);
           setHomeworkAssignments(data.data.assignments);
           setVideoMaterials(data.data.videos);
           setAvailableQuizzes(data.data.quizzes);
@@ -130,13 +130,13 @@ const SubjectPage = () => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!event.target.closest('.homework-dropdown-container')) {
+      if (!event.target.closest(".homework-dropdown-container")) {
         setOpenDropdown(null);
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   const handleDownload = (url) => {
@@ -253,7 +253,7 @@ const SubjectPage = () => {
                 onUpload={null}
                 onDownload={() =>
                   window.open(
-                    `${process.env.REACT_APP_API_BASE_URL}/api/v1/videos/stream/${v._id}`,
+                    `http://localhost:8000/api/v1/videos/stream/${v._id}`,
                     "_blank"
                   )
                 }
@@ -277,9 +277,14 @@ const SubjectPage = () => {
                   <h4>
                     {a.teacher?.name || "Unknown Teacher"} | {a.title}
                   </h4>
-                  <p>Due date: {a.deadline ? new Date(a.deadline).toLocaleDateString() : "No deadline"}</p>
+                  <p>
+                    Due date:{" "}
+                    {a.deadline
+                      ? new Date(a.deadline).toLocaleDateString()
+                      : "No deadline"}
+                  </p>
                   {submissions[a.id || a._id] && (
-                    <p style={{ color: 'green', fontSize: '12px' }}>
+                    <p style={{ color: "green", fontSize: "12px" }}>
                       Submitted: {submissions[a.id || a._id].originalFileName}
                     </p>
                   )}
@@ -288,8 +293,17 @@ const SubjectPage = () => {
                   <button
                     className="homework-dropdown-btn"
                     onClick={() => {
-                      console.log('Assignment:', a.id || a._id, 'Submission:', submissions[a.id || a._id]);
-                      setOpenDropdown(openDropdown === `homework-${i}` ? null : `homework-${i}`);
+                      console.log(
+                        "Assignment:",
+                        a.id || a._id,
+                        "Submission:",
+                        submissions[a.id || a._id]
+                      );
+                      setOpenDropdown(
+                        openDropdown === `homework-${i}`
+                          ? null
+                          : `homework-${i}`
+                      );
                     }}
                   >
                     Options ▼
@@ -313,7 +327,9 @@ const SubjectPage = () => {
                           className="dropdown-item"
                           onClick={() => {
                             window.open(
-                              `http://localhost:8000/api/v1/submissions/download/${submissions[a.id || a._id].fileName}`,
+                              `http://localhost:8000/api/v1/submissions/download/${
+                                submissions[a.id || a._id].fileName
+                              }`,
                               "_blank"
                             );
                             setOpenDropdown(null);
@@ -325,30 +341,41 @@ const SubjectPage = () => {
                         <button
                           className="dropdown-item upload-item"
                           onClick={() => {
-                            const input = document.createElement('input');
-                            input.type = 'file';
-                            input.accept = '.pdf';
+                            const input = document.createElement("input");
+                            input.type = "file";
+                            input.accept = ".pdf";
                             input.onchange = async (e) => {
                               const file = e.target.files[0];
                               if (file) {
                                 const formData = new FormData();
-                                formData.append('pdf', file);
+                                formData.append("pdf", file);
                                 try {
-                                  const response = await fetch(`/api/v1/submissions/assignment/${a.id || a._id}`, {
-                                    method: 'POST',
-                                    credentials: 'include',
-                                    body: formData
-                                  });
+                                  const response = await fetch(
+                                    `/api/v1/submissions/assignment/${
+                                      a.id || a._id
+                                    }`,
+                                    {
+                                      method: "POST",
+                                      credentials: "include",
+                                      body: formData,
+                                    }
+                                  );
                                   if (response.ok) {
                                     const data = await response.json();
-                                    setSubmissions(prev => ({ ...prev, [a.id || a._id]: data.data }));
-                                    alert('Homework submitted successfully!');
+                                    setSubmissions((prev) => ({
+                                      ...prev,
+                                      [a.id || a._id]: data.data,
+                                    }));
+                                    alert("Homework submitted successfully!");
                                   } else {
                                     const error = await response.json();
-                                    alert(error.message || 'Failed to submit homework');
+                                    alert(
+                                      error.message ||
+                                        "Failed to submit homework"
+                                    );
                                   }
                                 } catch (error) {
-                                  alert('Failed to submit homework');
+                                  alert("Failed to submit homework");
                                 }
                               }
                             };
@@ -386,7 +413,9 @@ const SubjectPage = () => {
             availableQuizzes.map((quiz, i) => (
               <div className="assignment-card" key={quiz._id || i}>
                 <div>
-                  <h4><strong>{quiz.title}</strong></h4>
+                  <h4>
+                    <strong>{quiz.title}</strong>
+                  </h4>
                 </div>
                 <div className="homework-dropdown-container">
                   {isQuizSubmitted(quiz) ? (

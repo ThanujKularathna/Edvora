@@ -11,7 +11,7 @@
   background-color: rgba(105, 125, 127, 1);
   padding: 25px;
   width: 100%;
-  max-width: 1300px;
+  /* max-width: 1300px; */
   height: 125px;
   margin-bottom: 30px;
   margin-top: 12px;
@@ -38,7 +38,7 @@
   padding: 15px;
   background-color: #e6f0f0;
   border-radius: 6px;
-  max-width: 1300px;
+  
 }
 
 .assignment-card {
