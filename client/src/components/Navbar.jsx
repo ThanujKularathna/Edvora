@@ -31,7 +31,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <img src="/Edvora.png" alt="Logo" className="logo" />
+        <img src="/edvora-new.png" alt="Logo" className="logo" />
       </div>
 
       <div className="navbar-right">
