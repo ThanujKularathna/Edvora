@@ -54,6 +54,16 @@
 
 .assignment-card:hover {
   background-color: #dce6e6;
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+.assignment-card:has(.homework-dropdown-menu) {
+  transform: none !important;
+}
+
+.assignment-card:has(.homework-dropdown-menu):hover {
+  transform: none !important;
 }
 
 .assignment-card .buttons {
@@ -239,6 +249,7 @@
   right: 40px;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 100;
 }
 
 .homework-dropdown-btn {
@@ -270,7 +281,7 @@
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  z-index: 1000;
+  z-index: 1001;
   min-width: 180px;
 }
 
